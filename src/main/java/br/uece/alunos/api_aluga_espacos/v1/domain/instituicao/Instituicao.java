@@ -1,4 +1,4 @@
-package br.uece.alunos.api_aluga_espacos.v1.domain;
+package br.uece.alunos.api_aluga_espacos.v1.domain.instituicao;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,7 +24,7 @@ public class Instituicao {
     @Column(name = "descricao")
     private String descricao;
 
-    @Column(name = "created_at", updatable = false, insertable=false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")

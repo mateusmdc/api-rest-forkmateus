@@ -1,4 +1,4 @@
-package br.uece.alunos.api_aluga_espacos.v1.domain;
+package br.uece.alunos.api_aluga_espacos.v1.domain.instituicao;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface InstituicaoRepository extends JpaRepository<Instituicao, String> {
     @Query("SELECT i FROM Instituicao i ORDER BY i.nome ASC")
-    Page<Instituicao> findAllInstituicoesOrderedByName(Pageable pageable);
+    Page<Instituicao> findAllOrderedByNome(Pageable pageable);
 
     @Query("SELECT i FROM Instituicao i WHERE LOWER(i.nome) = LOWER(:nome)")
     Instituicao findByNome(String nome);
