@@ -1,4 +1,4 @@
-package br.uece.alunos.api_aluga_espacos.v1.domain.instituicao;
+package br.uece.alunos.api_aluga_espacos.v1.domain.cargo;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -7,14 +7,14 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = "instituicao")
-@Entity(name = "Instituicao")
+@Table(name = "cargo")
+@Entity(name = "Cargo")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Instituicao {
+public class Cargo {
     @Id
     @Column(name = "id", nullable = false, length=36, updatable=false)
     private String id;
