@@ -1,20 +1,23 @@
-package br.uece.alunos.api_aluga_espacos.v1.domain.instituicao;
+package br.uece.alunos.api_aluga_espacos.v1.domain.curso;
 
+import br.uece.alunos.api_aluga_espacos.v1.domain.departamento.Departamento;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = "instituicao")
-@Entity(name = "Instituicao")
+@Table(name = "curso")
+@Entity(name = "Curso")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Instituicao {
+public class Curso {
     @Id
     @Column(name = "id", nullable = false, length=36, updatable=false)
     private String id;
@@ -23,8 +26,11 @@ public class Instituicao {
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "descricao")
-    private String descricao;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "departamento_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private Departamento departamento;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

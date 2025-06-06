@@ -1,6 +1,7 @@
 package br.uece.alunos.api_aluga_espacos.v1.domain.departamento;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ public class Departamento {
     @Column(name = "id", nullable = false, length=36, updatable=false)
     private String id;
 
+    @NotNull
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
