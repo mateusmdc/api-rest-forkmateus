@@ -1,6 +1,7 @@
-package br.uece.alunos.api_aluga_espacos.v1.domain.curso;
+package br.uece.alunos.api_aluga_espacos.v1.domain.usuarioCurso;
 
-import br.uece.alunos.api_aluga_espacos.v1.domain.departamento.Departamento;
+import br.uece.alunos.api_aluga_espacos.v1.domain.curso.Curso;
+import br.uece.alunos.api_aluga_espacos.v1.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -10,27 +11,30 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = "curso")
-@Entity(name = "Curso")
+@Table(name = "usuario_curso")
+@Entity(name = "UsuarioCurso")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Curso {
+public class UsuarioCurso {
+
     @Id
-    @Column(name = "id", nullable = false, length=36, updatable=false)
+    @Column(name = "id", nullable = false, length = 36, updatable = false)
     private String id;
 
     @NotNull
-    @Column(name = "nome", nullable = false, length = 100)
-    private String nome;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Usuario usuario;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "departamento_id", referencedColumnName = "id", nullable = false)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-    private Departamento departamento;
+    @JoinColumn(name = "curso_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Curso curso;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

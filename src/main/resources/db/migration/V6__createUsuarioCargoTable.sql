@@ -1,0 +1,20 @@
+CREATE TABLE usuario_cargo (
+    id VARCHAR(36) PRIMARY KEY,
+    usuario_id VARCHAR(36) REFERENCES usuario(id) ON DELETE CASCADE NOT NULL,
+    cargo_id VARCHAR(36) REFERENCES cargo(id) ON DELETE CASCADE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_set_updated_at
+BEFORE UPDATE ON usuario_cargo
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
