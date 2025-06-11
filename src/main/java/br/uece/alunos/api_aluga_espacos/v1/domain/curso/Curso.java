@@ -39,7 +39,7 @@ public class Curso {
     private LocalDateTime updatedAt;
 
     @PrePersist
-    public void generateId() {
+    public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();

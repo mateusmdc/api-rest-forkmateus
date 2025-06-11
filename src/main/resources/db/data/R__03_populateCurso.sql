@@ -1,4 +1,6 @@
-INSERT INTO dev.curso (id, nome, departamento_id, created_at, updated_at) VALUES
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+INSERT INTO curso (id, nome, departamento_id, created_at, updated_at) VALUES
 (uuid_generate_v4(), 'Medicina', '25ac7d29-1576-419f-8baf-7983cd39f932', NOW(), NOW()),
 (uuid_generate_v4(), 'Ciência da Computação', 'da3d46d7-f131-4bbd-84bd-043df2b7ce35', NOW(), NOW()),
 (uuid_generate_v4(), 'Enfermagem', '47aa992f-4f8e-4b21-a412-e3a221cc99bb', NOW(), NOW()),
