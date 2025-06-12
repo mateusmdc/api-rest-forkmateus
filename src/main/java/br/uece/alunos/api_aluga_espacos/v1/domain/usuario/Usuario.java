@@ -67,6 +67,9 @@ public class Usuario implements UserDetails {
     @Column(name = "token_mail")
     private String tokenMail;
 
+    @Column(name = "refresh_token_enabled")
+    private boolean refreshTokenEnabled = false;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
