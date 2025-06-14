@@ -5,6 +5,7 @@ import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class AuthController {
 
     @PostMapping("/criar")
     @Transactional
-    public ResponseEntity<UsuarioRetornoDTO> criarUsuario(@RequestBody UsuarioDTO data) {
+    public ResponseEntity<UsuarioRetornoDTO> criarUsuario(@RequestBody @Valid UsuarioDTO data) {
         var novoUsuarioDTO = authService.criarUsuario(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuarioDTO);
     }

@@ -4,9 +4,8 @@ import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
-import br.uece.alunos.sisreserva.v1.infra.exceptions.DTOValidationException;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
-import br.uece.alunos.sisreserva.v1.service.InstituicaoService;
+import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,7 @@ public class CriarUsuario {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private InstituicaoService instituicaoService;
+    private EntityHandlerService entityHandlerService;
 
     public UsuarioRetornoDTO criar(UsuarioDTO data) {
         boolean usuarioExiste = usuarioRepository.usuarioExistsByEmail(data.email());
@@ -27,7 +26,7 @@ public class CriarUsuario {
             throw new ValidationException("Email já cadastrado no sistema");
         }
 
-        var instituicao = instituicaoService.obterEntidadePorId(data.instituicaoId());
+        var instituicao = entityHandlerService.obterInstituicaoPorId(data.instituicaoId());
 
         var novoUsuario = new Usuario(data, instituicao);
 
