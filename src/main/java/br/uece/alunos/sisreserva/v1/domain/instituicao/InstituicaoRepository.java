@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InstituicaoRepository extends JpaRepository<Instituicao, String> {
     @Query("SELECT i FROM Instituicao i ORDER BY i.nome ASC")
@@ -19,4 +20,5 @@ public interface InstituicaoRepository extends JpaRepository<Instituicao, String
 
     @Query("SELECT i FROM Instituicao i WHERE i.id IN :ids")
     List<Instituicao> findAllById(List<String> ids);
+
 }
