@@ -31,21 +31,14 @@ public class CriarUsuario {
 
         var novoUsuario = new Usuario(data, instituicao);
 
-        System.out.println("Chamou até aqui, falta a validação que nem em add game list");
-        System.out.println("falta a parte de criação dos usuários cargo");
-        System.out.println("novo usuario");
-        System.out.println(novoUsuario);
-        System.out.println(novoUsuario.getEmail());
-        System.out.println(novoUsuario.getId());
+        String senhaProtegida = bCryptPasswordEncoder.encode(data.senha());
+        novoUsuario.setSenha(senhaProtegida);
 
-        //String senhaProtegida = bCryptPasswordEncoder.encode(data.senha());
-        //novoUsuario.setSenha(senhaProtegida);
+        var usuarioNoBanco = usuarioRepository.save(novoUsuario);
 
-        //var usuarioNoBanco = usuarioRepository.save(novoUsuario);
+        //FALTA AQUI A CHAMADA PARA A CRIAÇÃO DE USUARIO_CARGO
 
-        //return new UsuarioRetornoDTO(usuarioNoBanco);
-
-        return null;
+        return new UsuarioRetornoDTO(usuarioNoBanco);
     }
 
 }
