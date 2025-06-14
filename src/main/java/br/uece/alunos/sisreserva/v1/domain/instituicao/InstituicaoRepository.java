@@ -16,4 +16,7 @@ public interface InstituicaoRepository extends JpaRepository<Instituicao, String
 
     @Query("SELECT i FROM Instituicao i WHERE LOWER(TRIM(i.nome)) IN :nomes")
     List<Instituicao> findAllByNomesIgnoreCaseAndTrimmed(List<String> nomes);
+
+    @Query("SELECT i FROM Instituicao i WHERE i.id IN :ids")
+    List<Instituicao> findAllById(List<String> ids);
 }

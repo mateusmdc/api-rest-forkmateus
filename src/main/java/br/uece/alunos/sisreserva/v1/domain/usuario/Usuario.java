@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.domain.usuario;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
+import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.UsuarioCargo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -79,6 +80,18 @@ public class Usuario implements UserDetails {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UsuarioCargo> usuarioCargos = new ArrayList<>();
+
+    public Usuario(UsuarioDTO data, Instituicao instituicao) {
+        this.nome = data.nome();
+        this.senha = data.senha();
+        this.email = data.email();
+        this.fotoPerfil = data.fotoPerfil();
+        this.matricula = data.matricula();
+        this.telefone = data.telefone();
+        this.instituicao = instituicao;
+        this.refreshTokenEnabled = data.refreshTokenEnabled();
+        this.usuarioCargos = new ArrayList<>();
+    }
 
     public List<String> getRoles() {
         return usuarioCargos.stream()
