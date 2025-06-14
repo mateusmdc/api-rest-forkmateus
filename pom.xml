@@ -6,13 +6,13 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>br.uece.alunos</groupId>
-	<artifactId>api-aluga-espacos</artifactId>
+	<artifactId>sisreserva</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>api-aluga-espacos</name>
-	<description>api para projeto piloto de aluguel de espaços na uece</description>
+	<name>sisreserva</name>
+	<description>api para sistema de reserva de espaços na uece</description>
 	<url/>
 	<licenses>
 		<license/>
