@@ -1,5 +1,8 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario;
 
+import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
+import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
+import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.UsuarioCargo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -8,12 +11,10 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Table(name = "usuario")
 @Entity(name = "Usuario")
@@ -25,7 +26,7 @@ import java.util.UUID;
 public class Usuario implements UserDetails {
 
     @Id
-    @Column(name = "id", nullable = false, length=36, updatable=false)
+    @Column(name = "id", nullable = false, length = 36, updatable = false)
     private String id;
 
     @Column(name = "nome", nullable = false, length = 100)
@@ -76,10 +77,31 @@ public class Usuario implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UsuarioCargo> usuarioCargos = new ArrayList<>();
+
+    public List<String> getRoles() {
+        return usuarioCargos.stream()
+                .map(UsuarioCargo::getCargo)
+                .filter(Objects::nonNull)
+                .map(Cargo::getNome)
+                .distinct()
+                .toList();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        Set<GrantedAuthority> authorities = getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                .collect(Collectors.toSet());
+
+        if (authorities.stream().noneMatch(auth -> auth.getAuthority().equals("ROLE_USER"))) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
+        return authorities;
     }
+
 
     @Override
     public String getPassword() {
