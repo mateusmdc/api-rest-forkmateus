@@ -27,9 +27,6 @@ public class CriarUsuario {
             throw new ValidationException("Email já cadastrado no sistema");
         }
 
-        if (data.instituicaoId().isBlank()) {
-            throw new DTOValidationException("O campo instituição está vazio.");
-        }
         var instituicao = instituicaoService.obterEntidadePorId(data.instituicaoId());
 
         var novoUsuario = new Usuario(data, instituicao);
