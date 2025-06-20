@@ -25,13 +25,13 @@ public class UsuarioCargo {
     private String id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario usuario;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "cargo_id", referencedColumnName = "id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Cargo cargo;
@@ -41,6 +41,11 @@ public class UsuarioCargo {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public UsuarioCargo(Usuario usuario, Cargo cargo) {
+        this.usuario = usuario;
+        this.cargo = cargo;
+    }
 
     @PrePersist
     public void onCreate() {

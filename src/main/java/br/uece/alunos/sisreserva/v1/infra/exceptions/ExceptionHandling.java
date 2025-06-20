@@ -119,6 +119,11 @@ public class ExceptionHandling {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(DTOValidationException.class)
+    public ResponseEntity<String> handleDTOValidationException(ValidationException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity handleException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro inesperado: " + ex.getLocalizedMessage());
