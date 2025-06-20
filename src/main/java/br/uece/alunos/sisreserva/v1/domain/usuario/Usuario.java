@@ -114,6 +114,11 @@ public class Usuario implements UserDetails {
         return authorities;
     }
 
+    public void resetAccessCount() {
+        this.accessFailedCount = 0;
+        this.setLockoutEnabled(false);
+        this.setLockoutEnd(null);
+    }
 
     @Override
     public String getPassword() {
