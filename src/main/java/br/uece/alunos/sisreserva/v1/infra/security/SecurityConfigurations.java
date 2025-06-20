@@ -35,11 +35,11 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/teste/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/oauth/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/infra/verifyjwt/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/infra/ping").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/countries/**").permitAll();
-                    //req.requestMatchers(HttpMethod.DELETE, "/games/**").hasRole("ADMIN");
+                    //req.requestMatchers(HttpMethod.DELETE, "/espacos/**").hasRole("ADMIN");
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilterApplication, UsernamePasswordAuthenticationFilter.class)

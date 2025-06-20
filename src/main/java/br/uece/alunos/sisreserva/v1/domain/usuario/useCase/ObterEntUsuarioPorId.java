@@ -15,4 +15,5 @@ public class ObterEntUsuarioPorId {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Não foi encontrado usuário (entidade) com o ID informado."));
     }
+
 }

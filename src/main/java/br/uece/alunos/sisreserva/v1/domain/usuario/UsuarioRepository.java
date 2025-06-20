@@ -1,7 +1,9 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
@@ -25,9 +27,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
             SELECT u FROM Usuario u WHERE u.id = :id
             """)
     Usuario findByIdToHandle(String id);
-
-    /*
-    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.usuarioCargos uc LEFT JOIN FETCH uc.cargo WHERE u.id = :id")
-    Optional<Usuario> findByIdWithCargos(String id);
-     */
 }

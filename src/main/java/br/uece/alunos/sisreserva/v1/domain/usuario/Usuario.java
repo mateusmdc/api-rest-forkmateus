@@ -90,7 +90,6 @@ public class Usuario implements UserDetails {
         this.telefone = data.telefone();
         this.instituicao = instituicao;
         this.refreshTokenEnabled = data.refreshTokenEnabled();
-        this.usuarioCargos = new ArrayList<>();
     }
 
     public List<String> getRoles() {

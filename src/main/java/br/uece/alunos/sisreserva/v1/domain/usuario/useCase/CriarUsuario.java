@@ -44,13 +44,16 @@ public class CriarUsuario {
 
             if (data.cargosNome() != null && !data.cargosNome().isEmpty()) {
                 var cargaDTO = new CriarCargaUsuarioCargoDTO(usuarioNoBanco.getId(), data.cargosNome());
-                usuarioCargoService.criarEmCargaUsuarioCargo(cargaDTO);
-                // atualiza as relações de cargos após persistência
-                usuarioNoBanco = usuarioRepository.findById(usuarioNoBanco.getId()).orElseThrow();
+                var listaUsuariosCargo = usuarioCargoService.criarEmCargaUsuarioCargo(cargaDTO);
+
+                //apos persistir o usuario, os cargos ainda nao estao carregados em usuario.getUsuarioCargos()
+                //(provavelmente por causa do contexto de persistencia e ausencia de fetch automatico).
+                //para evitar consultas desnecessarias ao banco e garantir que o dto tenha os dados corretos,
+                //utilizo diretamente o retorno da criação da relação que ja traz os cargos vinculados.
+                return new UsuarioRetornoDTO(usuarioNoBanco, listaUsuariosCargo);
             }
 
             return new UsuarioRetornoDTO(usuarioNoBanco);
-
         } catch (Exception e) {
             throw new ValidationException("Erro ao criar usuário: " + e.getMessage());
         }
