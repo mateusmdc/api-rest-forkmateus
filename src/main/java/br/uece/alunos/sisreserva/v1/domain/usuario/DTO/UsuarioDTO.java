@@ -31,6 +31,6 @@ public record UsuarioDTO(
         boolean refreshTokenEnabled,
 
         @NotEmpty(message = "Pelo menos um cargo deve ser informado")
-        List<@NotBlank(message = "ID de cargo não pode estar em branco") String> cargosId
+        List<@NotBlank(message = "Lista de cargos não pode estar em branco") String> cargosNome
 
 ) {}

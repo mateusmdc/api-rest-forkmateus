@@ -1,5 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
+import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
+import br.uece.alunos.sisreserva.v1.domain.cargo.useCase.ObterEntListaCargoPorNome;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituicaoPorId;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituicoesPorId;
@@ -21,6 +23,9 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
     private ObterEntInstituicoesPorId obterEntInstituicoesPorId;
 
     @Autowired
+    private ObterEntListaCargoPorNome obterEntListaCargoPorNome;
+
+    @Autowired
     private ObterEntUsuarioPorId obterEntUsuarioPorId;
 
     public Instituicao obterInstituicaoPorId(String id) {
@@ -33,5 +38,10 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
 
     public Usuario obterUsuarioPorId(String id) {
         return obterEntUsuarioPorId.obterEntidade(id);
+    }
+
+    @Override
+    public List<Cargo> obterEntidadesCargoPorNome(List<String> nomes) {
+        return obterEntListaCargoPorNome.obterEntidadesCargoPorNome(nomes);
     }
 }

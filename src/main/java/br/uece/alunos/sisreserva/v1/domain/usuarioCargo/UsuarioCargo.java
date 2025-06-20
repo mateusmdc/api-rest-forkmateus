@@ -42,6 +42,11 @@ public class UsuarioCargo {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public UsuarioCargo(Usuario usuario, Cargo cargo) {
+        this.usuario = usuario;
+        this.cargo = cargo;
+    }
+
     @PrePersist
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();

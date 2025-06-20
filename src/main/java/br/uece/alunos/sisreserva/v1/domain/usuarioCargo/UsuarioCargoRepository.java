@@ -9,4 +9,11 @@ public interface UsuarioCargoRepository extends JpaRepository<UsuarioCargo, Stri
 
     @Query("SELECT uc FROM UsuarioCargo uc WHERE uc.cargo.id = :cargoId")
     UsuarioCargo findByCargoId(String cargoId);
+
+    @Query("""
+            SELECT CASE WHEN COUNT(uc) > 0 THEN true ELSE false END
+            FROM UsuarioCargo uc
+            WHERE uc.usuario.id = :usuarioId AND uc.cargo.id = :cargoId
+    """)
+    boolean existsByUsuarioIdAndCargoId(String usuarioId, String cargoId);
 }
