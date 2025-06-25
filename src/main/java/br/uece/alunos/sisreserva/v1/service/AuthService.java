@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface AuthService {
     UsuarioRetornoDTO criarUsuario(UsuarioDTO data);
     MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data);
-    UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT);
     AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request);
+    UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT);
+    MessageResponseDTO resetarSenha(UsuarioTrocarSenhaDTO data);
 }

@@ -2,9 +2,9 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
 import br.uece.alunos.sisreserva.v1.domain.cargo.useCase.ObterEntListaCargoPorNome;
-import br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.Instituicao;
-import br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.useCase.ObterEntInstituicaoPorId;
-import br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.useCase.ObterEntInstituicoesPorId;
+import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
+import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituicaoPorId;
+import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituicoesPorId;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.ObterEntUsuarioPorId;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
