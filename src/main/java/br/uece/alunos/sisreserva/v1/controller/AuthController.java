@@ -16,10 +16,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,10 +34,17 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuarioDTO);
     }
 
+    @PostMapping("/esqueci_senha")
+    @Transactional
+    public ResponseEntity esqueciSenha(@RequestBody UsuarioEmailDTO data) {
+        var messageResponseDTO = authService.esqueciMinhaSenha(data);
+        return ResponseEntity.ok(messageResponseDTO);
+    }
+
     @PostMapping("/login")
     @Transactional
-    public ResponseEntity<AccessTokenDTO> performLogin(@RequestBody @Valid UsuarioLoginDTO data, HttpServletResponse response, HttpServletRequest request) {
-        AuthTokensDTO tokensJwt = authService.signIn(data, request);
+    public ResponseEntity<AccessTokenDTO> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data, HttpServletResponse response, HttpServletRequest request) {
+        AuthTokensDTO tokensJwt = authService.login(data, request);
         if (tokensJwt.refreshToken() != null) {
             cookieManager.addRefreshTokenCookie(response, tokensJwt.refreshToken());
         }
@@ -48,10 +52,10 @@ public class AuthController {
         return ResponseEntity.ok(accessTokenDto);
     }
 
-    @PostMapping("/esqueci_senha")
-    @Transactional
-    public ResponseEntity forgotPassword(@RequestBody UsuarioEmailDTO data) {
-        var messageResponseDTO = authService.esqueciMinhaSenha(data);
-        return ResponseEntity.ok(messageResponseDTO);
+    @GetMapping("/usuario/me")
+    public ResponseEntity<UsuarioRetornoDTO> obterUsuarioPorTokenJWT(@RequestHeader("Authorization") String authorizationHeader) {
+        var tokenJWT = authorizationHeader.substring(7);
+        var usuario = authService.obterPorTokenJwt(tokenJWT);
+        return ResponseEntity.ok(usuario);
     }
 }

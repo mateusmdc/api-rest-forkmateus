@@ -31,7 +31,7 @@ public class RealizarLogin {
     private RegisterAuditLog registerAuditLog;
 
     @Transactional
-    public AuthTokensDTO signIn(UsuarioLoginDTO data, HttpServletRequest request) {
+    public AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request) {
         if (data.email().isEmpty() || data.senha().isEmpty()) {
             throw new ValidationException("Email e senha não podem ser vazios.");
         }
