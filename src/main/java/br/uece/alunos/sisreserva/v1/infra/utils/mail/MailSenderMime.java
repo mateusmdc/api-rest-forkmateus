@@ -16,7 +16,7 @@ public class MailSenderMime {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public boolean sendMail(MailDTO data) {
+    public void sendMail(MailDTO data) {
         try {
             var mimeMessage = javaMailSender.createMimeMessage();
             var mimeMessageHelper = new MimeMessageHelper(mimeMessage, false);
@@ -27,8 +27,6 @@ public class MailSenderMime {
             mimeMessageHelper.setText(data.Body());
 
             javaMailSender.send(mimeMessage);
-
-            return true;
         } catch (Exception e) {
             throw new EmailSendingException("Erro ao enviar email", e);
         }

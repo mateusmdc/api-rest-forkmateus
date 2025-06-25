@@ -51,11 +51,7 @@ public class AuthController {
     @PostMapping("/esqueci_senha")
     @Transactional
     public ResponseEntity forgotPassword(@RequestBody UsuarioEmailDTO data) {
-        var status = authService.esqueciMinhaSenha(data);
-        if (status) {
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.badRequest().body("Não foi possível enviar o email.");
-        }
+        var messageResponseDTO = authService.esqueciMinhaSenha(data);
+        return ResponseEntity.ok(messageResponseDTO);
     }
 }

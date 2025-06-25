@@ -4,6 +4,8 @@ import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEmailDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEsqueciSenhaDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.dto.utils.MailDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
+import br.uece.alunos.sisreserva.v1.infra.exceptions.EmailSendingException;
 import br.uece.alunos.sisreserva.v1.infra.utils.mail.*;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 
@@ -21,7 +23,7 @@ public class EsqueciSenha {
     @Autowired
     private MailSenderMime mailSender;
 
-    public boolean esqueciMinhaSenha(UsuarioEmailDTO data) {
+    public MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data) {
         var email = data.email();
         var usuarioExiste = repository.usuarioExistsByEmail(email);
 
@@ -40,6 +42,11 @@ public class EsqueciSenha {
 
         var mailDTO = new MailDTO(subject, email, token);
 
-        return mailSender.sendMail(mailDTO);
+        try {
+            mailSender.sendMail(mailDTO);
+            return new MessageResponseDTO("Sucesso no envio de e-mail com dados para troca de senha.");
+        } catch (Exception e) {
+            throw new EmailSendingException("Erro ao enviar email com os dados para troca de senha.", e);
+        }
     }
 }

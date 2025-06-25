@@ -1,13 +1,11 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEmailDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.*;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.CriarUsuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.EsqueciSenha;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.RealizarLogin;
 import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -35,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean esqueciMinhaSenha(UsuarioEmailDTO data) {
+    public MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data) {
         return esqueciSenha.esqueciMinhaSenha(data);
     }
 }
