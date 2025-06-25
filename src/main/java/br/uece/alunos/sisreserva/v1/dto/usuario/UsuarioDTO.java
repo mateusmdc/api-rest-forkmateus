@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.domain.usuario.DTO;
+package br.uece.alunos.sisreserva.v1.dto.usuario;
 
 import jakarta.validation.constraints.*;
 import java.util.List;

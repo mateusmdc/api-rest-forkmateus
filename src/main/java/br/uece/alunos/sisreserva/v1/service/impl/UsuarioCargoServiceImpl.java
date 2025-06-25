@@ -1,7 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
-import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.DTO.CriarCargaUsuarioCargoDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.DTO.UsuarioCargoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.CriarCargaUsuarioCargoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.UsuarioCargoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.useCase.CriarEmCargaUsuarioCargo;
 import br.uece.alunos.sisreserva.v1.service.UsuarioCargoService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.domain.usuarioCargo.DTO;
+package br.uece.alunos.sisreserva.v1.dto.usuarioCargo;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

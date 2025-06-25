@@ -2,7 +2,7 @@ package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
 import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.LoginStatus;
 import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLog;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioLoginDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
-import br.uece.alunos.sisreserva.v1.infra.security.AuthTokensDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.TokenService;
 
 @Component

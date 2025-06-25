@@ -1,12 +1,12 @@
 package br.uece.alunos.sisreserva.v1.service;
 
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioLoginDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioRetornoDTO;
-import br.uece.alunos.sisreserva.v1.infra.security.AuthTokensDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.*;
+import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface AuthService {
     UsuarioRetornoDTO criarUsuario(UsuarioDTO data);
     AuthTokensDTO signIn(UsuarioLoginDTO data, HttpServletRequest request);
+    MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data);
 }
