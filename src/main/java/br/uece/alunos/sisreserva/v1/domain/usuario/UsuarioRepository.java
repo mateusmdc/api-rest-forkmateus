@@ -1,5 +1,7 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +29,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
             SELECT u FROM Usuario u WHERE u.id = :id
             """)
     Usuario findByIdToHandle(String id);
+
+    @Query("SELECT u FROM Usuario u ORDER BY u.nome ASC")
+    Page<Usuario> findAllUsuariosPageable(Pageable pageable);
 }

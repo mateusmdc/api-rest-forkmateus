@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,10 +59,20 @@ public class AuthController {
         return ResponseEntity.ok(accessTokenDto);
     }
 
-    @GetMapping("/usuario/me")
+    @GetMapping("/usuarios/me")
     public ResponseEntity<UsuarioRetornoDTO> obterUsuarioPorTokenJWT(@RequestHeader("Authorization") String authorizationHeader) {
         var tokenJWT = authorizationHeader.substring(7);
         var usuario = authService.obterPorTokenJwt(tokenJWT);
         return ResponseEntity.ok(usuario);
+    }
+
+    @GetMapping("/usuarios/todos")
+    public ResponseEntity obterTodosUsuariosPaginados ( @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "16") int size,
+                                                        @RequestParam(defaultValue = "nome") String sortField,
+                                                        @RequestParam(defaultValue = "asc") String sortOrder) {
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
+        var usuariosPaginados = authService.obterUsuarios(pageable);
+        return ResponseEntity.ok(usuariosPaginados);
     }
 }

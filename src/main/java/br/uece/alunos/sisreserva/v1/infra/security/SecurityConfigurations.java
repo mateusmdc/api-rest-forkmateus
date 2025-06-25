@@ -38,7 +38,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.GET, "/oauth/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/infra/verifyjwt/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/infra/ping").permitAll();
-                    //req.requestMatchers(HttpMethod.DELETE, "/espacos/**").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.GET, "/auth/usuarios/todos").hasRole("ADMIN");
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilterApplication, UsernamePasswordAuthenticationFilter.class)
