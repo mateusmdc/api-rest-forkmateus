@@ -1,10 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
-import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.ObterUsuarioPorJWT;
+import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.*;
 import br.uece.alunos.sisreserva.v1.dto.usuario.*;
-import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.CriarUsuario;
-import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.EsqueciSenha;
-import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.RealizarLogin;
 import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
@@ -24,6 +21,8 @@ public class AuthServiceImpl implements AuthService {
     private ObterUsuarioPorJWT obterUsuarioPorJWT;
     @Autowired
     private RealizarLogin realizarLogin;
+    @Autowired
+    private TrocarSenha trocarSenha;
 
     @Override
     public UsuarioRetornoDTO criarUsuario(UsuarioDTO data) {
@@ -43,5 +42,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT) {
         return obterUsuarioPorJWT.obterPorTokenJwt(tokenJWT);
+    }
+
+    @Override
+    public MessageResponseDTO resetarSenha(UsuarioTrocarSenhaDTO data) {
+        return trocarSenha.resetarSenha(data);
     }
 }

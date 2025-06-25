@@ -1,11 +1,9 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEmailDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.*;
 import br.uece.alunos.sisreserva.v1.dto.utils.AccessTokenDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import br.uece.alunos.sisreserva.v1.infra.utils.httpCookies.CookieManager;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,8 +34,15 @@ public class AuthController {
 
     @PostMapping("/esqueci_senha")
     @Transactional
-    public ResponseEntity esqueciSenha(@RequestBody UsuarioEmailDTO data) {
+    public ResponseEntity<MessageResponseDTO> esqueciSenha(@RequestBody @Valid UsuarioEmailDTO data) {
         var messageResponseDTO = authService.esqueciMinhaSenha(data);
+        return ResponseEntity.ok(messageResponseDTO);
+    }
+
+    @PostMapping("/trocar_senha")
+    @Transactional
+    public ResponseEntity<MessageResponseDTO> resetPassword(@RequestBody @Valid UsuarioTrocarSenhaDTO data) {
+        var messageResponseDTO = authService.resetarSenha(data);
         return ResponseEntity.ok(messageResponseDTO);
     }
 
