@@ -12,15 +12,15 @@ CREATE TABLE audit_log_login (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE OR REPLACE FUNCTION update_timestamp()
+CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
-   NEW.updated_at = NOW();
-   RETURN NEW;
+    NEW.updated_at := CURRENT_TIMESTAMP;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_audit_log_timestamp
-BEFORE UPDATE ON audit_log
+CREATE TRIGGER trigger_set_updated_at
+BEFORE UPDATE ON audit_log_login
 FOR EACH ROW
-EXECUTE FUNCTION update_timestamp();
+EXECUTE FUNCTION set_updated_at();

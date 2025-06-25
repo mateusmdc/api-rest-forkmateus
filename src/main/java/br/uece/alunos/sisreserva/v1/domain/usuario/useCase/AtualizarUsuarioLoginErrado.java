@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
+import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLog;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
@@ -20,10 +21,7 @@ public class AtualizarUsuarioLoginErrado {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-    /*
-    Autowired
-    private RegisterAuditLog registerAuditLog;
-     */
+
     @Autowired
     private TaskScheduler taskScheduler;
 

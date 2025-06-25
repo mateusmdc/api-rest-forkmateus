@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Table(name = "audit_log_login")
 @Entity(name = "AuditLogLogin")
@@ -49,6 +50,7 @@ public class AuditLogLogin {
 
     @PrePersist
     protected void onCreate() {
+        this.id = UUID.randomUUID().toString().toUpperCase();
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

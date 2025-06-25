@@ -1,5 +1,7 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
+import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.LoginStatus;
+import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLog;
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioLoginDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +16,6 @@ import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.infra.security.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.TokenService;
 
-import java.util.UUID;
-
 @Component
 public class RealizarLogin {
 
@@ -27,10 +27,8 @@ public class RealizarLogin {
     @Autowired
     private AtualizarUsuarioLoginErrado atualizarUsuarioLoginErrado;
 
-    /*
     @Autowired
     private RegisterAuditLog registerAuditLog;
-     */
 
     @Transactional
     public AuthTokensDTO signIn(UsuarioLoginDTO data, HttpServletRequest request) {
@@ -53,15 +51,12 @@ public class RealizarLogin {
                 refreshToken = tokenService.generateRefreshToken(usuarioAutenticado);
             }
 
-            /*
             registerAuditLog.logLogin(
-                    data.login(),
+                    data.email(),
                     request,
-                    LoginStatus.SUCCESS,
-                    request.getHeader("User-Agent"),
-                    UUID.fromString("a05fa936-8640-4474-b5cd-963a36ff5fe6")
+                    LoginStatus.SUCESSO,
+                    request.getHeader("User-Agent")
             );
-             */
 
             return new AuthTokensDTO(accessToken, refreshToken);
         } catch (BadCredentialsException e) {
@@ -74,14 +69,11 @@ public class RealizarLogin {
     private void handleFailedLogin(String email, HttpServletRequest request) {
         atualizarUsuarioLoginErrado.updateFailedLogin(email);
 
-        /*
         registerAuditLog.logLogin(
-                login,
+                email,
                 request,
-                LoginStatus.FAILURE,
-                request.getHeader("User-Agent"),
-                UUID.fromString("a05fa936-8640-4474-b5cd-963a36ff5fe6")
+                LoginStatus.FALHA,
+                request.getHeader("User-Agent")
         );
-         */
     }
 }
