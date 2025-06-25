@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.infra.utils.mail;
+package br.uece.alunos.sisreserva.v1.dto.utils;
 
 public record MailDTO(String subject, String to, String Body) {
 }

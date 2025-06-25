@@ -1,9 +1,9 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
-import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioEsqueciSenhaDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.Instituicao;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEsqueciSenhaDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.UsuarioCargo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

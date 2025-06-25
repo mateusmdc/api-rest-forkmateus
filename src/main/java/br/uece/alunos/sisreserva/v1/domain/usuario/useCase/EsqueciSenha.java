@@ -1,8 +1,9 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioEmailDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioEsqueciSenhaDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEmailDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEsqueciSenhaDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
+import br.uece.alunos.sisreserva.v1.dto.utils.MailDTO;
 import br.uece.alunos.sisreserva.v1.infra.utils.mail.*;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 

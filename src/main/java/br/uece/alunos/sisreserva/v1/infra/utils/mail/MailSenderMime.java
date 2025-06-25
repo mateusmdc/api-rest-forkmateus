@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.infra.utils.mail;
 
+import br.uece.alunos.sisreserva.v1.dto.utils.MailDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.EmailSendingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,7 +1,7 @@
-package br.uece.alunos.sisreserva.v1.domain.usuario.DTO;
+package br.uece.alunos.sisreserva.v1.dto.usuario;
 
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
-import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.DTO.UsuarioCargoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.UsuarioCargoRetornoDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,11 +1,11 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioEmailDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioLoginDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioRetornoDTO;
-import br.uece.alunos.sisreserva.v1.infra.security.AccessTokenDTO;
-import br.uece.alunos.sisreserva.v1.infra.security.AuthTokensDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEmailDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.AccessTokenDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.infra.utils.httpCookies.CookieManager;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;

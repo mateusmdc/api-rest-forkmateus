@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.domain.curso.DTO;
+package br.uece.alunos.sisreserva.v1.dto.curso;
 
 import br.uece.alunos.sisreserva.v1.domain.curso.Curso;
 

@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.domain.instituicao;
+package br.uece.alunos.sisreserva.v1.dto.usuario.instituicao;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

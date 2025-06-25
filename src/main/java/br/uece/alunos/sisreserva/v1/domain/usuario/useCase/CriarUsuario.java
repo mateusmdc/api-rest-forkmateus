@@ -1,10 +1,10 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
-import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.DTO.CriarCargaUsuarioCargoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.CriarCargaUsuarioCargoDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import br.uece.alunos.sisreserva.v1.service.UsuarioCargoService;

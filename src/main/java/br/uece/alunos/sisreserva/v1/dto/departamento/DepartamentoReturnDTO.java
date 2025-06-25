@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.domain.departamento.DTO;
+package br.uece.alunos.sisreserva.v1.dto.departamento;
 
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 

@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.domain.instituicao;
+package br.uece.alunos.sisreserva.v1.dto.usuario.instituicao;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface InstituicaoRepository extends JpaRepository<Instituicao, String> {
     @Query("SELECT i FROM Instituicao i ORDER BY i.nome ASC")
