@@ -1,8 +1,9 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
-import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
-import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.Instituicao;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEsqueciSenhaDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.UsuarioCargo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -114,6 +115,16 @@ public class Usuario implements UserDetails {
         return authorities;
     }
 
+    public void resetAccessCount() {
+        this.accessFailedCount = 0;
+        this.setLockoutEnabled(false);
+        this.setLockoutEnd(null);
+    }
+
+    public void esqueciSenha(UsuarioEsqueciSenhaDTO data) {
+        this.tokenMail = data.tokenMail();
+        this.tokenExpiration = data.tokenExpiration();
+    }
 
     @Override
     public String getPassword() {
