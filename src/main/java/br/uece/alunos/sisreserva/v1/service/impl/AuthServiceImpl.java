@@ -1,9 +1,11 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
+import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioEmailDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioLoginDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.CriarUsuario;
+import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.EsqueciSenha;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.RealizarLogin;
 import br.uece.alunos.sisreserva.v1.infra.security.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
@@ -18,6 +20,8 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private CriarUsuario criarUsuario;
     @Autowired
+    private EsqueciSenha esqueciSenha;
+    @Autowired
     private RealizarLogin realizarLogin;
 
     @Override
@@ -28,5 +32,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthTokensDTO signIn(UsuarioLoginDTO data, HttpServletRequest request) {
         return realizarLogin.signIn(data, request);
+    }
+
+    @Override
+    public boolean esqueciMinhaSenha(UsuarioEmailDTO data) {
+        return esqueciSenha.esqueciMinhaSenha(data);
     }
 }

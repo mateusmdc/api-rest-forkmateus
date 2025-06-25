@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioDTO;
+import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioEmailDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioLoginDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.DTO.UsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.AccessTokenDTO;
@@ -45,5 +46,16 @@ public class AuthController {
         }
         AccessTokenDTO accessTokenDto = new AccessTokenDTO(tokensJwt.accessToken());
         return ResponseEntity.ok(accessTokenDto);
+    }
+
+    @PostMapping("/esqueci_senha")
+    @Transactional
+    public ResponseEntity forgotPassword(@RequestBody UsuarioEmailDTO data) {
+        var status = authService.esqueciMinhaSenha(data);
+        if (status) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().body("Não foi possível enviar o email.");
+        }
     }
 }
