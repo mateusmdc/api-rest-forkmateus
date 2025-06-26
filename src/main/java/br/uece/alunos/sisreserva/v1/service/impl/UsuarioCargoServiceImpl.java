@@ -13,15 +13,18 @@ public class UsuarioCargoServiceImpl implements UsuarioCargoService {
     @Autowired
     private ApagarUsuarioCargo apagarUsuarioCargo;
     @Autowired
+    private AtualizarUsuarioCargos atualizarUsuarioCargos;
+    @Autowired
     private CriarUsuarioCargo criarUsuarioCargo;
     @Autowired
     private CriarEmCargaUsuarioCargo criarEmCargaUsuarioCargo;
     @Autowired
     private ObterCargosUsuarioId obterCargosUsuarioId;
 
+
     @Override
-    public void remover(ApagarUsuarioCargoDTO data) {
-        apagarUsuarioCargo.remover(data);
+    public void atualizarCargos(List<String> cargosId, String idUsuario) {
+        atualizarUsuarioCargos.atualizarCargos(cargosId, idUsuario);
     }
 
     @Override
@@ -38,4 +41,10 @@ public class UsuarioCargoServiceImpl implements UsuarioCargoService {
     public List<UsuarioCargoRetornoDTO> obterCargosPorIdUsuario(String idUsuario) {
         return obterCargosUsuarioId.obterCargosPorIdUsuario(idUsuario);
     }
+
+    @Override
+    public void remover(ApagarUsuarioCargoDTO data) {
+        apagarUsuarioCargo.remover(data);
+    }
+
 }

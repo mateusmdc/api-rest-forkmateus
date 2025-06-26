@@ -7,6 +7,7 @@ import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class CriarUsuarioCargo {
@@ -15,6 +16,7 @@ public class CriarUsuarioCargo {
     @Autowired
     private EntityHandlerService entityHandlerService;
 
+    @Transactional
     public UsuarioCargoRetornoDTO criar(CriarUsuarioCargoDTO data) {
         try {
             var usuario = entityHandlerService.obterUsuarioPorId(data.usuarioId());
@@ -31,6 +33,9 @@ public class CriarUsuarioCargo {
 
             var novo = new UsuarioCargo(usuario, cargo);
             var salvo = usuarioCargoRepository.save(novo);
+
+            //garante a sincronicidade para que o usuário já fique com o cargo atualizado nessa transação
+            usuario.getUsuarioCargos().add(salvo);
 
             return new UsuarioCargoRetornoDTO(salvo);
         } catch (Exception e) {

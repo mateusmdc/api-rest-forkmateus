@@ -4,17 +4,12 @@ import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.dto.usuario.AtualizarUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.UsuarioCargoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.infra.security.TokenService;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import br.uece.alunos.sisreserva.v1.service.UsuarioCargoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class AtualizarUsuario {
@@ -38,19 +33,16 @@ public class AtualizarUsuario {
                 ? entityHandlerService.obterInstituicaoPorId(data.instituicaoId())
                 : null;
 
-
-
         usuarioNoBanco.atualizarUsuario(data,instituicao);
 
         var usuarioAtualizado = usuarioRepository.save(usuarioNoBanco);
 
         if (!data.cargosId().isEmpty()) {
-            //atualizarCargos(data.cargosId(), usuarioAtualizado.getId());
+            usuarioCargoService.atualizarCargos(data.cargosId(), usuarioAtualizado.getId());
         }
+
+        usuarioAtualizado = usuarioRepository.findByIdToHandle(idUsuario);
 
         return new UsuarioRetornoDTO(usuarioAtualizado);
     }
-    //AQUI TEM A QUESTÃO DE ATUALIZAR (APAGAR E CRIAR) OS USUARIO_CARGO, ALÉM DOS DADOS NORMAIS
-
-
 }

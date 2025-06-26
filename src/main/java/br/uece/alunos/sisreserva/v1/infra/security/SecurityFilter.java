@@ -41,7 +41,6 @@ public class SecurityFilter extends OncePerRequestFilter {
             String subject = tokenService.getSubject(refreshToken);
             Usuario usuario = getUsuarioFromCacheOrDb(subject);
             if (usuario != null && usuario.isRefreshTokenEnabled()) {
-                System.out.println("acertou, o token tá sendo alterado");
                 String newAccessToken = tokenService.generateAccessToken(usuario);
 
                 response.setHeader("Authorization", "Bearer " + newAccessToken);

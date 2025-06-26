@@ -30,7 +30,6 @@ public interface UsuarioCargoRepository extends JpaRepository<UsuarioCargo, Stri
 
     @Query("""
             SELECT uc FROM UsuarioCargo uc
-            FROM UsuarioCargo uc
             WHERE uc.usuario.id = :usuarioId AND uc.cargo.id = :cargoId
     """)
     Optional<UsuarioCargo> findByUsuarioIdAndCargoId(String usuarioId, String cargoId);
