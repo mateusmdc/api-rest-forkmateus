@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class AuthServiceImpl implements AuthService {
     @Autowired
+    private AtualizarUsuario atualizarUsuario;
+    @Autowired
     private CriarUsuario criarUsuario;
     @Autowired
     private EsqueciSenha esqueciSenha;
@@ -29,6 +31,11 @@ public class AuthServiceImpl implements AuthService {
     private RealizarLogin realizarLogin;
     @Autowired
     private TrocarSenha trocarSenha;
+
+    @Override
+    public UsuarioRetornoDTO atualizarUsuario(AtualizarUsuarioDTO data, String idUsuario) {
+        return atualizarUsuario.atualizarUsuario(data, idUsuario);
+    }
 
     @Override
     public UsuarioRetornoDTO criarUsuario(UsuarioDTO data) {

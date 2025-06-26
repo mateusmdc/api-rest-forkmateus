@@ -9,8 +9,7 @@ import java.util.List;
 public interface EntityHandlerService {
     Instituicao obterInstituicaoPorId(String id);
     List<Instituicao> obterInstituicoesPorListaDeId(List<String> ids);
-
     Usuario obterUsuarioPorId(String id);
-
     List<Cargo> obterEntidadesCargoPorNome(List<String> nomes);
+    Cargo obterCargoPorId(String id);
 }
