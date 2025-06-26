@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class AuthController {
     @Autowired
     private CookieManager cookieManager;
 
-    @PostMapping("/create")
+    @PostMapping("/signup")
     @Transactional
     public ResponseEntity<UsuarioRetornoDTO> criarUsuario(@RequestBody @Valid UsuarioDTO data) {
         var novoUsuarioDTO = authService.criarUsuario(data);
@@ -59,25 +60,31 @@ public class AuthController {
         return ResponseEntity.ok(accessTokenDto);
     }
 
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<UsuarioRetornoDTO> atualizarUsuario(@PathVariable String userId, @RequestBody AtualizarUsuarioDTO data) {
+        var usuarioAtualizado = authService.atualizarUsuario(data,userId);
+        return ResponseEntity.ok(usuarioAtualizado);
+    }
+
     @GetMapping("/users/me")
     public ResponseEntity<UsuarioRetornoDTO> obterUsuarioPorTokenJWT(@RequestHeader("Authorization") String authorizationHeader) {
-        var tokenJWT = authorizationHeader.substring(7);
+        var tokenJWT = authorizationHeader.replaceFirst("(?i)^Bearer\\s+", "").trim();
         var usuario = authService.obterPorTokenJwt(tokenJWT);
         return ResponseEntity.ok(usuario);
     }
 
     @GetMapping("/users/all")
-    public ResponseEntity obterTodosUsuariosPaginados ( @RequestParam(defaultValue = "0") int page,
-                                                        @RequestParam(defaultValue = "16") int size,
-                                                        @RequestParam(defaultValue = "nome") String sortField,
-                                                        @RequestParam(defaultValue = "asc") String sortOrder) {
+    public ResponseEntity<Page<UsuarioRetornoDTO>> obterTodosUsuariosPaginados (@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "16") int size,
+                                                             @RequestParam(defaultValue = "nome") String sortField,
+                                                             @RequestParam(defaultValue = "asc") String sortOrder) {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
         var usuariosPaginados = authService.obterUsuarios(pageable);
         return ResponseEntity.ok(usuariosPaginados);
     }
 
     @GetMapping("/users/role/{roleId}")
-    public ResponseEntity obterUsuariosPorCargo (       @RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<UsuarioRetornoDTO>> obterUsuariosPorCargo (       @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "16") int size,
                                                         @RequestParam(defaultValue = "nome") String sortField,
                                                         @RequestParam(defaultValue = "asc") String sortOrder,

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface UsuarioCargoService {
     List<UsuarioCargoRetornoDTO> criarEmCargaUsuarioCargo(CriarCargaUsuarioCargoDTO data);
+    List<UsuarioCargoRetornoDTO> obterCargosPorIdUsuario(String idUsuario);
 }

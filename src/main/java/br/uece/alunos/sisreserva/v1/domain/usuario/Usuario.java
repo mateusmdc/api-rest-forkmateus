@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.domain.usuario;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
+import br.uece.alunos.sisreserva.v1.dto.usuario.AtualizarUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEsqueciSenhaDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.UsuarioCargo;
@@ -113,6 +114,32 @@ public class Usuario implements UserDetails {
         }
 
         return authorities;
+    }
+
+    public void atualizarUsuario(AtualizarUsuarioDTO data, Instituicao instituicao) {
+        if (data.nome() != null && !data.nome().isBlank()) {
+            this.nome = data.nome();
+        }
+
+        if (data.fotoPerfil() != null && !data.fotoPerfil().isBlank()) {
+            this.fotoPerfil = data.fotoPerfil();
+        }
+
+        if (data.matricula() != null && data.matricula() > 0) {
+            this.matricula = data.matricula();
+        }
+
+        if (data.telefone() != null && !data.telefone().isBlank()) {
+            this.telefone = data.telefone();
+        }
+
+        if (instituicao != null) {
+            this.instituicao = instituicao;
+        }
+
+        if (data.refreshTokenEnabled() != null) {
+            this.refreshTokenEnabled = data.refreshTokenEnabled();
+        }
     }
 
     public void resetAccessCount() {
