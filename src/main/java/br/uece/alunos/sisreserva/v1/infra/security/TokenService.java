@@ -30,10 +30,10 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(accessSecret);
 
             String token = JWT.create()
-                    .withIssuer("aluguelsalas-api")
+                    .withIssuer("sisreserva-api")
                     .withSubject(usuario.getEmail())
                     .withClaim("id", usuario.getId())
-                    //.withClaim("role", user.getRole().toString())  - > aqui ainda vou ver a questão dos cargos
+                    .withClaim("role", usuario.getRoles().toString())
                     .withIssuedAt(Instant.now())
                     .withExpiresAt(dateExpires())
                     .sign(algorithm);
@@ -48,7 +48,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(refreshSecret);
             return JWT.create()
-                    .withIssuer("aluguelsalas-api")
+                    .withIssuer("sisreserva-api")
                     .withSubject(usuario.getEmail())
                     .withClaim("id", usuario.getId())
                     .withClaim("refreshId", UUID.randomUUID().toString())
@@ -64,7 +64,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(accessSecret);
             JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("aluguelsalas-api")
+                    .withIssuer("sisreserva-api")
                     .build();
 
             DecodedJWT jwt = verifier.verify(tokenJwt);
@@ -79,7 +79,7 @@ public class TokenService {
     public boolean isRefreshTokenValid(String refreshToken) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(refreshSecret);
-            JWTVerifier verifier = JWT.require(algorithm).withIssuer("aluguelsalas-api").build();
+            JWTVerifier verifier = JWT.require(algorithm).withIssuer("sisreserva-api").build();
             DecodedJWT jwt = verifier.verify(refreshToken);
 
             return true;
@@ -92,7 +92,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(accessSecret);
             String emailUsuarioLogado = JWT.require(algorithm)
-                    .withIssuer("aluguelsalas-api")
+                    .withIssuer("sisreserva-api")
                     .build()
                     .verify(tokenJwt)
                     .getSubject();
@@ -107,7 +107,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(accessSecret);
             String usuarioLogadoId = String.valueOf(JWT.require(algorithm)
-                    .withIssuer("aluguelsalas-api")
+                    .withIssuer("sisreserva-api")
                     .build()
                     .verify(tokenJwt)
                     .getClaim("id"));

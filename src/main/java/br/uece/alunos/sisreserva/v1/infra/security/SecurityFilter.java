@@ -45,7 +45,6 @@ public class SecurityFilter extends OncePerRequestFilter {
 
                 response.setHeader("Authorization", "Bearer " + newAccessToken);
 
-
                 authenticateUsuario(subject);
             }
         }

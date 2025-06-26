@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.dto.usuario.instituicao;
+package br.uece.alunos.sisreserva.v1.domain.instituicao;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

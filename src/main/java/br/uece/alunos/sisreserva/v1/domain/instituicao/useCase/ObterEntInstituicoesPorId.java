@@ -1,7 +1,7 @@
-package br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.useCase;
+package br.uece.alunos.sisreserva.v1.domain.instituicao.useCase;
 
-import br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.Instituicao;
-import br.uece.alunos.sisreserva.v1.dto.usuario.instituicao.InstituicaoRepository;
+import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
+import br.uece.alunos.sisreserva.v1.domain.instituicao.InstituicaoRepository;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -40,7 +40,26 @@ public class EsqueciSenha {
 
         var subject = "Esqueci Minha Senha - Sis Reserva";
 
-        var mailDTO = new MailDTO(subject, email, token);
+        var body = """
+                Olá %s,
+
+                Recebemos uma solicitação para redefinir a senha da sua conta no SisReserva.
+        
+                Para continuar com a troca de senha, utilize o token abaixo na aplicação:
+        
+                Token de redefinição: %s
+        
+                Este token é válido por 1 hora e deve ser utilizado apenas na plataforma oficial. 
+                Por motivos de segurança, não compartilhe este código com ninguém. 
+                A equipe do SisReserva nunca solicitará este token por e-mail ou outros meios de contato.
+        
+                Caso você não tenha solicitado essa troca de senha, ignore este e-mail.
+        
+                Atenciosamente,
+                Equipe SisReserva
+                """.formatted(email, token);
+
+        var mailDTO = new MailDTO(subject, email, body);
 
         try {
             mailSender.sendMail(mailDTO);
