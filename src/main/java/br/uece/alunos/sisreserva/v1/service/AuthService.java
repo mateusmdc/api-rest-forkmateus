@@ -13,5 +13,6 @@ public interface AuthService {
     AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request);
     UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT);
     Page<UsuarioRetornoDTO> obterUsuarios(Pageable pageable);
+    Page<UsuarioRetornoDTO> obterUsuariosPorCargo(String cargoId, Pageable pageable);
     MessageResponseDTO resetarSenha(UsuarioTrocarSenhaDTO data);
 }

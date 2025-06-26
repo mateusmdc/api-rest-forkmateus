@@ -22,6 +22,8 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private ObterUsuarioPorJWT obterUsuarioPorJWT;
     @Autowired
+    private ObterUsuariosPorCargoId obterUsuariosPorCargoId;
+    @Autowired
     private ObterUsuariosPaginado obterUsuariosPaginado;
     @Autowired
     private RealizarLogin realizarLogin;
@@ -51,6 +53,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Page<UsuarioRetornoDTO> obterUsuarios(Pageable pageable) {
         return obterUsuariosPaginado.obterUsuarios(pageable);
+    }
+
+    @Override
+    public Page<UsuarioRetornoDTO> obterUsuariosPorCargo(String cargoId, Pageable pageable) {
+        return obterUsuariosPorCargoId.obterUsuariosPorCargo(cargoId, pageable);
     }
 
     @Override

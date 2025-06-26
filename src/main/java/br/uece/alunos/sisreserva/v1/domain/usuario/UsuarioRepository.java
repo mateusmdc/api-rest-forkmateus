@@ -30,6 +30,15 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
             """)
     Usuario findByIdToHandle(String id);
 
-    @Query("SELECT u FROM Usuario u ORDER BY u.nome ASC")
+    @Query("SELECT u FROM Usuario u")
     Page<Usuario> findAllUsuariosPageable(Pageable pageable);
+
+
+    @Query("""
+    SELECT u FROM Usuario u
+    JOIN UsuarioCargo uc ON uc.usuario = u
+    JOIN Cargo c ON uc.cargo = c
+    WHERE c.id = :cargoId
+    """)
+    Page<Usuario> findAllUsuariosByCargoId(String cargoId, Pageable pageable);
 }

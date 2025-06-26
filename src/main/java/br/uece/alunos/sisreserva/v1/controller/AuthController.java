@@ -75,4 +75,15 @@ public class AuthController {
         var usuariosPaginados = authService.obterUsuarios(pageable);
         return ResponseEntity.ok(usuariosPaginados);
     }
+
+    @GetMapping("/users/role/{roleId}")
+    public ResponseEntity obterUsuariosPorCargo (       @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "16") int size,
+                                                        @RequestParam(defaultValue = "nome") String sortField,
+                                                        @RequestParam(defaultValue = "asc") String sortOrder,
+                                                        @PathVariable String roleId) {
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
+        var usuariosPorCargo = authService.obterUsuariosPorCargo(roleId, pageable);
+        return ResponseEntity.ok(usuariosPorCargo);
+    }
 }
