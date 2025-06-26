@@ -1,7 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.usuarioCargo.useCase;
 
-import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.ObterUsuariosPorCargoId;
-import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.UsuarioCargoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.*;
 import br.uece.alunos.sisreserva.v1.service.UsuarioCargoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,19 +21,15 @@ public class AtualizarCargos {
                 .map(UsuarioCargoRetornoDTO::cargoId)
                 .collect(Collectors.toSet());
 
-        // Verifica o que já existe
         for (String cargoId : cargosId) {
             if (!cargosIdNoBanco.contains(cargoId)) {
-                System.out.println("Tem que criar: " + cargoId);
-
+                var novoUsuarioCargo = usuarioCargoService.criar(new CriarUsuarioCargoDTO(idUsuario, cargoId));
             }
         }
 
-        // Verifica o que deve ser removido
         for (String cargoIdNoBanco : cargosIdNoBanco) {
             if (!cargosId.contains(cargoIdNoBanco)) {
-                System.out.println("Tem que apagar: " + cargoIdNoBanco);
-
+                usuarioCargoService.remover(new ApagarUsuarioCargoDTO(idUsuario, cargoIdNoBanco));
             }
         }
     }

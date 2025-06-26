@@ -11,11 +11,18 @@ import java.util.List;
 @Service
 public class UsuarioCargoServiceImpl implements UsuarioCargoService {
     @Autowired
+    private ApagarUsuarioCargo apagarUsuarioCargo;
+    @Autowired
     private CriarUsuarioCargo criarUsuarioCargo;
     @Autowired
     private CriarEmCargaUsuarioCargo criarEmCargaUsuarioCargo;
     @Autowired
     private ObterCargosUsuarioId obterCargosUsuarioId;
+
+    @Override
+    public void remover(ApagarUsuarioCargoDTO data) {
+        apagarUsuarioCargo.remover(data);
+    }
 
     @Override
     public UsuarioCargoRetornoDTO criar(CriarUsuarioCargoDTO data) {

@@ -26,4 +26,12 @@ public interface UsuarioCargoRepository extends JpaRepository<UsuarioCargo, Stri
             WHERE uc.usuario.id = :usuarioId AND uc.cargo.id = :cargoId
     """)
     boolean existsByUsuarioIdAndCargoId(String usuarioId, String cargoId);
+
+
+    @Query("""
+            SELECT uc FROM UsuarioCargo uc
+            FROM UsuarioCargo uc
+            WHERE uc.usuario.id = :usuarioId AND uc.cargo.id = :cargoId
+    """)
+    Optional<UsuarioCargo> findByUsuarioIdAndCargoId(String usuarioId, String cargoId);
 }
