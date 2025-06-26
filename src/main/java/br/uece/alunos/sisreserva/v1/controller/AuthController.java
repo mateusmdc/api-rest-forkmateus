@@ -27,28 +27,28 @@ public class AuthController {
     @Autowired
     private CookieManager cookieManager;
 
-    @PostMapping("/criar")
+    @PostMapping("/create")
     @Transactional
     public ResponseEntity<UsuarioRetornoDTO> criarUsuario(@RequestBody @Valid UsuarioDTO data) {
         var novoUsuarioDTO = authService.criarUsuario(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuarioDTO);
     }
 
-    @PostMapping("/esqueci_senha")
+    @PostMapping("/password/forgot")
     @Transactional
     public ResponseEntity<MessageResponseDTO> esqueciSenha(@RequestBody @Valid UsuarioEmailDTO data) {
         var messageResponseDTO = authService.esqueciMinhaSenha(data);
         return ResponseEntity.ok(messageResponseDTO);
     }
 
-    @PostMapping("/trocar_senha")
+    @PostMapping("/password/reset")
     @Transactional
     public ResponseEntity<MessageResponseDTO> resetPassword(@RequestBody @Valid UsuarioTrocarSenhaDTO data) {
         var messageResponseDTO = authService.resetarSenha(data);
         return ResponseEntity.ok(messageResponseDTO);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/signin")
     @Transactional
     public ResponseEntity<AccessTokenDTO> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data, HttpServletResponse response, HttpServletRequest request) {
         AuthTokensDTO tokensJwt = authService.login(data, request);
@@ -59,14 +59,14 @@ public class AuthController {
         return ResponseEntity.ok(accessTokenDto);
     }
 
-    @GetMapping("/usuarios/me")
+    @GetMapping("/users/me")
     public ResponseEntity<UsuarioRetornoDTO> obterUsuarioPorTokenJWT(@RequestHeader("Authorization") String authorizationHeader) {
         var tokenJWT = authorizationHeader.substring(7);
         var usuario = authService.obterPorTokenJwt(tokenJWT);
         return ResponseEntity.ok(usuario);
     }
 
-    @GetMapping("/usuarios/todos")
+    @GetMapping("/users/all")
     public ResponseEntity obterTodosUsuariosPaginados ( @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "16") int size,
                                                         @RequestParam(defaultValue = "nome") String sortField,
