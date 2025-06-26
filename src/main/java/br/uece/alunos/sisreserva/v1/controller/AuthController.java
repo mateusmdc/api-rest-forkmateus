@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,28 +27,28 @@ public class AuthController {
     @Autowired
     private CookieManager cookieManager;
 
-    @PostMapping("/criar")
+    @PostMapping("/create")
     @Transactional
     public ResponseEntity<UsuarioRetornoDTO> criarUsuario(@RequestBody @Valid UsuarioDTO data) {
         var novoUsuarioDTO = authService.criarUsuario(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuarioDTO);
     }
 
-    @PostMapping("/esqueci_senha")
+    @PostMapping("/password/forgot")
     @Transactional
     public ResponseEntity<MessageResponseDTO> esqueciSenha(@RequestBody @Valid UsuarioEmailDTO data) {
         var messageResponseDTO = authService.esqueciMinhaSenha(data);
         return ResponseEntity.ok(messageResponseDTO);
     }
 
-    @PostMapping("/trocar_senha")
+    @PostMapping("/password/reset")
     @Transactional
     public ResponseEntity<MessageResponseDTO> resetPassword(@RequestBody @Valid UsuarioTrocarSenhaDTO data) {
         var messageResponseDTO = authService.resetarSenha(data);
         return ResponseEntity.ok(messageResponseDTO);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/signin")
     @Transactional
     public ResponseEntity<AccessTokenDTO> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data, HttpServletResponse response, HttpServletRequest request) {
         AuthTokensDTO tokensJwt = authService.login(data, request);
@@ -57,10 +59,31 @@ public class AuthController {
         return ResponseEntity.ok(accessTokenDto);
     }
 
-    @GetMapping("/usuario/me")
+    @GetMapping("/users/me")
     public ResponseEntity<UsuarioRetornoDTO> obterUsuarioPorTokenJWT(@RequestHeader("Authorization") String authorizationHeader) {
         var tokenJWT = authorizationHeader.substring(7);
         var usuario = authService.obterPorTokenJwt(tokenJWT);
         return ResponseEntity.ok(usuario);
+    }
+
+    @GetMapping("/users/all")
+    public ResponseEntity obterTodosUsuariosPaginados ( @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "16") int size,
+                                                        @RequestParam(defaultValue = "nome") String sortField,
+                                                        @RequestParam(defaultValue = "asc") String sortOrder) {
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
+        var usuariosPaginados = authService.obterUsuarios(pageable);
+        return ResponseEntity.ok(usuariosPaginados);
+    }
+
+    @GetMapping("/users/role/{roleId}")
+    public ResponseEntity obterUsuariosPorCargo (       @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "16") int size,
+                                                        @RequestParam(defaultValue = "nome") String sortField,
+                                                        @RequestParam(defaultValue = "asc") String sortOrder,
+                                                        @PathVariable String roleId) {
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
+        var usuariosPorCargo = authService.obterUsuariosPorCargo(roleId, pageable);
+        return ResponseEntity.ok(usuariosPorCargo);
     }
 }

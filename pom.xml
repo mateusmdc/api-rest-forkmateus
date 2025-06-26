@@ -1,35 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.0</version>
 		<relativePath/>
 	</parent>
+
 	<groupId>br.uece.alunos</groupId>
 	<artifactId>sisreserva</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sisreserva</name>
 	<description>api para sistema de reserva de espaços na uece</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+
 	<properties>
 		<java.version>21</java.version>
 	</properties>
+
 	<dependencies>
+		<!-- Seus dependencies existentes -->
+		<!-- (sem alterações aqui para manter clareza) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -66,7 +61,6 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-database-postgresql</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -93,25 +87,29 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.auth0</groupId>
 			<artifactId>java-jwt</artifactId>
 			<version>4.4.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.8.9</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.github.vladimir-bukhtoyarov</groupId>
 			<artifactId>bucket4j-core</artifactId>
 			<version>7.6.0</version>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>
@@ -127,6 +125,7 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -139,6 +138,52 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>se.bjurr.gitchangelog</groupId>
+				<artifactId>git-changelog-maven-plugin</artifactId>
+				<version>1.74</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>git-changelog</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<templateContent>
+						<![CDATA[
+# 📜 Changelog
+
+Gerado automaticamente em {{date}} a partir do histórico de commits Git.
+
+{{#tags}}
+## 🏷 {{name}}
+
+{{#commits}}
+- {{messageTitle}} _({{authorName}}, {{commitTime}})_
+{{/commits}}
+
+{{/tags}}
+
+{{^tags}}
+{{#commits}}
+- {{messageTitle}} _({{authorName}}, {{commitTime}})_
+{{/commits}}
+{{/tags}}
+						]]>
+					</templateContent>
+					<file>CHANGELOG.md</file>
+					<fromRef> </fromRef>
+					<toRef>HEAD</toRef>
+					<ignoreCommitsIfMessageMatches>
+						^Merge.*|\[maven-release-plugin\].*
+					</ignoreCommitsIfMessageMatches>
+					<removeIssueFromMessage>true</removeIssueFromMessage>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 

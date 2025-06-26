@@ -8,6 +8,8 @@ import br.uece.alunos.sisreserva.v1.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +21,10 @@ public class AuthServiceImpl implements AuthService {
     private EsqueciSenha esqueciSenha;
     @Autowired
     private ObterUsuarioPorJWT obterUsuarioPorJWT;
+    @Autowired
+    private ObterUsuariosPorCargoId obterUsuariosPorCargoId;
+    @Autowired
+    private ObterUsuariosPaginado obterUsuariosPaginado;
     @Autowired
     private RealizarLogin realizarLogin;
     @Autowired
@@ -42,6 +48,16 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT) {
         return obterUsuarioPorJWT.obterPorTokenJwt(tokenJWT);
+    }
+
+    @Override
+    public Page<UsuarioRetornoDTO> obterUsuarios(Pageable pageable) {
+        return obterUsuariosPaginado.obterUsuarios(pageable);
+    }
+
+    @Override
+    public Page<UsuarioRetornoDTO> obterUsuariosPorCargo(String cargoId, Pageable pageable) {
+        return obterUsuariosPorCargoId.obterUsuariosPorCargo(cargoId, pageable);
     }
 
     @Override
