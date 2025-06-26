@@ -11,9 +11,16 @@ import java.util.List;
 @Service
 public class UsuarioCargoServiceImpl implements UsuarioCargoService {
     @Autowired
+    private CriarUsuarioCargo criarUsuarioCargo;
+    @Autowired
     private CriarEmCargaUsuarioCargo criarEmCargaUsuarioCargo;
     @Autowired
     private ObterCargosUsuarioId obterCargosUsuarioId;
+
+    @Override
+    public UsuarioCargoRetornoDTO criar(CriarUsuarioCargoDTO data) {
+        return criarUsuarioCargo.criar(data);
+    }
 
     @Override
     public List<UsuarioCargoRetornoDTO> criarEmCargaUsuarioCargo(CriarCargaUsuarioCargoDTO data) {
