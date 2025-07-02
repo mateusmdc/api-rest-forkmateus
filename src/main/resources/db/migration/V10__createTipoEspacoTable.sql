@@ -1,7 +1,6 @@
 CREATE TABLE tipo_espaco (
     id VARCHAR(36) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL UNIQUE,
-    tipo_atividade_id VARCHAR(36) NULL REFERENCES tipo_atividade(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
