@@ -21,17 +21,20 @@ import java.nio.file.AccessDeniedException;
 import java.sql.SQLException;
 import java.util.List;
 
+import static br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO.failure;
+
 @RestControllerAdvice
 public class ExceptionHandling {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity handleEntityNotFoundException() {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<?> handleEntityNotFoundException() {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(failure("EntityNotFoundException", "Entidade não encontrada."));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(failure("IllegalArgumentException", ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -39,94 +42,95 @@ public class ExceptionHandling {
         List<String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> {
-                    String field = error.getField();
-                    String message = error.getDefaultMessage();
-                    return String.format("Campo '%s': %s", field, message);
-                })
+                .map(error -> String.format("Campo '%s': %s", error.getField(), error.getDefaultMessage()))
                 .toList();
 
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(failure("ValidationException", String.join("; ", errors)));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        if (ex.getCause() instanceof InvalidFormatException) {
-            var invalidFormatException = (InvalidFormatException) ex.getCause();
-            if (invalidFormatException.getTargetType().equals(java.time.LocalDate.class)) {
-                return ResponseEntity.badRequest().body("Formato de data inválido. Use o formato AAAA-MM-DD.");
-            }
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        if (ex.getCause() instanceof InvalidFormatException ife &&
+                ife.getTargetType().equals(java.time.LocalDate.class)) {
+            return ResponseEntity.badRequest()
+                    .body(failure("InvalidFormatException", "Formato de data inválido. Use o formato AAAA-MM-DD."));
         }
-        return ResponseEntity.badRequest().body("Erro ao ler a mensagem da requisição.");
+
+        return ResponseEntity.badRequest()
+                .body(failure("HttpMessageNotReadableException", "Erro ao ler a mensagem da requisição."));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity handleBadCredentialsException() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas.");
+    public ResponseEntity<?> handleBadCredentialsException() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(failure("BadCredentialsException", "Credenciais inválidas."));
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity handleAuthenticationException() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Erro ao autenticar o usuário.");
+    public ResponseEntity<?> handleAuthenticationException() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(failure("AuthenticationException", "Erro ao autenticar o usuário."));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity handleAccessDeniedException() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acesso negado.");
+    public ResponseEntity<?> handleAccessDeniedException() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(failure("AccessDeniedException", "Acesso negado."));
     }
 
     @ExceptionHandler(LockedException.class)
-    public ResponseEntity handleLockedException() {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Conta bloqueada.");
+    public ResponseEntity<?> handleLockedException() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(failure("LockedException", "Conta bloqueada."));
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+    public ResponseEntity<?> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         Throwable rootCause = ex.getRootCause();
-        if (rootCause instanceof SQLException) {
-            SQLException sqlEx = (SQLException) rootCause;
-            String sqlState = sqlEx.getSQLState();
-            String errorMessage = sqlEx.getMessage();
-
-            if (sqlState != null && sqlState.equals("23505")) {
-                if (errorMessage.contains("usuario_email_key")) {
-                    return ResponseEntity.badRequest().body("Erro de integridade. Já existe um usuário com este email.");
-                }
+        if (rootCause instanceof SQLException sqlEx && "23505".equals(sqlEx.getSQLState())) {
+            if (sqlEx.getMessage().contains("usuario_email_key")) {
+                return ResponseEntity.badRequest()
+                        .body(failure("DuplicateEmail", "Já existe um usuário com este email."));
             }
         }
 
-        return ResponseEntity.badRequest().body("Erro de integridade de dados.");
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.status(500).body("Erro interno do servidor: " + ex.getMessage());
+        return ResponseEntity.badRequest()
+                .body(failure("DataIntegrityViolationException", "Erro de integridade de dados."));
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
-        return ResponseEntity.badRequest().body("Tamanho máximo de upload excedido. Envie um arquivo menor.");
+    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity.badRequest()
+                .body(failure("MaxUploadSizeExceededException", "Tamanho máximo de upload excedido. Envie um arquivo menor."));
     }
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public ResponseEntity handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Login ou senha incorretos.");
+    public ResponseEntity<?> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(failure("InternalAuthenticationServiceException", "Login ou senha incorretos."));
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<?> handleValidationException(ValidationException ex) {
+        return ResponseEntity.badRequest().body(failure("ValidationException", ex.getMessage()));
     }
 
     @ExceptionHandler(DTOValidationException.class)
-    public ResponseEntity<String> handleDTOValidationException(ValidationException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<?> handleDTOValidationException(DTOValidationException ex) {
+        return ResponseEntity.badRequest().body(failure("DTOValidationException", ex.getMessage()));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(failure("RuntimeException", "Erro interno do servidor: " + ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity handleException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro inesperado: " + ex.getLocalizedMessage());
+    public ResponseEntity<?> handleException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(failure("Exception", "Erro inesperado: " + ex.getLocalizedMessage()));
     }
 
     private record DataValidationError(String field, String message) {

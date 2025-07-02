@@ -9,7 +9,7 @@ CREATE TABLE audit_log_login (
     host_name VARCHAR(255),                -- Nome do host que fez o login
     server_name VARCHAR(255),              -- Nome do servidor que processou a requisição
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP
 );
 
 CREATE OR REPLACE FUNCTION set_updated_at()
