@@ -13,4 +13,4 @@ INSERT INTO tipo_equipamento (id, nome) VALUES
   ('l4p6j6p3-3j2no4m3i-1x2w-8h9l6n2345l2', 'Mesa de Conferência'),
   ('m5q7k7q4-4k3op5n4j-0v1u-9i0m7o3456m3', 'Kit de Química'),
   ('n6r8l8r5-5l4pq6o5k-3t2s-1j2p8q4567n4', 'Equipamento de Som'),
-  ('o7s9m9s6-6m5qr7p6l-4r3t-2k3q9r5678o5', 'Equipamento de Rede'),
+  ('o7s9m9s6-6m5qr7p6l-4r3t-2k3q9r5678o5', 'Equipamento de Rede');
