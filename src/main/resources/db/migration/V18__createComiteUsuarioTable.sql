@@ -2,8 +2,10 @@ CREATE TABLE comite_usuario (
     id VARCHAR(36) PRIMARY KEY,
     comite_id VARCHAR(36) NOT NULL REFERENCES comite(id) ON DELETE CASCADE,
     usuario_id VARCHAR(36) NOT NULL REFERENCES usuario(id) ON DELETE CASCADE,
-    espaco_id VARCHAR(36) REFERENCES espaco(id) ON DELETE SET NULL,
-    descricao VARCHAR(100), -- suplente, titular, etc
+    departamento_id VARCHAR(36) REFERENCES departamento(id) ON DELETE SET NULL,
+    descricao VARCHAR(100),
+    portaria VARCHAR(50),
+    is_titular BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
