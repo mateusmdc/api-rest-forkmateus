@@ -1,6 +1,5 @@
 package br.uece.alunos.sisreserva.v1.domain.comiteUsuario;
 
-import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.domain.Page;
@@ -27,7 +26,6 @@ public interface ComiteUsuarioRepository extends JpaRepository<ComiteUsuario, St
     @Query("SELECT cu FROM ComiteUsuario cu WHERE cu.comite.id = :comiteId AND cu.isTitular = true ORDER BY cu.id")
     ComiteUsuario findTitularByComiteId(String comiteId);
 
-    @NonNull
     @Query("SELECT cu FROM ComiteUsuario cu ORDER BY cu.id")
-    Page<ComiteUsuario> findAll(@NonNull Pageable pageable);
+    Page<ComiteUsuario> findAllPageable(Pageable pageable);
 }
