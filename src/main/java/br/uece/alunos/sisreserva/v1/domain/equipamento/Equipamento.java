@@ -33,12 +33,10 @@ public class Equipamento {
     @Column(name = "descricao", length = 255)
     private String descricao;
 
-    /**
-     * 0 = Inativo, 1 = Ativo, 2 = Em manutenção
-     */
     @NotNull
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "status", nullable = false)
-    private Integer status = 1;
+    private StatusEquipamento status = StatusEquipamento.ATIVO;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
