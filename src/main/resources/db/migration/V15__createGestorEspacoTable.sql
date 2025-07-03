@@ -2,5 +2,5 @@ CREATE TABLE gestor_espaco (
     id VARCHAR(36) PRIMARY KEY,
     usuario_gestor_id VARCHAR(36) REFERENCES usuario(id) ON DELETE CASCADE,
     espaco_id VARCHAR(36) REFERENCES espaco(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
