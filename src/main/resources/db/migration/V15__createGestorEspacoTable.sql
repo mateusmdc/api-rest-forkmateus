@@ -14,7 +14,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_set_updated_at_espaco
+CREATE TRIGGER trigger_set_updated_at_gestor_espaco
 BEFORE UPDATE ON gestor_espaco
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();

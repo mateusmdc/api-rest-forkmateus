@@ -18,7 +18,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_set_updated_at_comite
+CREATE TRIGGER trigger_set_updated_at_comite_usuario
 BEFORE UPDATE ON comite_usuario
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
