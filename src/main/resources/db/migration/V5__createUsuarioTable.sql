@@ -4,6 +4,7 @@ CREATE TABLE usuario (
     senha VARCHAR(255) NOT NULL,
     matricula INT NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    documento_fiscal VARCHAR(18) NOT NULL,
     foto_perfil VARCHAR(100),
     telefone VARCHAR(20),
     instituicao_id VARCHAR(36) REFERENCES instituicao(id),

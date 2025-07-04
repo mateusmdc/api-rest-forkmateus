@@ -18,6 +18,10 @@ public record UsuarioDTO(
         @Email(message = "Email inválido")
         String email,
 
+        @NotBlank
+        @NotNull
+        String documentoFiscal,
+
         String fotoPerfil,
 
         @Positive(message = "A matrícula deve ser um número positivo")
