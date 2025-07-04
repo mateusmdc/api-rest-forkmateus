@@ -44,6 +44,9 @@ public class Usuario implements UserDetails {
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
+    @Column(name = "documento_fiscal", nullable = false, length = 18)
+    private String documentoFiscal;
+
     @Column(name = "foto_perfil", length = 100)
     private String fotoPerfil;
 
@@ -87,6 +90,7 @@ public class Usuario implements UserDetails {
         this.nome = data.nome();
         this.senha = data.senha();
         this.email = data.email();
+        this.documentoFiscal = data.documentoFiscal();
         this.fotoPerfil = data.fotoPerfil();
         this.matricula = data.matricula();
         this.telefone = data.telefone();
