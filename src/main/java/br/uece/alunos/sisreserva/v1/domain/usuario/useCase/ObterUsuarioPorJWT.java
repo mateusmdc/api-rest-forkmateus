@@ -16,7 +16,6 @@ public class ObterUsuarioPorJWT {
 
     public UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT) {
         var usuarioId = tokenService.getIdClaim(tokenJWT);
-        usuarioId = usuarioId.replaceAll("\"", "");
 
         var usuario = repository.findById(usuarioId)
                 .orElseThrow(() -> new ValidationException("Não foi encontrado Usuário com o ID do token de autenticação."));
