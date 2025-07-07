@@ -3,24 +3,22 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.useCase.*;
 import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.*;
 import br.uece.alunos.sisreserva.v1.service.UsuarioCargoService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class UsuarioCargoServiceImpl implements UsuarioCargoService {
-    @Autowired
-    private ApagarUsuarioCargo apagarUsuarioCargo;
-    @Autowired
-    private AtualizarUsuarioCargos atualizarUsuarioCargos;
-    @Autowired
-    private CriarUsuarioCargo criarUsuarioCargo;
-    @Autowired
-    private CriarEmCargaUsuarioCargo criarEmCargaUsuarioCargo;
-    @Autowired
-    private ObterCargosUsuarioId obterCargosUsuarioId;
-
+    private final ApagarUsuarioCargo apagarUsuarioCargo;
+    private final AtualizarUsuarioCargos atualizarUsuarioCargos;
+    private final CriarUsuarioCargo criarUsuarioCargo;
+    private final CriarEmCargaUsuarioCargo criarEmCargaUsuarioCargo;
+    private final ObterCargosUsuarioId obterCargosUsuarioId;
 
     @Override
     public void atualizarCargos(List<String> cargosId, String idUsuario) {

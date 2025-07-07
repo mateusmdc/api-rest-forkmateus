@@ -18,19 +18,18 @@ import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.ObterEntUsuarioPorId;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class EntityHandlerServiceImpl implements EntityHandlerService {
-    //Cargo
-    @Autowired
-    private ObterEntCargoPorId obterEntCargoPorId;
-    @Autowired
-    private ObterEntListaCargoPorNome obterEntListaCargoPorNome;
+    // Cargo
+    private final ObterEntCargoPorId obterEntCargoPorId;
+    private final ObterEntListaCargoPorNome obterEntListaCargoPorNome;
     @Override
     public List<Cargo> obterEntidadesCargoPorNome(List<String> nomes) {
         return obterEntListaCargoPorNome.obterEntidadesCargoPorNome(nomes);
@@ -40,19 +39,16 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
         return obterEntCargoPorId.obterEntidadeCargoPorId(id);
     }
 
-    //Departamento
-    @Autowired
-    private ObterEntDepartamentoPorId obterEntDepartamentoPorId;
+    // Departamento
+    private final ObterEntDepartamentoPorId obterEntDepartamentoPorId;
     @Override
     public Departamento obterDepartamentoPorId(String id) {
         return obterEntDepartamentoPorId.obterEntidadePorId(id);
     }
 
-    //Instituicao
-    @Autowired
-    private ObterEntInstituicaoPorId obterEntInstituicaoPorId;
-    @Autowired
-    private ObterEntInstituicoesPorId obterEntInstituicoesPorId;
+    // Instituicao
+    private final ObterEntInstituicaoPorId obterEntInstituicaoPorId;
+    private final ObterEntInstituicoesPorId obterEntInstituicoesPorId;
     public Instituicao obterInstituicaoPorId(String id) {
         return obterEntInstituicaoPorId.obterEntidadePorId(id);
     }
@@ -60,30 +56,30 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
         return obterEntInstituicoesPorId.obterEntidadesPorListaDeId(ids);
     }
 
-    @Autowired
-    private ObterEntLocalizacaoPorId obterEntLocalizacaoPorId;
+    // Localizacao
+    private final ObterEntLocalizacaoPorId obterEntLocalizacaoPorId;
     @Override
     public Localizacao obterLocalizacaoPorId(String id) {
         return obterEntLocalizacaoPorId.obterEntidadePorId(id);
     }
 
-    @Autowired
-    private ObterEntTipoAtividadePorId obterEntTipoAtividadePorId;
+    // Tipo Atividade
+    private final ObterEntTipoAtividadePorId obterEntTipoAtividadePorId;
     @Override
     public TipoAtividade obterTipoAtividadePorId(String id) {
         return obterEntTipoAtividadePorId.obterEntidadePorId(id);
     }
 
-    @Autowired
-    private ObterEntTipoEspacoPorId obterEntTipoEspacoPorId;
+    // Tipo Espaco
+    private final ObterEntTipoEspacoPorId obterEntTipoEspacoPorId;
     @Override
     public TipoEspaco obterTipoEspacoPorId(String id) {
         return obterEntTipoEspacoPorId.obterEntidadePorId(id);
     }
 
-    //Usuario
-    @Autowired
-    private ObterEntUsuarioPorId obterEntUsuarioPorId;
+    // Usuario
+    private final ObterEntUsuarioPorId obterEntUsuarioPorId;
+    @Override
     public Usuario obterUsuarioPorId(String id) {
         return obterEntUsuarioPorId.obterEntidade(id);
     }
