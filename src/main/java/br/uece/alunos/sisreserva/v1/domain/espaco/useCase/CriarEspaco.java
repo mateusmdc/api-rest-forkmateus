@@ -24,6 +24,7 @@ public class CriarEspaco {
 
         //deve buscar o departamento entidade
 
+
         //deve buscar a localizacao entidade
 
         //deve buscar o tipoEspaco entidade
