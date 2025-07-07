@@ -29,28 +29,28 @@ public class AuthController {
     @Autowired
     private CookieManager cookieManager;
 
-    @PostMapping("/signup")
+    @PostMapping("/cadastrar")
     @Transactional
     public ResponseEntity<ApiResponseDTO<UsuarioRetornoDTO>> criarUsuario(@RequestBody @Valid UsuarioDTO data) {
         var novoUsuarioDTO = authService.criarUsuario(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(novoUsuarioDTO));
     }
 
-    @PostMapping("/password/forgot")
+    @PostMapping("/senha/esqueci")
     @Transactional
     public ResponseEntity<ApiResponseDTO<String>> esqueciSenha(@RequestBody @Valid UsuarioEmailDTO data) {
         var messageResponseDTO = authService.esqueciMinhaSenha(data);
         return ResponseEntity.ok(ApiResponseDTO.success(messageResponseDTO.message()));
     }
 
-    @PostMapping("/password/reset")
+    @PostMapping("/senha/resetar")
     @Transactional
     public ResponseEntity<ApiResponseDTO<String>> resetPassword(@RequestBody @Valid UsuarioTrocarSenhaDTO data) {
         var messageResponseDTO = authService.resetarSenha(data);
         return ResponseEntity.ok(ApiResponseDTO.success(messageResponseDTO.message()));
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     @Transactional
     public ResponseEntity<ApiResponseDTO<AccessTokenDTO>> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data,
                                                                         HttpServletResponse response,
@@ -62,21 +62,21 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponseDTO.success(new AccessTokenDTO(tokensJwt.accessToken())));
     }
 
-    @PutMapping("/users/{userId}")
-    public ResponseEntity<ApiResponseDTO<UsuarioRetornoDTO>> atualizarUsuario(@PathVariable String userId,
+    @PutMapping("/usuario/{idUsuario}")
+    public ResponseEntity<ApiResponseDTO<UsuarioRetornoDTO>> atualizarUsuario(@PathVariable String idUsuario,
                                                                               @RequestBody AtualizarUsuarioDTO data) {
-        var usuarioAtualizado = authService.atualizarUsuario(data, userId);
+        var usuarioAtualizado = authService.atualizarUsuario(data, idUsuario);
         return ResponseEntity.ok(ApiResponseDTO.success(usuarioAtualizado));
     }
 
-    @GetMapping("/users/me")
+    @GetMapping("/usuario/me")
     public ResponseEntity<ApiResponseDTO<UsuarioRetornoDTO>> obterUsuarioPorTokenJWT(@RequestHeader("Authorization") String authorizationHeader) {
         var tokenJWT = authorizationHeader.replaceFirst("(?i)^Bearer\\s+", "").trim();
         var usuario = authService.obterPorTokenJwt(tokenJWT);
         return ResponseEntity.ok(ApiResponseDTO.success(usuario));
     }
 
-    @GetMapping("/users/all")
+    @GetMapping("/usuario/todos")
     public ResponseEntity<ApiResponseDTO<Page<UsuarioRetornoDTO>>> obterTodosUsuariosPaginados(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "16") int size,
@@ -88,16 +88,16 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponseDTO.success(usuariosPaginados));
     }
 
-    @GetMapping("/users/role/{roleId}")
+    @GetMapping("/usuario/cargo/{cargoId}")
     public ResponseEntity<ApiResponseDTO<Page<UsuarioRetornoDTO>>> obterUsuariosPorCargo(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "16") int size,
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
-            @PathVariable String roleId) {
+            @PathVariable String cargoId) {
 
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-        var usuariosPorCargo = authService.obterUsuariosPorCargo(roleId, pageable);
+        var usuariosPorCargo = authService.obterUsuariosPorCargo(cargoId, pageable);
         return ResponseEntity.ok(ApiResponseDTO.success(usuariosPorCargo));
     }
 }

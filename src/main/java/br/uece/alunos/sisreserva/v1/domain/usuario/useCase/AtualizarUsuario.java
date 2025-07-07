@@ -22,8 +22,6 @@ public class AtualizarUsuario {
     @Autowired
     private UsuarioCargoService usuarioCargoService;
 
-    @Autowired
-    private TokenService tokenService;
 
     public UsuarioRetornoDTO atualizarUsuario(AtualizarUsuarioDTO data, String idUsuario) {
         var usuarioNoBanco = usuarioRepository.findById(idUsuario)

@@ -106,13 +106,12 @@ public class TokenService {
     public String getIdClaim(String tokenJwt) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(accessSecret);
-            String usuarioLogadoId = String.valueOf(JWT.require(algorithm)
+            DecodedJWT decodedJWT = JWT.require(algorithm)
                     .withIssuer("sisreserva-api")
                     .build()
-                    .verify(tokenJwt)
-                    .getClaim("id"));
+                    .verify(tokenJwt);
 
-            return usuarioLogadoId;
+            return decodedJWT.getClaim("id").asString();
         } catch (JWTVerificationException exception){
             throw new RuntimeException("Token JWT inválido ou expirado.");
         }

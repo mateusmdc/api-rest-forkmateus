@@ -7,6 +7,7 @@ import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,23 +15,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    @Autowired
-    private AtualizarUsuario atualizarUsuario;
-    @Autowired
-    private CriarUsuario criarUsuario;
-    @Autowired
-    private EsqueciSenha esqueciSenha;
-    @Autowired
-    private ObterUsuarioPorJWT obterUsuarioPorJWT;
-    @Autowired
-    private ObterUsuariosPorCargoId obterUsuariosPorCargoId;
-    @Autowired
-    private ObterUsuariosPaginado obterUsuariosPaginado;
-    @Autowired
-    private RealizarLogin realizarLogin;
-    @Autowired
-    private TrocarSenha trocarSenha;
+    private final AtualizarUsuario atualizarUsuario;
+    private final CriarUsuario criarUsuario;
+    private final EsqueciSenha esqueciSenha;
+    private final ObterUsuarioPorJWT obterUsuarioPorJWT;
+    private final ObterUsuariosPorCargoId obterUsuariosPorCargoId;
+    private final ObterUsuariosPaginado obterUsuariosPaginado;
+    private final RealizarLogin realizarLogin;
+    private final TrocarSenha trocarSenha;
 
     @Override
     public UsuarioRetornoDTO atualizarUsuario(AtualizarUsuarioDTO data, String idUsuario) {
