@@ -4,6 +4,7 @@ import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
+import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 
 import java.util.List;
@@ -16,12 +17,15 @@ public interface EntityHandlerService {
     //departamento
     Departamento obterDepartamentoPorId(String id);
 
-    //instituicao
+    //instituição
     Instituicao obterInstituicaoPorId(String id);
     List<Instituicao> obterInstituicoesPorListaDeId(List<String> ids);
 
-    //localizacao
-    Localizacao obterEntidadePorId(String id);
+    //localização
+    Localizacao obterLocalizacaoPorId(String id);
+
+    //tipo de espaço
+    TipoEspaco obterEspacoPorId(String id);
 
     //usuario
     Usuario obterUsuarioPorId(String id);
