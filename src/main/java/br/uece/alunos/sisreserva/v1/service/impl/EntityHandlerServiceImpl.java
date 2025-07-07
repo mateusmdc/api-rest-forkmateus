@@ -10,6 +10,8 @@ import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituic
 import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituicoesPorId;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.useCase.ObterEntLocalizacaoPorId;
+import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
+import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.useCase.ObterEntTipoAtividadePorId;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.useCase.ObterEntTipoEspacoPorId;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
@@ -66,9 +68,16 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
     }
 
     @Autowired
+    private ObterEntTipoAtividadePorId obterEntTipoAtividadePorId;
+    @Override
+    public TipoAtividade obterTipoAtividadePorId(String id) {
+        return obterEntTipoAtividadePorId.obterEntidadePorId(id);
+    }
+
+    @Autowired
     private ObterEntTipoEspacoPorId obterEntTipoEspacoPorId;
     @Override
-    public TipoEspaco obterEspacoPorId(String id) {
+    public TipoEspaco obterTipoEspacoPorId(String id) {
         return obterEntTipoEspacoPorId.obterEntidadePorId(id);
     }
 
