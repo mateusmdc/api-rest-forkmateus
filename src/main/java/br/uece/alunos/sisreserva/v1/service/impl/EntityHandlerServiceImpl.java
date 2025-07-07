@@ -8,6 +8,8 @@ import br.uece.alunos.sisreserva.v1.domain.departamento.useCase.ObterEntDepartam
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituicaoPorId;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.useCase.ObterEntInstituicoesPorId;
+import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
+import br.uece.alunos.sisreserva.v1.domain.localizacao.useCase.ObterEntLocalizacaoPorId;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.ObterEntUsuarioPorId;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
@@ -52,6 +54,13 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
     }
     public List<Instituicao> obterInstituicoesPorListaDeId(List<String> ids) {
         return obterEntInstituicoesPorId.obterEntidadesPorListaDeId(ids);
+    }
+
+    @Autowired
+    private ObterEntLocalizacaoPorId obterEntLocalizacaoPorId;
+    @Override
+    public Localizacao obterEntidadePorId(String id) {
+        return obterEntLocalizacaoPorId.obterEntidadePorId(id);
     }
 
     //Usuario
