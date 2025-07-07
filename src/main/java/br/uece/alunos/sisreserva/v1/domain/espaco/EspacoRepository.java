@@ -3,16 +3,26 @@ package br.uece.alunos.sisreserva.v1.domain.espaco;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface EspacoRepository extends JpaRepository<Espaco, String> {
+public interface EspacoRepository extends JpaRepository<Espaco, String>, JpaSpecificationExecutor<Espaco> {
     @Query("SELECT e FROM Espaco e ORDER BY e.nome ASC")
     Page<Espaco> findAllOrderedByNome(Pageable pageable);
 
-    @Query("SELECT e FROM Espaco e WHERE LOWER(e.nome) = LOWER(:nome)")
+    @Query("SELECT e FROM Espaco e WHERE LOWER(TRIM(e.nome)) = LOWER(TRIM(:nome))")
     Espaco findByNome(String nome);
+
+    @Query("""
+    SELECT COUNT(e) > 0 
+    FROM Espaco e 
+    WHERE LOWER(TRIM(e.nome)) = LOWER(TRIM(:nome))
+      AND e.departamento.id = :departamentoId
+      AND e.localizacao.id = :localizacaoId
+    """)
+    boolean existsByNomeDepartamentoAndLocalizacao(String nome, String departamentoId, String localizacaoId);
 
     @Query("SELECT e FROM Espaco e WHERE LOWER(TRIM(e.nome)) IN :nomes")
     List<Espaco> findAllByNomesIgnoreCaseAndTrimmed(List<String> nomes);
