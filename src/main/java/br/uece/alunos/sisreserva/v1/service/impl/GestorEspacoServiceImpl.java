@@ -1,7 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.CadastraOuReativaGestorEspaco;
-import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.CadastrarGestorEspaco;
+import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.InativarGestorEspaco;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.ObterGestorEspaco;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GestorEspacoServiceImpl implements GestorEspacoService {
     private final CadastraOuReativaGestorEspaco cadastraOuReativaGestorEspaco;
+    private final InativarGestorEspaco inativarGestorEspaco;
     private final ObterGestorEspaco obterGestorEspaco;
 
     @Override
@@ -25,7 +26,12 @@ public class GestorEspacoServiceImpl implements GestorEspacoService {
     }
 
     @Override
-    public Page<GestorEspacoRetornoDTO> obter(Pageable pageable, String id, String espacoId, String gestorId) {
-        return obterGestorEspaco.obter(pageable, id, espacoId, gestorId);
+    public GestorEspacoRetornoDTO inativar(String gestorEspacoId) {
+        return inativarGestorEspaco.inativar(gestorEspacoId);
+    }
+
+    @Override
+    public Page<GestorEspacoRetornoDTO> obter(Pageable pageable, String id, String espacoId, String gestorId, boolean todos) {
+        return obterGestorEspaco.obter(pageable, id, espacoId, gestorId, todos);
     }
 }

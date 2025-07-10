@@ -34,4 +34,12 @@ public interface GestorEspacoRepository extends JpaRepository<GestorEspaco, Stri
           AND g.estaAtivo = false
         """)
     Optional<GestorEspaco> findByUsuarioGestorIdAndEspacoIdAndEstaAtivoFalse(String usuarioId, String espacoId);
+
+    @Query("""
+        SELECT g FROM GestorEspaco g 
+        WHERE g.usuarioGestor.id = :usuarioId 
+          AND g.espaco.id = :espacoId 
+          AND g.estaAtivo = true
+        """)
+    Optional<GestorEspaco> findByUsuarioGestorIdAndEspacoIdAndEstaAtivo(String usuarioId, String espacoId);
 }

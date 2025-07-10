@@ -25,10 +25,17 @@ public class GestorEspacoSpecification {
             }
 
             if (filtros.containsKey("gestorId")) {
-                predicates.add(cb.equal(root.get("gestor").get("id"), filtros.get("gestorId")));
+                predicates.add(cb.equal(root.get("usuarioGestor").get("id"), filtros.get("gestorId")));
+            }
+
+            // Só aplica o filtro estaAtivo=true se 'todos' não for true
+            boolean incluirTodos = filtros.containsKey("todos") && Boolean.TRUE.equals(filtros.get("todos"));
+            if (!incluirTodos) {
+                predicates.add(cb.isTrue(root.get("estaAtivo")));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
+
 }
