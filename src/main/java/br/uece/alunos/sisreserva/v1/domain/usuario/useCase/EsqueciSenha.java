@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
+import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEmailDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEsqueciSenhaDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
@@ -22,14 +23,13 @@ public class EsqueciSenha {
     private GerarTokenEsqueciMinhaSenha mailToken;
     @Autowired
     private MailSenderMime mailSender;
+    @Autowired
+    private UsuarioValidator usuarioValidator;
 
     public MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data) {
         var email = data.email();
-        var usuarioExiste = repository.usuarioExistsByEmail(email);
 
-        if (!usuarioExiste) {
-            throw new ValidationException("Não foi encontrado nenhum usuário com o e-mail informado para processo de Esqueci Minha Senha.");
-        }
+        usuarioValidator.validarEmailExistenteParaRecuperacao(email);
 
         var token = mailToken.gerarTokenEmail();
         var emUmaHora = LocalDateTime.now().plusHours(1);

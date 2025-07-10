@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
 import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.LoginStatus;
 import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLog;
+import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,12 @@ public class RealizarLogin {
     @Autowired
     private RegisterAuditLog registerAuditLog;
 
+    @Autowired
+    private UsuarioValidator usuarioValidator;
+
     @Transactional
     public AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request) {
-        if (data.email().isEmpty() || data.senha().isEmpty()) {
-            throw new ValidationException("Email e senha não podem ser vazios.");
-        }
+        usuarioValidator.validarCredenciaisPreenchidas(data.email(), data.senha());
 
         var authenticationToken = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
 
