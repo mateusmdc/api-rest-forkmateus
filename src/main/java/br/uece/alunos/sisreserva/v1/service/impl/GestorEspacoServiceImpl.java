@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
-import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.CadastroGestorEspaco;
+import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.CadastraOuReativaGestorEspaco;
+import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.CadastrarGestorEspaco;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.ObterGestorEspaco;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
@@ -15,12 +16,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class GestorEspacoServiceImpl implements GestorEspacoService {
-    private final CadastroGestorEspaco cadastroGestorEspaco;
+    private final CadastraOuReativaGestorEspaco cadastraOuReativaGestorEspaco;
     private final ObterGestorEspaco obterGestorEspaco;
 
     @Override
-    public GestorEspacoRetornoDTO cadastrarGestorEspaco(GestorEspacoDTO data) {
-        return cadastroGestorEspaco.cadastrarGestorEspaco(data);
+    public GestorEspacoRetornoDTO cadastrarOuReativarGestorEspaco(GestorEspacoDTO data) {
+        return cadastraOuReativaGestorEspaco.executar(data);
     }
 
     @Override

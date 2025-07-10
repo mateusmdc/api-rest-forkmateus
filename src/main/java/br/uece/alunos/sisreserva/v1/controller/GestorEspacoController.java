@@ -28,7 +28,7 @@ public class GestorEspacoController {
     @Transactional
     public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> cadastrarGestorEspaco(
             @RequestBody @Valid GestorEspacoDTO data) {
-        var gestorEspacoRetornoDTO = gestorEspacoService.cadastrarGestorEspaco(data);
+        var gestorEspacoRetornoDTO = gestorEspacoService.cadastrarOuReativarGestorEspaco(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(gestorEspacoRetornoDTO));
     }
 

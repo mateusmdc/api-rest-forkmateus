@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CadastroGestorEspaco {
+public class CadastrarGestorEspaco {
     @Autowired
     private GestorEspacoRepository repository;
 
@@ -21,14 +21,14 @@ public class CadastroGestorEspaco {
     private GestorEspacoValidator validator;
 
     public GestorEspacoRetornoDTO cadastrarGestorEspaco(GestorEspacoDTO data) {
-        validator.validarSeUsuarioJaEGestorDoEspaco(data.usuarioGestorId(), data.espacoId());
+        validator.validarGestorAtivoExistente(data.usuarioGestorId(), data.espacoId());
 
         var usuarioGestor = entityHandlerService.obterUsuarioPorId(data.usuarioGestorId());
         var espaco = entityHandlerService.obterEspacoPorId(data.espacoId());
 
-        var gestorEspaco = new GestorEspaco(usuarioGestor, espaco);
+        var novoGestor = new GestorEspaco(usuarioGestor, espaco);
 
-        var gestorEspacoSalvo = repository.save(gestorEspaco);
+        var gestorEspacoSalvo = repository.save(novoGestor);
 
         return new GestorEspacoRetornoDTO(gestorEspacoSalvo);
     }

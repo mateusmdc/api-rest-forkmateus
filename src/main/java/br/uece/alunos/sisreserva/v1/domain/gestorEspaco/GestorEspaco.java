@@ -35,17 +35,37 @@ public class GestorEspaco {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Espaco espaco;
 
+    @Column(name = "esta_ativo", nullable = false)
+    private Boolean estaAtivo = true;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public GestorEspaco(Usuario usuarioGestor, Espaco espaco) {
         this.usuarioGestor = usuarioGestor;
         this.espaco = espaco;
+        this.estaAtivo = true;
     }
 
     @PrePersist
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
+        if (estaAtivo != null && !estaAtivo) {
+            this.deletedAt = LocalDateTime.now();
+        }
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        if (estaAtivo != null && !estaAtivo && deletedAt == null) {
+            this.deletedAt = LocalDateTime.now();
+        }
+        if (estaAtivo != null && estaAtivo && deletedAt != null) {
+            this.deletedAt = null;
+        }
     }
 }

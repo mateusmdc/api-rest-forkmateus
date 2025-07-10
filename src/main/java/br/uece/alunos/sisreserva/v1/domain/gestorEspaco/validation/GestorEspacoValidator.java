@@ -11,11 +11,10 @@ public class GestorEspacoValidator {
     @Autowired
     private GestorEspacoRepository repository;
 
-    public void validarSeUsuarioJaEGestorDoEspaco(String usuarioId, String espacoId) {
-        boolean jaEGestor = repository.existsByUsuarioGestorIdAndEspacoId(usuarioId, espacoId);
-
-        if (jaEGestor) {
-            throw new ValidationException("O usuário já é o gestor do espaço.");
+    public void validarGestorAtivoExistente(String usuarioId, String espacoId) {
+        boolean existeAtivo = repository.existsByUsuarioGestorIdAndEspacoIdAndEstaAtivoTrue(usuarioId, espacoId);
+        if (existeAtivo) {
+            throw new ValidationException("O usuário já é gestor ativo do espaço.");
         }
     }
 }
