@@ -7,15 +7,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GestorEspacoValidator {
-
     @Autowired
     private GestorEspacoRepository repository;
 
-    public void validarSeUsuarioJaEGestorDoEspaco(String usuarioId, String espacoId) {
-        boolean jaEGestor = repository.existsByUsuarioGestorIdAndEspacoId(usuarioId, espacoId);
+    public void validarGestorAtivoExistente(String usuarioId, String espacoId) {
+        boolean existeAtivo = repository.existsByUsuarioGestorIdAndEspacoIdAndEstaAtivoTrue(usuarioId, espacoId);
+        if (existeAtivo) {
+            throw new ValidationException("O usuário já é gestor ativo do espaço.");
+        }
+    }
 
-        if (jaEGestor) {
-            throw new ValidationException("O usuário já é o gestor do espaço.");
+    public void validarGestorAtivoParaInativar(String gestorEspacoId) {
+        var gestorEspaco = repository.findById(gestorEspacoId)
+                .orElseThrow(() -> new ValidationException("Gestor do espaço não encontrado."));
+
+        if (!gestorEspaco.getEstaAtivo()) {
+            throw new ValidationException("O gestor já está inativo.");
         }
     }
 }

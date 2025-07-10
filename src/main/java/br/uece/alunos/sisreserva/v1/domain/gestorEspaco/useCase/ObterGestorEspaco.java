@@ -18,18 +18,17 @@ public class ObterGestorEspaco {
     @Autowired
     private GestorEspacoRepository repository;
 
-    public Page<GestorEspacoRetornoDTO> obter(Pageable pageable,
-                                              String id,
-                                              String espacoId,
-                                              String gestorId) {
-
+    public Page<GestorEspacoRetornoDTO> obter(Pageable pageable, String id, String espacoId, String gestorId, Boolean todos) {
         Map<String, Object> filtros = new HashMap<>();
+
         if (id != null) filtros.put("id", id);
         if (espacoId != null) filtros.put("espacoId", espacoId);
         if (gestorId != null) filtros.put("gestorId", gestorId);
+        if (Boolean.TRUE.equals(todos)) filtros.put("todos", true); // marca para não filtrar por estaAtivo
 
-        return execute(filtros, pageable)
-                .map(GestorEspacoRetornoDTO::new);
+        var spec = GestorEspacoSpecification.byFilters(filtros);
+
+        return repository.findAll(spec, pageable).map(GestorEspacoRetornoDTO::new);
     }
 
     private Page<GestorEspaco> execute(Map<String, Object> filtros, Pageable pageable) {

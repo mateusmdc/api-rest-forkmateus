@@ -1,7 +1,6 @@
 
 package br.uece.alunos.sisreserva.v1.controller;
 
-import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
@@ -28,8 +27,15 @@ public class GestorEspacoController {
     @Transactional
     public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> cadastrarGestorEspaco(
             @RequestBody @Valid GestorEspacoDTO data) {
-        var gestorEspacoRetornoDTO = gestorEspacoService.cadastrarGestorEspaco(data);
+        var gestorEspacoRetornoDTO = gestorEspacoService.cadastrarOuReativarGestorEspaco(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(gestorEspacoRetornoDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> inativarGestorEspaco(@PathVariable String id) {
+        gestorEspacoService.inativar(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping
@@ -40,14 +46,15 @@ public class GestorEspacoController {
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,
             @RequestParam(required = false) String espaco,
-            @RequestParam(required = false) String usuarioGestor) {
+            @RequestParam(required = false) String gestor,
+            @RequestParam(defaultValue = "false") boolean todos) {
         var fieldToSort = switch (sortField) {
-            case "usuarioGestor" -> "usuarioGestor.nome";
-            case "espaco" -> "espaco.nome";
+            case "gestor" -> "usuarioGestor.id";
+            case "espaco" -> "espaco.id";
             default -> sortField;
         };
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), fieldToSort));
-        var gestoresPaginados = gestorEspacoService.obter(pageable, id, espaco, usuarioGestor);
+        var gestoresPaginados = gestorEspacoService.obter(pageable, id, espaco, gestor, todos);
         return ResponseEntity.ok(ApiResponseDTO.success(gestoresPaginados));
     }
 }

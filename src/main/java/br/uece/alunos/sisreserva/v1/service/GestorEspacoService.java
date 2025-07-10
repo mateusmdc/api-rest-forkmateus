@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface GestorEspacoService {
-    GestorEspacoRetornoDTO cadastrarGestorEspaco(GestorEspacoDTO data);
-    Page<GestorEspacoRetornoDTO> obter(Pageable pageable, String id, String espacoId, String gestorId);
+    GestorEspacoRetornoDTO cadastrarOuReativarGestorEspaco(GestorEspacoDTO data);
+    GestorEspacoRetornoDTO inativar(String gestorEspacoId);
+    Page<GestorEspacoRetornoDTO> obter(Pageable pageable, String id, String espacoId, String gestorId, boolean todos);
 }
