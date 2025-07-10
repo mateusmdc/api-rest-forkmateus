@@ -38,6 +38,11 @@ public class GestorEspaco {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    public GestorEspaco(Usuario usuarioGestor, Espaco espaco) {
+        this.usuarioGestor = usuarioGestor;
+        this.espaco = espaco;
+    }
+
     @PrePersist
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();

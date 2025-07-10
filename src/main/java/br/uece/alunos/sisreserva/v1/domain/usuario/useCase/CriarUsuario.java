@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
+import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
@@ -14,10 +15,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CriarUsuario {
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -27,12 +24,15 @@ public class CriarUsuario {
     @Autowired
     private UsuarioCargoService usuarioCargoService;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private UsuarioValidator usuarioValidator;
+
     public UsuarioRetornoDTO criar(UsuarioDTO data) {
         try {
-            boolean usuarioExiste = usuarioRepository.usuarioExistsByEmail(data.email());
-            if (usuarioExiste) {
-                throw new ValidationException("Email já cadastrado no sistema");
-            }
+            usuarioValidator.validarEmailJaExistente(data.email());
 
             var instituicao = entityHandlerService.obterInstituicaoPorId(data.instituicaoId());
 
