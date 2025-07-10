@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
+import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioTrocarSenhaDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
@@ -18,14 +19,12 @@ public class TrocarSenha {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private UsuarioValidator usuarioValidator;
+
     public MessageResponseDTO resetarSenha(UsuarioTrocarSenhaDTO data) {
         try {
-            var email = data.email();
-            var usuarioExiste = repository.usuarioExistsByEmail(email);
-
-            if (!usuarioExiste) {
-                throw new ValidationException("Não foi encontrado nenhum usuário com o e-mail informado para processo de Troca de Senha.");
-            }
+            usuarioValidator.validarEmailExistenteParaRecuperacao(data.email());
 
             var usuario = repository.findByEmailToHandle(data.email());
 
