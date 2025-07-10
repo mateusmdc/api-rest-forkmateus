@@ -3,11 +3,12 @@ package br.uece.alunos.sisreserva.v1.domain.gestorEspaco;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface GestorEspacoRepository extends JpaRepository<GestorEspaco, String> {
+public interface GestorEspacoRepository extends JpaRepository<GestorEspaco, String>, JpaSpecificationExecutor<GestorEspaco> {
     @Query("SELECT g FROM GestorEspaco g WHERE g.usuarioGestor.id = :usuarioId")
     List<GestorEspaco> findByUsuarioGestorId(String usuarioId);
 
