@@ -4,6 +4,7 @@ import br.uece.alunos.sisreserva.v1.dto.departamento.DepartamentoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.localizacao.LocalizacaoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.LocalizacaoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/localizacao")
+@Tag(name = "Rotas de localização mapeadas no controller")
 public class LocalizacaoController {
     @Autowired
     private LocalizacaoService service;
