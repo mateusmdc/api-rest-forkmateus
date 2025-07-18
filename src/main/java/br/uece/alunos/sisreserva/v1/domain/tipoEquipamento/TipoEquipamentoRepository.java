@@ -3,11 +3,12 @@ package br.uece.alunos.sisreserva.v1.domain.tipoEquipamento;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface TipoEquipamentoRepository extends JpaRepository<TipoEquipamento, String> {
+public interface TipoEquipamentoRepository extends JpaRepository<TipoEquipamento, String>, JpaSpecificationExecutor<TipoEquipamento> {
     @Query("SELECT te FROM TipoEquipamento te ORDER BY te.nome ASC")
     Page<TipoEquipamento> findAllOrderedByNome(Pageable pageable);
 
