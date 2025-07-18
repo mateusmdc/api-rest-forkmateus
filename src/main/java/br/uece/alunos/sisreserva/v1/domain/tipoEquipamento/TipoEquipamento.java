@@ -15,18 +15,22 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class TipoEquipamento {
+
     @Id
-    @Column(name = "id", nullable = false, length=36, updatable=false)
+    @Column(name = "id", nullable = false, length = 36, updatable = false)
     private String id;
 
     @NotNull
-    @Column(name = "nome", nullable = false, length = 100)
+    @Column(name = "nome", nullable = false, length = 100, unique = true)
     private String nome;
+
+    @Column(name = "is_detalhamento_origatorio", nullable = false)
+    private Boolean isDetalhamentoOrigatorio = true;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false) 
     private LocalDateTime updatedAt;
 
     @PrePersist
