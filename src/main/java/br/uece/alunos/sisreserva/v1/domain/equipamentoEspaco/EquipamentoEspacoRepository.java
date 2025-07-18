@@ -1,12 +1,13 @@
 package br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface EquipamentoEspacoRepository extends JpaRepository<EquipamentoEspaco, String> {
+public interface EquipamentoEspacoRepository extends JpaRepository<EquipamentoEspaco, String>, JpaSpecificationExecutor<EquipamentoEspaco> {
     @Query("SELECT ee FROM EquipamentoEspaco ee WHERE ee.equipamento.id = :equipamentoId")
     List<EquipamentoEspaco> findByEquipamentoId(String equipamentoId);
 
