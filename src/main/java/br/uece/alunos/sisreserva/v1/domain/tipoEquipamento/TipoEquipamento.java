@@ -24,13 +24,13 @@ public class TipoEquipamento {
     @Column(name = "nome", nullable = false, length = 100, unique = true)
     private String nome;
 
-    @Column(name = "is_detalhamento_origatorio", nullable = false)
-    private Boolean isDetalhamentoOrigatorio = true;
+    @Column(name = "is_detalhamento_obrigatorio", nullable = false)
+    private Boolean isDetalhamentoObrigatorio = true;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", insertable = false) 
+    @Column(name = "updated_at", insertable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
