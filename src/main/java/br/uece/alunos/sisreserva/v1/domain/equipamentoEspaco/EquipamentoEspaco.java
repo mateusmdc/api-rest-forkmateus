@@ -39,6 +39,11 @@ public class EquipamentoEspaco {
     @Column(name = "data_remocao")
     private LocalDateTime dataRemocao;
 
+    public EquipamentoEspaco(Equipamento equipamento, Espaco espaco) {
+        this.equipamento = equipamento;
+        this.espaco = espaco;
+    }
+
     @PrePersist
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();

@@ -1,9 +1,17 @@
 package br.uece.alunos.sisreserva.v1.dto.usuarioCargo;
 
 import br.uece.alunos.sisreserva.v1.domain.usuarioCargo.UsuarioCargo;
+import br.uece.alunos.sisreserva.v1.dto.cargo.CargoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
 
-public record UsuarioCargoRetornoDTO(String cargoId, String cargoNome, String usuarioId) {
+public record UsuarioCargoRetornoDTO(
+        CargoRetornoDTO cargo,
+        UsuarioRetornoDTO usuario
+) {
     public UsuarioCargoRetornoDTO(UsuarioCargo data) {
-        this(data.getCargo().getId(), data.getCargo().getNome(), data.getUsuario().getId());
+        this(
+                new CargoRetornoDTO(data.getCargo()),
+                new UsuarioRetornoDTO(data.getUsuario())
+        );
     }
 }

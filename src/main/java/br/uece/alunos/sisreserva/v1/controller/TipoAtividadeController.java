@@ -6,6 +6,7 @@ import br.uece.alunos.sisreserva.v1.dto.tipoAtividade.TipoAtividadeRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.tipoEspaco.TipoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.TipoEspacoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/atividade/tipo")
+@Tag(name = "Rotas de tipo de atividade mapeadas no controller")
 public class TipoAtividadeController {
     @Autowired
     private ObterTiposAtividade obterTiposAtividade;

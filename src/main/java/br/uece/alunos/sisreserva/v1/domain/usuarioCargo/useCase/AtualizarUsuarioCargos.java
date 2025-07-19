@@ -23,7 +23,7 @@ public class AtualizarUsuarioCargos {
     public void atualizarCargos(List<String> cargosId, String idUsuario) {
         Set<String> atuais = obterCargosUsuarioId.obterCargosPorIdUsuario(idUsuario)
                 .stream()
-                .map(UsuarioCargoRetornoDTO::cargoId)
+                .map(uc -> uc.cargo().nome())
                 .collect(Collectors.toSet());
 
         Set<String> desejados = new HashSet<>(cargosId);

@@ -9,4 +9,5 @@ public interface GestorEspacoService {
     GestorEspacoRetornoDTO cadastrarOuReativarGestorEspaco(GestorEspacoDTO data);
     GestorEspacoRetornoDTO inativar(String gestorEspacoId);
     Page<GestorEspacoRetornoDTO> obter(Pageable pageable, String id, String espacoId, String gestorId, boolean todos);
+    void validarGestorAtivo(String usuarioId, String espacoId);
 }
