@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.service;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
+import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
 import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
@@ -19,6 +20,9 @@ public interface EntityHandlerService {
 
     //departamento
     Departamento obterDepartamentoPorId(String id);
+
+    //equipamento
+    Equipamento obterEquipamentoPorId(String id);
 
     //espaço
     Espaco obterEspacoPorId(String id);

@@ -1,46 +1,39 @@
 
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoEspacoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/espaco/equipamento")
+@RequestMapping("/equipamento/espaco")
 @Tag(name = "Rotas de equipamentos de um espaço mapeadas no controller")
 public class EquipamentoEspacoController {
     @Autowired
     private EquipamentoEspacoService service;
 
     /*
-    @PostMapping
-    @Transactional
-    public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> cadastrarGestorEspaco(
-            @RequestBody @Valid GestorEspacoDTO data) {
-        var gestorEspacoRetornoDTO = gestorEspacoService.cadastrarOuReativarGestorEspaco(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(gestorEspacoRetornoDTO));
-    }
-
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> inativarGestorEspaco(@PathVariable String id) {
         gestorEspacoService.inativar(id);
         return ResponseEntity.noContent().build();
-    }
-
-
-     */
+    } */
 
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<EquipamentoEspacoRetornoDTO>>> obter(
@@ -80,4 +73,11 @@ public class EquipamentoEspacoController {
         return ResponseEntity.ok(ApiResponseDTO.success(pageResultado));
     }
 
+    @PostMapping
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<EquipamentoEspacoRetornoDTO>> cadastrar(
+            @RequestBody @Valid CriarEquipamentoEspacoDTO data) {
+        var retornoDTO = service.criarEquipamentoAlocandoAoEspaco(data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(retornoDTO));
+    }
 }
