@@ -24,8 +24,13 @@ public class EquipamentoValidator {
     }
 
     public void validarTombamentoUnico(String tombamento) {
-        if (tombamento != null && repository.existsByTombamento(tombamento.trim())) {
+        if (tombamento == null || tombamento.trim().isEmpty()) {
+            return;
+        }
+
+        if (repository.existsByTombamento(tombamento.trim())) {
             throw new ValidationException("Já existe um equipamento com o tombamento informado.");
         }
     }
+
 }

@@ -10,6 +10,8 @@ import br.uece.alunos.sisreserva.v1.service.EquipamentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class CriarEquipamentoEspaco {
     @Autowired
@@ -24,20 +26,22 @@ public class CriarEquipamentoEspaco {
     @Autowired
     private ValidadorGestorEspaco validaSeGestorEspaco;
 
-    public EquipamentoEspacoRetornoDTO criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
-        // inicialmente valida se o usuário que está tentando criar o equipamento, alocando ao espaço, é gestor daquele espaço
+    public List<EquipamentoEspacoRetornoDTO> criarEquipamentosAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
         validaSeGestorEspaco.validarGestorAtivo(data.usuarioId(), data.espacoId());
 
-        var equipamentoNovo = equipamentoService.criar(data.equipamento());
+        var espacoEntidade = entityHandlerService.obterEspacoPorId(data.espacoId());
 
-        var equipamentoEntidade = entityHandlerService.obterEquipamentoPorId(equipamentoNovo.id());
+        return data.equipamentos().stream()
+                .map(equipamentoDTO -> {
+                    var equipamentoNoBanco = equipamentoService.criar(equipamentoDTO);
 
-        var espacoEntidade =  entityHandlerService.obterEspacoPorId(data.espacoId());
+                    var equipamentoEntidade = entityHandlerService.obterEquipamentoPorId(equipamentoNoBanco.id());
+                    var equipamentoEspaco = new EquipamentoEspaco(equipamentoEntidade, espacoEntidade);
 
-        var equipamentoEspaco = new EquipamentoEspaco(equipamentoEntidade, espacoEntidade);
+                    var salvo = repository.save(equipamentoEspaco);
 
-        var equipamentoEspacoNoBanco = repository.save(equipamentoEspaco);
-
-        return new EquipamentoEspacoRetornoDTO(equipamentoEspacoNoBanco);
+                    return new EquipamentoEspacoRetornoDTO(salvo);
+                })
+                .toList();
     }
 }
