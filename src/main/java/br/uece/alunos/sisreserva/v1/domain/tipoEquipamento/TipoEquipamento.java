@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.tipoEquipamento;
 
+import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -32,6 +33,11 @@ public class TipoEquipamento {
 
     @Column(name = "updated_at", insertable = false)
     private LocalDateTime updatedAt;
+
+    public TipoEquipamento(TipoEquipamentoDTO data) {
+        this.nome = data.nome();
+        this.isDetalhamentoObrigatorio = data.isDetalhamentoObrigatorio();
+    }
 
     @PrePersist
     public void onCreate() {
