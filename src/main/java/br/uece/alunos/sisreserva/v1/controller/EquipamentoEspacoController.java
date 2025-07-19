@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/equipamento/espaco")
@@ -75,7 +76,7 @@ public class EquipamentoEspacoController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<ApiResponseDTO<EquipamentoEspacoRetornoDTO>> cadastrar(
+    public ResponseEntity<ApiResponseDTO<List<EquipamentoEspacoRetornoDTO>>> cadastrar(
             @RequestBody @Valid CriarEquipamentoEspacoDTO data) {
         var retornoDTO = service.criarEquipamentoAlocandoAoEspaco(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(retornoDTO));
