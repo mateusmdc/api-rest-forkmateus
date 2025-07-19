@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.domain.equipamento;
 
 import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
+import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -29,7 +30,7 @@ public class Equipamento {
     private String tombamento;
 
     @Size(max = 255)
-    @Column(name = "descricao", length = 255)
+    @Column(name = "descricao")
     private String descricao;
 
     @NotNull
@@ -48,6 +49,13 @@ public class Equipamento {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public Equipamento(EquipamentoDTO data, TipoEquipamento tipoEquipamento) {
+        this.tombamento = data.tombamento();
+        this.descricao = data.descricao();
+        this.status = data.statusEquipamento();
+        this.tipoEquipamento =  tipoEquipamento;
+    }
 
     @PrePersist
     public void onCreate() {

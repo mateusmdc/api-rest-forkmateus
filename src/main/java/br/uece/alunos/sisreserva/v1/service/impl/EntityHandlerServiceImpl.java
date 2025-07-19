@@ -14,6 +14,8 @@ import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.useCase.ObterEntLocalizacaoPorId;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.useCase.ObterEntTipoAtividadePorId;
+import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
+import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.useCase.ObterEntTipoEquipamentoPorId;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.useCase.ObterEntTipoEspacoPorId;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
@@ -77,6 +79,13 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
     @Override
     public TipoAtividade obterTipoAtividadePorId(String id) {
         return obterEntTipoAtividadePorId.obterEntidadePorId(id);
+    }
+
+    // Tipo Equipamento
+    private final ObterEntTipoEquipamentoPorId obterEntTipoEquipamentoPorId;
+    @Override
+    public TipoEquipamento obterTipoEquipamentoPorId(String id) {
+        return obterEntTipoEquipamentoPorId.obterEntidadePorId(id);
     }
 
     // Tipo Espaco

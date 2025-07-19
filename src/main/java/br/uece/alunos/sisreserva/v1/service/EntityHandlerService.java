@@ -6,6 +6,7 @@ import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
+import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 
@@ -31,6 +32,9 @@ public interface EntityHandlerService {
 
     //tipo de atividade
     TipoAtividade obterTipoAtividadePorId(String id);
+
+    //tipo de equipamento
+    TipoEquipamento obterTipoEquipamentoPorId(String id);
 
     //tipo de espaço
     TipoEspaco obterTipoEspacoPorId(String id);

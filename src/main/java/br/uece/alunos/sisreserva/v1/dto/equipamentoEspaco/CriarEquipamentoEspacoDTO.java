@@ -1,0 +1,16 @@
+package br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco;
+
+import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record CriarEquipamentoEspacoDTO(
+        @NotNull(message = "Os dados do equipamento são obrigatórios")
+        EquipamentoDTO equipamento,
+
+        @NotBlank(message = "O ID do espaço é obrigatório")
+        String espacoId,
+
+        @NotBlank(message = "O ID do usuário é obrigatório")
+        String usuarioId
+) {}
