@@ -17,4 +17,7 @@ public interface EquipamentoRepository extends JpaRepository<Equipamento, String
 
     @Query("SELECT e FROM Equipamento e WHERE LOWER(TRIM(e.tombamento)) IN :tombamentos")
     List<Equipamento> findAllByTombamentosIgnoreCaseAndTrimmed(List<String> tombamentos);
+
+    @Query("SELECT COUNT(*) > 0 FROM Equipamento WHERE tombamento = :tombamento")
+    boolean existsByTombamento(String tombamento);
 }

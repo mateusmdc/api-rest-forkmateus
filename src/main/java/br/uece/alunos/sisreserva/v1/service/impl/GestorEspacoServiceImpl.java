@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.CadastraOuReativaGestorEspaco;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.InativarGestorEspaco;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.ObterGestorEspaco;
+import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.ValidadorGestorEspaco;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.GestorEspacoService;
@@ -19,6 +20,7 @@ public class GestorEspacoServiceImpl implements GestorEspacoService {
     private final CadastraOuReativaGestorEspaco cadastraOuReativaGestorEspaco;
     private final InativarGestorEspaco inativarGestorEspaco;
     private final ObterGestorEspaco obterGestorEspaco;
+    private final ValidadorGestorEspaco validadorGestorEspaco;
 
     @Override
     public GestorEspacoRetornoDTO cadastrarOuReativarGestorEspaco(GestorEspacoDTO data) {
@@ -33,5 +35,10 @@ public class GestorEspacoServiceImpl implements GestorEspacoService {
     @Override
     public Page<GestorEspacoRetornoDTO> obter(Pageable pageable, String id, String espacoId, String gestorId, boolean todos) {
         return obterGestorEspaco.obter(pageable, id, espacoId, gestorId, todos);
+    }
+
+    @Override
+    public void validarGestorAtivo(String usuarioId, String espacoId) {
+        validadorGestorEspaco.validarGestorAtivo(usuarioId, espacoId);
     }
 }
