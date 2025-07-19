@@ -37,7 +37,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/auth/usuario/todos").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/espaco").hasRole("ADMIN");
-                    req.requestMatchers(HttpMethod.POST, "/espaco").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/equipamento/tipo").hasRole("ADMIN");
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilterApplication, UsernamePasswordAuthenticationFilter.class)

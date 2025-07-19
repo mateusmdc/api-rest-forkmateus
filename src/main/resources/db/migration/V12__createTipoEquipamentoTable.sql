@@ -1,6 +1,7 @@
 CREATE TABLE tipo_equipamento (
     id VARCHAR(36) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL UNIQUE,
+    is_detalhamento_obrigatorio BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );

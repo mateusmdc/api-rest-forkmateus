@@ -1,14 +1,14 @@
 package br.uece.alunos.sisreserva.v1.dto.equipamento;
 
 import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
+import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoRetornoDTO;
 
 public record EquipamentoRetornoDTO(
         String id,
         String tombamento,
         String descricao,
         int status,
-        String tipoEquipamentoId,
-        String tipoEquipamentoNome
+        TipoEquipamentoRetornoDTO tipoEquipamento
 ) {
     public EquipamentoRetornoDTO(Equipamento e) {
         this(
@@ -16,8 +16,7 @@ public record EquipamentoRetornoDTO(
                 e.getTombamento(),
                 e.getDescricao(),
                 e.getStatus().getCodigo(),
-                e.getTipoEquipamento().getId(),
-                e.getTipoEquipamento().getNome()
+                new TipoEquipamentoRetornoDTO(e.getTipoEquipamento())
         );
     }
 }

@@ -24,9 +24,8 @@ public class Equipamento {
     @Column(name = "id", nullable = false, length = 36, updatable = false)
     private String id;
 
-    @NotNull
     @Size(max = 100)
-    @Column(name = "tombamento", nullable = false, unique = true, length = 100)
+    @Column(name = "tombamento", length = 100)
     private String tombamento;
 
     @Size(max = 255)

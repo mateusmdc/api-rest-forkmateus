@@ -1,6 +1,6 @@
 CREATE TABLE equipamento (
     id VARCHAR(36) PRIMARY KEY,
-    tombamento VARCHAR (100) NOT NULL UNIQUE,
+    tombamento VARCHAR (100),
     descricao VARCHAR (255),
     status INT CHECK (status IN (0, 1, 2)) NOT NULL DEFAULT 1,
     tipo_equipamento_id VARCHAR(36) REFERENCES tipo_equipamento(id) ON DELETE CASCADE,
