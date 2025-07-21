@@ -3,20 +3,20 @@ package br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.GestorEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.validation.GestorEspacoValidator;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class InativarGestorEspaco {
-    @Autowired
-    private GestorEspacoRepository repository;
-    @Autowired
-    private GestorEspacoValidator validator;
+    private final GestorEspacoRepository repository;
+    private final GestorEspacoValidator validator;
 
     public GestorEspacoRetornoDTO inativar(String gestorEspacoId) {
         validator.validarGestorAtivoParaInativar(gestorEspacoId);
 
-        var gestor = repository.findById(gestorEspacoId).get();
+        var gestor = repository.findById(gestorEspacoId)
+                        .orElseThrow(() -> new IllegalStateException("Gestor de Espaço deveria existir após validação, mas não foi encontrado."));
 
         gestor.setEstaAtivo(false);
 

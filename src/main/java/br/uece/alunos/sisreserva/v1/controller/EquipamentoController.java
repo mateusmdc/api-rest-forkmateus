@@ -25,7 +25,7 @@ public class EquipamentoController {
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<EquipamentoRetornoDTO>>> obter(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "tombamento") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,

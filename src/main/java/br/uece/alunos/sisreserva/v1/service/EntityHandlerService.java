@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
+import br.uece.alunos.sisreserva.v1.domain.comite.Comite;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
 import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
@@ -17,6 +18,9 @@ public interface EntityHandlerService {
     //cargo
     List<Cargo> obterEntidadesCargoPorNome(List<String> nomes);
     Cargo obterCargoPorId(String id);
+
+    //comitê
+    Comite obterComitePorId(String id);
 
     //departamento
     Departamento obterDepartamentoPorId(String id);

@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.comite;
 
+import br.uece.alunos.sisreserva.v1.dto.comite.ComiteDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -35,11 +36,15 @@ public class Comite {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public Comite(ComiteDTO data) {
+        this.descricao = data.descricao();
+        this.tipo = data.tipo();
+    }
+
     @PrePersist
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

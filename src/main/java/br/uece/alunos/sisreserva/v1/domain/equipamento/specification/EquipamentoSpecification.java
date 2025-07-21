@@ -28,7 +28,7 @@ public class EquipamentoSpecification {
 
             if (filtros.containsKey("status")) {
                 try {
-                    StatusEquipamento status = StatusEquipamento.valueOf(filtros.get("status").toString().toUpperCase());
+                    StatusEquipamento status = StatusEquipamento.valueOf(filtros.get("status").toString());
                     predicates.add(cb.equal(root.get("status"), status));
                 } catch (IllegalArgumentException ignored) {
                     // Ignora status inválido

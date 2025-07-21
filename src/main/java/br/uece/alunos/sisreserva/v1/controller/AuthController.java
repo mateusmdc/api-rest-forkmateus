@@ -79,7 +79,7 @@ public class AuthController {
     @GetMapping("/usuario/todos")
     public ResponseEntity<ApiResponseDTO<Page<UsuarioRetornoDTO>>> obterTodosUsuariosPaginados(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder) {
 
@@ -91,7 +91,7 @@ public class AuthController {
     @GetMapping("/usuario/cargo/{cargoId}")
     public ResponseEntity<ApiResponseDTO<Page<UsuarioRetornoDTO>>> obterUsuariosPorCargo(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @PathVariable String cargoId) {
