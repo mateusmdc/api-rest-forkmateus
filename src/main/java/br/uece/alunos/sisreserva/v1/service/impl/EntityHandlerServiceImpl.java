@@ -3,6 +3,8 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
 import br.uece.alunos.sisreserva.v1.domain.cargo.useCase.ObterEntCargoPorId;
 import br.uece.alunos.sisreserva.v1.domain.cargo.useCase.ObterEntListaCargoPorNome;
+import br.uece.alunos.sisreserva.v1.domain.comite.Comite;
+import br.uece.alunos.sisreserva.v1.domain.comite.useCase.ObterEntComitePorId;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.departamento.useCase.ObterEntDepartamentoPorId;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
@@ -43,6 +45,13 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
     @Override
     public Cargo obterCargoPorId(String id) {
         return obterEntCargoPorId.obterEntidadeCargoPorId(id);
+    }
+
+    // Comitê
+    private final ObterEntComitePorId obterEntComitePorId;
+    @Override
+    public Comite obterComitePorId(String id) {
+        return obterEntComitePorId.obterEntidadePorId(id);
     }
 
     // Departamento
