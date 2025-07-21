@@ -28,8 +28,8 @@ public class AuthServiceImpl implements AuthService {
     private final TrocarSenha trocarSenha;
 
     @Override
-    public TokenDTO atualizarToken(TokenDTO data) {
-        return atualizaTokenAcesso.atualizaToken(data);
+    public TokenDTO atualizarToken(String refreshToken) {
+        return atualizaTokenAcesso.atualizaToken(refreshToken);
     }
 
     @Override

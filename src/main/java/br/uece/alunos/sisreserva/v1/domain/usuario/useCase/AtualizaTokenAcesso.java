@@ -9,13 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class AtualizaTokenAcesso {
-
     private final UsuarioRepository repository;
     private final TokenService tokenService;
 
-    public TokenDTO atualizaToken(TokenDTO data) {
-        var refreshToken = data.token();
-
+    public TokenDTO atualizaToken(String refreshToken) {
         if (!tokenService.isRefreshTokenValid(refreshToken)) {
             throw new RuntimeException("Refresh token inválido ou expirado.");
         }

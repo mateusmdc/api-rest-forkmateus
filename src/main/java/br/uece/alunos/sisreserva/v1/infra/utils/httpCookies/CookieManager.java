@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.infra.utils.httpCookies;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
@@ -15,5 +16,17 @@ public class CookieManager {
         newCookie.setMaxAge(30 * 24 * 60 * 60); // expiração do cookie para 30 dias
         response.addCookie(newCookie);
         return response;
+    }
+
+    public String getRefreshTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }
