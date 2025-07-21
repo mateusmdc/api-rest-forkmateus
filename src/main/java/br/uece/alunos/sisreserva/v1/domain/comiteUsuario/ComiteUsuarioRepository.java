@@ -1,13 +1,14 @@
 package br.uece.alunos.sisreserva.v1.domain.comiteUsuario;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface ComiteUsuarioRepository extends JpaRepository<ComiteUsuario, String> {
+public interface ComiteUsuarioRepository extends JpaRepository<ComiteUsuario, String>, JpaSpecificationExecutor<ComiteUsuario> {
     @Query("SELECT cu FROM ComiteUsuario cu WHERE cu.comite.id = :comiteId")
     List<ComiteUsuario> findByComiteId(String comiteId);
 

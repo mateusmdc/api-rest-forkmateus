@@ -4,18 +4,18 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public record EspacoDTO(
-        @NotNull @NotEmpty
+        @NotEmpty(message = "O nome não pode ser vazio")
         String nome,
         String urlCnpq,
         String observacao,
-        @NotNull @NotEmpty
+        @NotEmpty(message = "O departamentoId não pode ser vazio")
         String departamentoId,
-        @NotNull @NotEmpty
+        @NotEmpty(message = "O localizacaoId não pode ser vazio")
         String localizacaoId,
-        @NotNull @NotEmpty
+        @NotEmpty(message = "O tipoEspacoId não pode ser vazio")
         String tipoEspacoId,
-        @NotNull @NotEmpty
+        @NotEmpty(message = "O tipoAtividadeId não pode ser vazio")
         String tipoAtividadeId,
-        @NotNull
+        @NotNull(message = "O campo precisaProjeto é obrigatório")
         Boolean precisaProjeto
 ) {}
