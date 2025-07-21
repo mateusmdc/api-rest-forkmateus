@@ -1,9 +1,8 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
-import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoDTO;
-import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.comite.ComiteRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
-import br.uece.alunos.sisreserva.v1.service.TipoEquipamentoService;
+import br.uece.alunos.sisreserva.v1.service.ComiteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +15,32 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/equipamento/tipo")
-@Tag(name = "Rotas de tipo de equipamento mapeadas no controller")
-public class TipoEquipamentoController {
+@RequestMapping("/comite")
+@Tag(name = "Rotas de comitê mapeadas no controller")
+public class ComiteController {
     @Autowired
-    private TipoEquipamentoService service;
+    private ComiteService service;
 
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<Page<TipoEquipamentoRetornoDTO>>> obter(
+    public ResponseEntity<ApiResponseDTO<Page<ComiteRetornoDTO>>> obter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
-            @RequestParam(defaultValue = "nome") String sortField,
+            @RequestParam(defaultValue = "tipo") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,
-            @RequestParam(required = false) String nome
+            @RequestParam(required = false) Integer tipo
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-        var tiposDeEquipamento = service.obter(pageable, id, nome);
-        return ResponseEntity.ok(ApiResponseDTO.success(tiposDeEquipamento));
+        var comites = service.obter(pageable, id, tipo);
+        return ResponseEntity.ok(ApiResponseDTO.success(comites));
     }
 
+    /*
     @PostMapping
     public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> criar (@Valid TipoEquipamentoDTO data) {
         var tipoEquipamentoDTO = service.criar(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(tipoEquipamentoDTO));
     }
+
+     */
 }

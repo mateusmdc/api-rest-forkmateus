@@ -28,18 +28,10 @@ public class EquipamentoEspacoController {
     @Autowired
     private EquipamentoEspacoService service;
 
-    /*
-    @DeleteMapping("/{id}")
-    @Transactional
-    public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> inativarGestorEspaco(@PathVariable String id) {
-        gestorEspacoService.inativar(id);
-        return ResponseEntity.noContent().build();
-    } */
-
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<EquipamentoEspacoRetornoDTO>>> obter(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,
