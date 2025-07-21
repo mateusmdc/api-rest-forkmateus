@@ -7,6 +7,7 @@ import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -18,6 +19,7 @@ public class CriarComiteUsuario {
     private final EntityHandlerService entityHandlerService;
     private final ComiteUsuarioValidator validator;
 
+    @Transactional
     public ComiteUsuarioRetornoDTO criar(ComiteUsuarioDTO data) {
         var usuario = entityHandlerService.obterUsuarioPorId(data.usuarioId());
         var comite = entityHandlerService.obterComitePorId(data.comiteId());

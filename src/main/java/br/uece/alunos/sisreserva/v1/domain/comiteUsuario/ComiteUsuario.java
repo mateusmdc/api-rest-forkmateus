@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.domain.comiteUsuario;
 import br.uece.alunos.sisreserva.v1.domain.comite.Comite;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
+import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -71,6 +72,21 @@ public class ComiteUsuario {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
     }
+
+    public void atualizar(ComiteUsuarioAtualizarDTO data, Departamento departamento) {
+        if (data.descricao() != null) {
+            this.descricao = data.descricao();
+        }
+
+        if (data.isTitular() != null) {
+            this.isTitular = data.isTitular();
+        }
+
+        if (data.departamentoId() != null && departamento != null) {
+            this.departamento = departamento;
+        }
+    }
+
 
     @PreUpdate
     public void onUpdate() {

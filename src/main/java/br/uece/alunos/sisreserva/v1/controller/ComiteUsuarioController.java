@@ -1,6 +1,7 @@
 
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
@@ -61,5 +62,14 @@ public class ComiteUsuarioController {
             @RequestBody @Valid ComiteUsuarioDTO data) {
         var comiteUsuarioCriado = service.criar(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(comiteUsuarioCriado));
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<ComiteUsuarioRetornoDTO>> atualizar(
+            @PathVariable String id,
+            @RequestBody @Valid ComiteUsuarioAtualizarDTO data) {
+        var atualizado = service.atualizar(id, data);
+        return ResponseEntity.ok(ApiResponseDTO.success(atualizado));
     }
 }

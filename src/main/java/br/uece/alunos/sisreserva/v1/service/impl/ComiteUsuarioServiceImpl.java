@@ -1,8 +1,10 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
+import br.uece.alunos.sisreserva.v1.domain.comiteUsuario.useCase.AtualizarComiteUsuario;
 import br.uece.alunos.sisreserva.v1.domain.comiteUsuario.useCase.CriarComiteUsuario;
 import br.uece.alunos.sisreserva.v1.domain.comiteUsuario.useCase.DeletarComiteUsuario;
 import br.uece.alunos.sisreserva.v1.domain.comiteUsuario.useCase.ObterComiteUsuarios;
+import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.ComiteUsuarioService;
@@ -16,9 +18,15 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class ComiteUsuarioServiceImpl implements ComiteUsuarioService {
+    private final AtualizarComiteUsuario atualizarComiteUsuario;
     private final CriarComiteUsuario criarComiteUsuario;
     private final DeletarComiteUsuario deletarComiteUsuario;
     private final ObterComiteUsuarios obterComiteUsuarios;
+
+    @Override
+    public ComiteUsuarioRetornoDTO atualizar(String id, ComiteUsuarioAtualizarDTO data) {
+        return atualizarComiteUsuario.atualizar(id, data);
+    }
 
     @Override
     public ComiteUsuarioRetornoDTO criar(ComiteUsuarioDTO data) {
