@@ -1,6 +1,5 @@
-package br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.validation;
+package br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.validator;
 
-import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamentoRepository;
 import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;

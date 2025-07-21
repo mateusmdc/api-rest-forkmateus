@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.comite.ComiteDTO;
 import br.uece.alunos.sisreserva.v1.dto.comite.ComiteRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.ComiteService;
@@ -35,12 +36,9 @@ public class ComiteController {
         return ResponseEntity.ok(ApiResponseDTO.success(comites));
     }
 
-    /*
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> criar (@Valid TipoEquipamentoDTO data) {
-        var tipoEquipamentoDTO = service.criar(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(tipoEquipamentoDTO));
+    public ResponseEntity<ApiResponseDTO<ComiteRetornoDTO>> criar(@RequestBody @Valid ComiteDTO data) {
+        var comiteDTO = service.criar(data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(comiteDTO));
     }
-
-     */
 }

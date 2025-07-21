@@ -37,7 +37,7 @@ public class TipoEquipamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> criar (@Valid TipoEquipamentoDTO data) {
+    public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> criar (@RequestBody @Valid TipoEquipamentoDTO data) {
         var tipoEquipamentoDTO = service.criar(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(tipoEquipamentoDTO));
     }
