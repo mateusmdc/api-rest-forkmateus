@@ -1,12 +1,10 @@
 
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioRetornoDTO;
-import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoDTO;
-import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.ComiteUsuarioService;
-import br.uece.alunos.sisreserva.v1.service.GestorEspacoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -20,31 +18,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/comite/usuario")
-@Tag(name = "Rotas de usuários do comitÊ mapeadas no controller")
+@Tag(name = "Rotas de usuários do comitê mapeadas no controller")
 public class ComiteUsuarioController {
     @Autowired
     private ComiteUsuarioService service;
 
-    /*
-    @PostMapping
-    @Transactional
-    public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> cadastrarGestorEspaco(
-            @RequestBody @Valid GestorEspacoDTO data) {
-        var gestorEspacoRetornoDTO = gestorEspacoService.cadastrarOuReativarGestorEspaco(data);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(gestorEspacoRetornoDTO));
-    }
-
-    @DeleteMapping("/{id}")
-    @Transactional
-    public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> inativarGestorEspaco(@PathVariable String id) {
-        gestorEspacoService.inativar(id);
-        return ResponseEntity.noContent().build();
-    }
-
-     */
-
     @GetMapping
-    public ResponseEntity<ApiResponseDTO<Page<ComiteUsuarioRetornoDTO>>> obterComiteUsuarioPaginado(
+    public ResponseEntity<ApiResponseDTO<Page<ComiteUsuarioRetornoDTO>>> obter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "comite") String sortField,
@@ -67,4 +47,11 @@ public class ComiteUsuarioController {
         return ResponseEntity.ok(ApiResponseDTO.success(retornoPaginado));
     }
 
+    @PostMapping
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<ComiteUsuarioRetornoDTO>> criar(
+            @RequestBody @Valid ComiteUsuarioDTO data) {
+        var comiteUsuarioCriado = service.criar(data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(comiteUsuarioCriado));
+    }
 }
