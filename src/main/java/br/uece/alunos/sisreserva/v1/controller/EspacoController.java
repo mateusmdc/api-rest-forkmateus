@@ -33,7 +33,7 @@ public class EspacoController {
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<EspacoRetornoDTO>>> obterEspacosPaginados(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,

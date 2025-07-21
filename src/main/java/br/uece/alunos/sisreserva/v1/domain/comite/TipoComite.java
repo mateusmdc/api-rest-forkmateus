@@ -1,10 +1,13 @@
 package br.uece.alunos.sisreserva.v1.domain.comite;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum TipoComite {
-    GESTOR(1),
-    USUARIOS(2),
-    TECNICOS(3),
-    REPRESENTANTE_DISCENTE(4);
+    GESTOR(0),
+    USUARIOS(1),
+    TECNICOS(2),
+    REPRESENTANTE_DISCENTE(3);
 
     private final int codigo;
 
@@ -12,10 +15,12 @@ public enum TipoComite {
         this.codigo = codigo;
     }
 
+    @JsonValue
     public int getCodigo() {
         return codigo;
     }
 
+    @JsonCreator
     public static TipoComite fromCodigo(int codigo) {
         for (TipoComite tipo : values()) {
             if (tipo.getCodigo() == codigo) {

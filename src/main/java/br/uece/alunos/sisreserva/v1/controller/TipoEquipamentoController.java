@@ -25,7 +25,7 @@ public class TipoEquipamentoController {
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<TipoEquipamentoRetornoDTO>>> obter(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,
@@ -37,7 +37,7 @@ public class TipoEquipamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> criar (@Valid TipoEquipamentoDTO data) {
+    public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> criar (@RequestBody @Valid TipoEquipamentoDTO data) {
         var tipoEquipamentoDTO = service.criar(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(tipoEquipamentoDTO));
     }

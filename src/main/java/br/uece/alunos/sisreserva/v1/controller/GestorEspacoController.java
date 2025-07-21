@@ -41,7 +41,7 @@ public class GestorEspacoController {
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<GestorEspacoRetornoDTO>>> obterGestorEspacoPaginado(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "16") int size,
+            @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "id") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,
