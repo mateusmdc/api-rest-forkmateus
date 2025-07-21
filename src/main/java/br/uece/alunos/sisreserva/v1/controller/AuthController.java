@@ -105,9 +105,9 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @Transactional
-    public ResponseEntity<ApiResponseDTO<TokenDTO>> atualizarAccessToken(@RequestBody TokenDTO refreshToken) {
-        var accessTokenDTO = authService.atualizarToken(refreshToken);
-        return ResponseEntity.ok(ApiResponseDTO.success(accessTokenDTO));
+    public ResponseEntity<ApiResponseDTO<TokenDTO>> atualizarAccessToken(HttpServletRequest request) {
+        var refreshToken = cookieManager.getRefreshTokenFromCookie(request);
+        var novoAccessToken = authService.atualizarToken(refreshToken);
+        return ResponseEntity.ok(ApiResponseDTO.success(novoAccessToken));
     }
 }
