@@ -53,7 +53,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Transactional
-    public ResponseEntity<ApiResponseDTO<AuthTokensDTO>> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data,
+    public ResponseEntity<ApiResponseDTO<TokenDTO>> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data,
                                                                        HttpServletResponse response,
                                                                        HttpServletRequest request) {
         var tokensJwt = authService.login(data, request);
@@ -62,7 +62,7 @@ public class AuthController {
             cookieManager.addRefreshTokenCookie(response, tokensJwt.refreshToken());
         }
 
-        return ResponseEntity.ok(ApiResponseDTO.success(tokensJwt));
+        return ResponseEntity.ok(ApiResponseDTO.success(new TokenDTO(tokensJwt.accessToken())));
     }
 
     @PutMapping("/usuario/{idUsuario}")
