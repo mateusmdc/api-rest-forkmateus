@@ -32,4 +32,15 @@ public class ComiteUsuarioValidator {
             }
         }
     }
+
+    public void validarComiteUsuarioId(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new ValidationException("O ID do Comitê de Usuário deve ser informado.");
+        }
+
+        boolean existe = repository.existsById(id);
+        if (!existe) {
+            throw new ValidationException("Comitê de Usuário não encontrado para o ID informado.");
+        }
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ComiteUsuarioService {
     ComiteUsuarioRetornoDTO criar(ComiteUsuarioDTO data);
+    void deletar(String id);
     Page<ComiteUsuarioRetornoDTO> obter(
             Pageable pageable,
             String id,

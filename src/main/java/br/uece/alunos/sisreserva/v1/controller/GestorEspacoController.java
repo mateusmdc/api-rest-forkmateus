@@ -33,7 +33,7 @@ public class GestorEspacoController {
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<ApiResponseDTO<GestorEspacoRetornoDTO>> inativarGestorEspaco(@PathVariable String id) {
+    public ResponseEntity<ApiResponseDTO<Void>> inativarGestorEspaco(@PathVariable String id) {
         gestorEspacoService.inativar(id);
         return ResponseEntity.noContent().build();
     }

@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.controller;
 
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.gestorEspaco.GestorEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.ComiteUsuarioService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +23,13 @@ import org.springframework.web.bind.annotation.*;
 public class ComiteUsuarioController {
     @Autowired
     private ComiteUsuarioService service;
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Void> deletar(@PathVariable String id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<ComiteUsuarioRetornoDTO>>> obter(

@@ -40,6 +40,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/equipamento/tipo").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/comite").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/comite/usuario").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/comite/usuario").hasRole("ADMIN");
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilterApplication, UsernamePasswordAuthenticationFilter.class)
