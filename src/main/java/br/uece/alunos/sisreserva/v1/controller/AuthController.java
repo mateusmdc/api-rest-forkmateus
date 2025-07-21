@@ -1,8 +1,9 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
 import br.uece.alunos.sisreserva.v1.dto.usuario.*;
-import br.uece.alunos.sisreserva.v1.dto.utils.AccessTokenDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.TokenDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
+import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.infra.utils.httpCookies.CookieManager;
 import br.uece.alunos.sisreserva.v1.service.AuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,14 +53,16 @@ public class AuthController {
 
     @PostMapping("/login")
     @Transactional
-    public ResponseEntity<ApiResponseDTO<AccessTokenDTO>> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data,
-                                                                        HttpServletResponse response,
-                                                                        HttpServletRequest request) {
+    public ResponseEntity<ApiResponseDTO<AuthTokensDTO>> realizarLogin(@RequestBody @Valid UsuarioLoginDTO data,
+                                                                       HttpServletResponse response,
+                                                                       HttpServletRequest request) {
         var tokensJwt = authService.login(data, request);
+
         if (tokensJwt.refreshToken() != null) {
             cookieManager.addRefreshTokenCookie(response, tokensJwt.refreshToken());
         }
-        return ResponseEntity.ok(ApiResponseDTO.success(new AccessTokenDTO(tokensJwt.accessToken())));
+
+        return ResponseEntity.ok(ApiResponseDTO.success(tokensJwt));
     }
 
     @PutMapping("/usuario/{idUsuario}")
@@ -99,5 +102,12 @@ public class AuthController {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
         var usuariosPorCargo = authService.obterUsuariosPorCargo(cargoId, pageable);
         return ResponseEntity.ok(ApiResponseDTO.success(usuariosPorCargo));
+    }
+
+    @PostMapping("/refresh")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<TokenDTO>> atualizarAccessToken(@RequestBody TokenDTO refreshToken) {
+        var accessTokenDTO = authService.atualizarToken(refreshToken);
+        return ResponseEntity.ok(ApiResponseDTO.success(accessTokenDTO));
     }
 }
