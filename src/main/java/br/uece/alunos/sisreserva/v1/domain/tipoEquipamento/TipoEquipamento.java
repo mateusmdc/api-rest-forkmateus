@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.tipoEquipamento;
 
+import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +44,12 @@ public class TipoEquipamento {
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void atualizar(TipoEquipamentoAtualizarDTO data) {
+        if (data.nome() != null && !data.nome().isEmpty()) {
+            this.nome = data.nome();
+        }
     }
 
     @PreUpdate

@@ -40,4 +40,14 @@ public class ComiteValidator {
                 .replaceAll("[^\\p{ASCII}]", "")   // remove caracteres especiais (não ASCII)
                 .replaceAll("\\s+", " ");          // normaliza espaços
     }
+
+    public void validarComiteId(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new ValidationException("O ID do comitê não pode ser nulo ou vazio.");
+        }
+
+        if (!repository.existsById(id)) {
+            throw new ValidationException("Comitê com o ID fornecido não existe.");
+        }
+    }
 }

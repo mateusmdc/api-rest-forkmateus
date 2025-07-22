@@ -79,29 +79,41 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponseDTO.success(usuario));
     }
 
-    @GetMapping("/usuario/todos")
-    public ResponseEntity<ApiResponseDTO<Page<UsuarioRetornoDTO>>> obterTodosUsuariosPaginados(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size,
-            @RequestParam(defaultValue = "nome") String sortField,
-            @RequestParam(defaultValue = "asc") String sortOrder) {
-
-        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-        var usuariosPaginados = authService.obterUsuarios(pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(usuariosPaginados));
-    }
-
-    @GetMapping("/usuario/cargo/{cargoId}")
-    public ResponseEntity<ApiResponseDTO<Page<UsuarioRetornoDTO>>> obterUsuariosPorCargo(
+    @GetMapping("/usuario")
+    public ResponseEntity<ApiResponseDTO<Page<UsuarioRetornoDTO>>> obter(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size,
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
-            @PathVariable String cargoId) {
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) Integer matricula,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String documentoFiscal,
+            @RequestParam(required = false) String instituicaoId,
+            @RequestParam(required = false) String cargoId,
+            @RequestParam(required = false) String nome
+    ) {
+        String fieldToSort = switch (sortField) {
+            case "nome" -> "nome";
+            case "email" -> "email";
+            case "matricula" -> "matricula";
+            default -> sortField;
+        };
 
-        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-        var usuariosPorCargo = authService.obterUsuariosPorCargo(cargoId, pageable);
-        return ResponseEntity.ok(ApiResponseDTO.success(usuariosPorCargo));
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), fieldToSort));
+
+        var resultado = authService.obter(
+                pageable,
+                id,
+                matricula,
+                email,
+                documentoFiscal,
+                instituicaoId,
+                cargoId,
+                nome
+        );
+
+        return ResponseEntity.ok(ApiResponseDTO.success(resultado));
     }
 
     @PostMapping("/refresh")
@@ -109,5 +121,11 @@ public class AuthController {
         var refreshToken = cookieManager.getRefreshTokenFromCookie(request);
         var novoAccessToken = authService.atualizarToken(refreshToken);
         return ResponseEntity.ok(ApiResponseDTO.success(novoAccessToken));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponseDTO<String>> logout(HttpServletResponse response) {
+        cookieManager.removeRefreshTokenCookie(response);
+        return ResponseEntity.ok(ApiResponseDTO.success("Logout realizado com sucesso."));
     }
 }

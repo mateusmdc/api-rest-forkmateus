@@ -22,8 +22,7 @@ public class AuthServiceImpl implements AuthService {
     private final CriarUsuario criarUsuario;
     private final EsqueciSenha esqueciSenha;
     private final ObterUsuarioPorJWT obterUsuarioPorJWT;
-    private final ObterUsuariosPorCargoId obterUsuariosPorCargoId;
-    private final ObterUsuariosPaginado obterUsuariosPaginado;
+    private final ObterUsuarios obterUsuarios;
     private final RealizarLogin realizarLogin;
     private final TrocarSenha trocarSenha;
 
@@ -58,13 +57,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Page<UsuarioRetornoDTO> obterUsuarios(Pageable pageable) {
-        return obterUsuariosPaginado.obterUsuarios(pageable);
-    }
-
-    @Override
-    public Page<UsuarioRetornoDTO> obterUsuariosPorCargo(String cargoId, Pageable pageable) {
-        return obterUsuariosPorCargoId.obterUsuariosPorCargo(cargoId, pageable);
+    public Page<UsuarioRetornoDTO> obter(Pageable pageable, String id, Integer matricula, String email, String documentoFiscal, String instituicaoId, String cargoId, String nome) {
+        return obterUsuarios.obter(pageable, id, matricula, email, documentoFiscal, instituicaoId, cargoId, nome);
     }
 
     @Override
