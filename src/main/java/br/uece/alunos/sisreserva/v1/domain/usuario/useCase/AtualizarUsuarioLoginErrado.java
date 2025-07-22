@@ -1,11 +1,10 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
-import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLog;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,15 +14,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Component
+@AllArgsConstructor
 public class AtualizarUsuarioLoginErrado {
 
     private static final int MAX_ATTEMPTS = 5;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private TaskScheduler taskScheduler;
+    private final UsuarioRepository usuarioRepository;
+    private final TaskScheduler taskScheduler;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateFailedLogin(String email) {

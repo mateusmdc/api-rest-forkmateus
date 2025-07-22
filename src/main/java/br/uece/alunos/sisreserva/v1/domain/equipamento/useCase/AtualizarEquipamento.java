@@ -23,7 +23,7 @@ public class AtualizarEquipamento {
         validator.validarEquipamentoId(id);
 
         var equipamento = repository.findById(id)
-                .orElseThrow(() -> new ValidationException("Equipamento não encontrado"));
+                .orElseThrow(() -> new ValidationException("Equipamento não encontrado, mesmo após a validação do ID."));
 
         var espaco = repository.findEspacoIdJoinedByEquipamentoId(id)
                 .orElseThrow(() -> new ValidationException("Espaço não encontrado para o equipamento"));
