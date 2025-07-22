@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.domain.equipamento;
 
 import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
+import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +21,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Equipamento {
-
     @Id
     @Column(name = "id", nullable = false, length = 36, updatable = false)
     private String id;
@@ -61,6 +61,15 @@ public class Equipamento {
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void atualizar(EquipamentoAtualizarDTO data) {
+        if (data.descricao() != null) {
+            this.descricao = data.descricao();
+        }
+        if (data.status() != null) {
+            this.status = data.status();
+        }
     }
 
     @PreUpdate
