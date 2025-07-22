@@ -77,7 +77,7 @@ public class Espaco {
     }
 
     public void atualizar(EspacoAtualizarDTO data) {
-        if (data.nome() != null) {
+        if (data.nome() != null && !data.nome().isEmpty()) {
             this.nome = data.nome();
         }
         if (data.urlCnpq() != null) {

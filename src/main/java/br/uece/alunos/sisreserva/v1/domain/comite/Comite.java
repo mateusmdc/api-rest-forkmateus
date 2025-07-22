@@ -49,7 +49,7 @@ public class Comite {
     }
 
     public void atualizarComite(ComiteAtualizarDTO data) {
-        if (data.descricao() != null) {
+        if (data.descricao() != null && !data.descricao().isEmpty()) {
             this.descricao = data.descricao();
         }
     }
