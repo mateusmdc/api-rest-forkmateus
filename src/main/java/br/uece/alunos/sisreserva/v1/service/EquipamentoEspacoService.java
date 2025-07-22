@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface EquipamentoEspacoService {
     List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data);
+    EquipamentoEspacoRetornoDTO inativar(String equipamentoEspacoId, String usuarioId);
     Page<EquipamentoEspacoRetornoDTO> obter(Pageable pageable,
                                             String id,
                                             String equipamentoId,

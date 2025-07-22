@@ -5,6 +5,7 @@ import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspaco
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoEspacoService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,5 +73,16 @@ public class EquipamentoEspacoController {
             @RequestBody @Valid CriarEquipamentoEspacoDTO data) {
         var retornoDTO = service.criarEquipamentoAlocandoAoEspaco(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(retornoDTO));
+    }
+
+    @Operation(summary = "Inativa o vínculo entre equipamento e espaço se o usuário for gestor autorizado")
+    @DeleteMapping
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<EquipamentoEspacoRetornoDTO>> inativar(
+            @RequestParam String equipamentoEspacoId,
+            @RequestParam String usuarioId
+    ) {
+        var retorno = service.inativar(equipamentoEspacoId, usuarioId);
+        return ResponseEntity.ok(ApiResponseDTO.success(retorno));
     }
 }
