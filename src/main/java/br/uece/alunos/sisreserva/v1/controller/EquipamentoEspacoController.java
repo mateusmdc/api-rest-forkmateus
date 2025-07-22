@@ -78,11 +78,11 @@ public class EquipamentoEspacoController {
     @Operation(summary = "Inativa o vínculo entre equipamento e espaço se o usuário for gestor autorizado")
     @DeleteMapping
     @Transactional
-    public ResponseEntity<ApiResponseDTO<EquipamentoEspacoRetornoDTO>> inativar(
+    public ResponseEntity<Void> inativar(
             @RequestParam String equipamentoEspacoId,
             @RequestParam String usuarioId
     ) {
         var retorno = service.inativar(equipamentoEspacoId, usuarioId);
-        return ResponseEntity.ok(ApiResponseDTO.success(retorno));
+        return ResponseEntity.noContent().build();
     }
 }

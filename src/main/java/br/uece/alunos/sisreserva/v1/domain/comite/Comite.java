@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.comite;
 
+import br.uece.alunos.sisreserva.v1.dto.comite.ComiteAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.comite.ComiteDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -45,6 +46,12 @@ public class Comite {
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
+    }
+
+    public void atualizarComite(ComiteAtualizarDTO data) {
+        if (data.descricao() != null) {
+            this.descricao = data.descricao();
+        }
     }
 
     @PreUpdate
