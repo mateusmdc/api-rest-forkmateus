@@ -110,4 +110,10 @@ public class AuthController {
         var novoAccessToken = authService.atualizarToken(refreshToken);
         return ResponseEntity.ok(ApiResponseDTO.success(novoAccessToken));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponseDTO<String>> logout(HttpServletResponse response) {
+        cookieManager.removeRefreshTokenCookie(response);
+        return ResponseEntity.ok(ApiResponseDTO.success("Logout realizado com sucesso."));
+    }
 }

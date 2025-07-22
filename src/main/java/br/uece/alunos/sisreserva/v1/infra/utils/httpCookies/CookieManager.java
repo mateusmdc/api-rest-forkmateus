@@ -29,4 +29,15 @@ public class CookieManager {
         }
         return null;
     }
+
+    public HttpServletResponse removeRefreshTokenCookie(HttpServletResponse response) {
+        Cookie expiredCookie = new Cookie("refreshToken", null);
+        expiredCookie.setHttpOnly(true);
+        expiredCookie.setSecure(false); // trocar para true em produção com HTTPS
+        expiredCookie.setPath("/");
+        expiredCookie.setMaxAge(0);
+        response.addCookie(expiredCookie);
+        return response;
+    }
+
 }
