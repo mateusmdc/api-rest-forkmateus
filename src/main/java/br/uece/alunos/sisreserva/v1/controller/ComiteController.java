@@ -1,10 +1,12 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.comite.ComiteAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.comite.ComiteDTO;
 import br.uece.alunos.sisreserva.v1.dto.comite.ComiteRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.ComiteService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,5 +42,14 @@ public class ComiteController {
     public ResponseEntity<ApiResponseDTO<ComiteRetornoDTO>> criar(@RequestBody @Valid ComiteDTO data) {
         var comiteDTO = service.criar(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(comiteDTO));
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<ComiteRetornoDTO>> atualizar(
+            @PathVariable String id,
+            @RequestBody ComiteAtualizarDTO data) {
+        var atualizado = service.atualizar(data, id);
+        return ResponseEntity.ok(ApiResponseDTO.success(atualizado));
     }
 }

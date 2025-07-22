@@ -74,7 +74,7 @@ public class ComiteUsuario {
     }
 
     public void atualizar(ComiteUsuarioAtualizarDTO data, Departamento departamento) {
-        if (data.descricao() != null) {
+        if (data.descricao() != null && !data.descricao().isEmpty()) {
             this.descricao = data.descricao();
         }
 

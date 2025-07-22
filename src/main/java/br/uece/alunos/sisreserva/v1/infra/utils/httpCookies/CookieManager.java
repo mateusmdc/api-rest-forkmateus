@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.infra.utils.httpCookies;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
@@ -16,4 +17,27 @@ public class CookieManager {
         response.addCookie(newCookie);
         return response;
     }
+
+    public String getRefreshTokenFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    public HttpServletResponse removeRefreshTokenCookie(HttpServletResponse response) {
+        Cookie expiredCookie = new Cookie("refreshToken", null);
+        expiredCookie.setHttpOnly(true);
+        expiredCookie.setSecure(false); // trocar para true em produção com HTTPS
+        expiredCookie.setPath("/");
+        expiredCookie.setMaxAge(0);
+        response.addCookie(expiredCookie);
+        return response;
+    }
+
 }

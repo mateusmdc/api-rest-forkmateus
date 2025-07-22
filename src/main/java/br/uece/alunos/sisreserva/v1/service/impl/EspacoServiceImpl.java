@@ -1,7 +1,9 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
+import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.AtualizarEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.CriarEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterEspaco;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.EspacoService;
@@ -15,8 +17,14 @@ import org.springframework.stereotype.Service;
 @Transactional
 @RequiredArgsConstructor
 public class EspacoServiceImpl implements EspacoService {
+    private final AtualizarEspaco atualizarEspaco;
     private final CriarEspaco criarEspaco;
     private final ObterEspaco obterEspaco;
+
+    @Override
+    public EspacoRetornoDTO atualizar(String id, EspacoAtualizarDTO data) {
+        return atualizarEspaco.atualizar(id, data);
+    }
 
     @Override
     public EspacoRetornoDTO criarEspaco(EspacoDTO data) {

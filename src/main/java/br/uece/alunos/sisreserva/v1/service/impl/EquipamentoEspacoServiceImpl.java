@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.CriarEquipamentoEspaco;
+import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.InativarEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.ObterEquipamentosEspaco;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
@@ -17,11 +18,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     private final CriarEquipamentoEspaco criarEquipamentoEspaco;
+    private final InativarEquipamentoEspaco inativarEquipamentoEspaco;
     private final ObterEquipamentosEspaco obterEquipamentosEspaco;
 
     @Override
     public List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
         return criarEquipamentoEspaco.criarEquipamentosAlocandoAoEspaco(data);
+    }
+
+    @Override
+    public EquipamentoEspacoRetornoDTO inativar(String equipamentoEspacoId, String usuarioId) {
+        return inativarEquipamentoEspaco.inativar(equipamentoEspacoId, usuarioId);
     }
 
     @Override

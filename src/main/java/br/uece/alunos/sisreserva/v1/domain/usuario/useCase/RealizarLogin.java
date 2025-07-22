@@ -5,6 +5,7 @@ import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLo
 import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,21 +19,13 @@ import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.TokenService;
 
 @Component
+@AllArgsConstructor
 public class RealizarLogin {
-
-    @Autowired
-    private AuthenticationManager manager;
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private AtualizarUsuarioLoginErrado atualizarUsuarioLoginErrado;
-
-    @Autowired
-    private RegisterAuditLog registerAuditLog;
-
-    @Autowired
-    private UsuarioValidator usuarioValidator;
+    private final AuthenticationManager manager;
+    private final TokenService tokenService;
+    private final AtualizarUsuarioLoginErrado atualizarUsuarioLoginErrado;
+    private final RegisterAuditLog registerAuditLog;
+    private final UsuarioValidator usuarioValidator;
 
     @Transactional
     public AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request) {
@@ -63,7 +56,7 @@ public class RealizarLogin {
             return new AuthTokensDTO(accessToken, refreshToken);
         } catch (BadCredentialsException e) {
             handleFailedLogin(data.email(), request);
-            throw new BadCredentialsException("Wrong login or password.");
+            throw new BadCredentialsException("Login ou senha errados.");
         }
     }
 

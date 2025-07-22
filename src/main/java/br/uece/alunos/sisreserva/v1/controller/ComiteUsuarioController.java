@@ -68,7 +68,7 @@ public class ComiteUsuarioController {
     @Transactional
     public ResponseEntity<ApiResponseDTO<ComiteUsuarioRetornoDTO>> atualizar(
             @PathVariable String id,
-            @RequestBody @Valid ComiteUsuarioAtualizarDTO data) {
+            @RequestBody ComiteUsuarioAtualizarDTO data) {
         var atualizado = service.atualizar(id, data);
         return ResponseEntity.ok(ApiResponseDTO.success(atualizado));
     }

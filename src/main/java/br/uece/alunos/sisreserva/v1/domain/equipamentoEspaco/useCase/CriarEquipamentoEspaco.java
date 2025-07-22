@@ -7,24 +7,19 @@ import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspaco
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@AllArgsConstructor
 public class CriarEquipamentoEspaco {
-    @Autowired
-    private EntityHandlerService entityHandlerService;
-
-    @Autowired
-    private EquipamentoEspacoRepository repository;
-
-    @Autowired
-    private EquipamentoService equipamentoService;
-
-    @Autowired
-    private ValidadorGestorEspaco validaSeGestorEspaco;
+    private final EntityHandlerService entityHandlerService;
+    private final EquipamentoEspacoRepository repository;
+    private final EquipamentoService equipamentoService;
+    private final ValidadorGestorEspaco validaSeGestorEspaco;
 
     public List<EquipamentoEspacoRetornoDTO> criarEquipamentosAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
         validaSeGestorEspaco.validarGestorAtivo(data.usuarioId(), data.espacoId());

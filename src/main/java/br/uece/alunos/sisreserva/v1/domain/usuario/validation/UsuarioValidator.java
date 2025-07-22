@@ -35,4 +35,14 @@ public class UsuarioValidator {
             throw new ValidationException("O campo senha não pode estar vazio.");
         }
     }
+
+    public void validarUsuarioId(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new ValidationException("O ID do usuário não pode ser nulo ou vazio.");
+        }
+
+        if (!usuarioRepository.existsById(id)) {
+            throw new ValidationException("Usuário com o ID fornecido não existe.");
+        }
+    }
 }

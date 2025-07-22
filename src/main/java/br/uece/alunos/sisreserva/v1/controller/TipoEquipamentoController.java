@@ -1,10 +1,12 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.tipoEquipamento.TipoEquipamentoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.TipoEquipamentoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,5 +42,14 @@ public class TipoEquipamentoController {
     public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> criar (@RequestBody @Valid TipoEquipamentoDTO data) {
         var tipoEquipamentoDTO = service.criar(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(tipoEquipamentoDTO));
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<TipoEquipamentoRetornoDTO>> atualizar(
+            @PathVariable String id,
+            @RequestBody TipoEquipamentoAtualizarDTO data) {
+        var atualizado = service.atualizar(data, id);
+        return ResponseEntity.ok(ApiResponseDTO.success(atualizado));
     }
 }

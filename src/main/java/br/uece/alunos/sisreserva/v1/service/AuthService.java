@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service;
 
 import br.uece.alunos.sisreserva.v1.dto.usuario.*;
+import br.uece.alunos.sisreserva.v1.dto.utils.TokenDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,12 +9,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface AuthService {
+    TokenDTO atualizarToken(String refreshToken);
     UsuarioRetornoDTO atualizarUsuario(AtualizarUsuarioDTO data, String idUsuario);
     UsuarioRetornoDTO criarUsuario(UsuarioDTO data);
     MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data);
     AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request);
     UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT);
-    Page<UsuarioRetornoDTO> obterUsuarios(Pageable pageable);
-    Page<UsuarioRetornoDTO> obterUsuariosPorCargo(String cargoId, Pageable pageable);
+    Page<UsuarioRetornoDTO> obter(Pageable pageable,
+                                  String id,
+                                  Integer matricula,
+                                  String email,
+                                  String documentoFiscal,
+                                  String instituicaoId,
+                                  String cargoId,
+                                  String nome);
     MessageResponseDTO resetarSenha(UsuarioTrocarSenhaDTO data);
 }

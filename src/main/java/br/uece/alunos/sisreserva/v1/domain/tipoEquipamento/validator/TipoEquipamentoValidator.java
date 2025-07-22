@@ -33,4 +33,14 @@ public class TipoEquipamentoValidator {
                 .replaceAll("[^\\p{ASCII}]", "")
                 .replaceAll("\\s+", " ");
     }
+
+    public void validarTipoEquipamentoId(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new ValidationException("O ID do tipo de equipamento não pode ser nulo ou vazio.");
+        }
+
+        if (!repository.existsById(id)) {
+            throw new ValidationException("Tipo de Equipamento com o ID fornecido não existe.");
+        }
+    }
 }

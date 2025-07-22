@@ -4,6 +4,7 @@ import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -21,7 +22,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Espaco {
-
     @Id
     @Column(name = "id", nullable = false, length = 36, updatable = false)
     private String id;
@@ -74,7 +74,21 @@ public class Espaco {
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void atualizar(EspacoAtualizarDTO data) {
+        if (data.nome() != null && !data.nome().isEmpty()) {
+            this.nome = data.nome();
+        }
+        if (data.urlCnpq() != null) {
+            this.urlCnpq = data.urlCnpq();
+        }
+        if (data.observacao() != null) {
+            this.observacao = data.observacao();
+        }
+        if (data.precisaProjeto() != null) {
+            this.precisaProjeto = data.precisaProjeto();
+        }
     }
 
     @PreUpdate

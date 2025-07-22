@@ -17,6 +17,9 @@ public class EquipamentoEspacoSpecification {
 
             if (filtros == null) return cb.conjunction();
 
+            // só registros com dataRemocao == null
+            predicates.add(cb.isNull(root.get("dataRemocao")));
+
             if (filtros.containsKey("id")) {
                 predicates.add(cb.equal(root.get("id"), filtros.get("id")));
             }
