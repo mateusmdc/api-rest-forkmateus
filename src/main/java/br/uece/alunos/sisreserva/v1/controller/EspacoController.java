@@ -1,8 +1,9 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioAtualizarDTO;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
-import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EspacoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +29,15 @@ public class EspacoController {
     public ResponseEntity<ApiResponseDTO<EspacoRetornoDTO>> criarEspaco(@RequestBody @Valid EspacoDTO data) {
         var espacoRetornoDTO = espacoService.criarEspaco(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(espacoRetornoDTO));
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<EspacoRetornoDTO>> atualizar(
+            @PathVariable String id,
+            @RequestBody EspacoAtualizarDTO data) {
+        var atualizado = espacoService.atualizar(id, data);
+        return ResponseEntity.ok(ApiResponseDTO.success(atualizado));
     }
 
     @GetMapping
