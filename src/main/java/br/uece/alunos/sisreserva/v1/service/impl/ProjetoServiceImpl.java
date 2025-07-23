@@ -1,7 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
-import br.uece.alunos.sisreserva.v1.domain.projeto.UseCase.CriarProjeto;
-import br.uece.alunos.sisreserva.v1.domain.projeto.UseCase.ObterProjeto;
+import br.uece.alunos.sisreserva.v1.domain.projeto.useCase.CriarProjeto;
+import br.uece.alunos.sisreserva.v1.domain.projeto.useCase.ObterProjeto;
 import br.uece.alunos.sisreserva.v1.dto.projeto.ProjetoDTO;
 import br.uece.alunos.sisreserva.v1.dto.projeto.ProjetoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.ProjetoService;

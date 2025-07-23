@@ -1,4 +1,4 @@
-package br.uece.alunos.sisreserva.v1.domain.projeto.UseCase;
+package br.uece.alunos.sisreserva.v1.domain.projeto.useCase;
 
 import br.uece.alunos.sisreserva.v1.domain.projeto.Projeto;
 import br.uece.alunos.sisreserva.v1.domain.projeto.ProjetoRepository;
