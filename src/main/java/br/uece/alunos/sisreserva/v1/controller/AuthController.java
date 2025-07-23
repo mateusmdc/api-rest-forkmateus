@@ -57,11 +57,7 @@ public class AuthController {
                                                                        HttpServletResponse response,
                                                                        HttpServletRequest request) {
         var tokensJwt = authService.login(data, request);
-
-        if (tokensJwt.refreshToken() != null) {
-            cookieManager.addRefreshTokenCookie(response, tokensJwt.refreshToken());
-        }
-
+        cookieManager.addRefreshTokenCookie(response, tokensJwt.refreshToken());
         return ResponseEntity.ok(ApiResponseDTO.success(new TokenDTO(tokensJwt.accessToken())));
     }
 
