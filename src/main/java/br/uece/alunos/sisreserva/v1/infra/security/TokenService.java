@@ -35,7 +35,7 @@ public class TokenService {
                     .withClaim("id", usuario.getId())
                     .withClaim("role", usuario.getRoles().toString())
                     .withIssuedAt(Instant.now())
-                    .withExpiresAt(dateExpires())
+                    .withExpiresAt(accessTokenExpirationDate())
                     .sign(algorithm);
 
             return token;
@@ -47,14 +47,17 @@ public class TokenService {
     public String generateRefreshToken(Usuario usuario) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(refreshSecret);
-            return JWT.create()
+            var builder = JWT.create()
                     .withIssuer("sisreserva-api")
                     .withSubject(usuario.getEmail())
-                    .withClaim("id", usuario.getId())
                     .withClaim("refreshId", UUID.randomUUID().toString())
-                    .withIssuedAt(Instant.now())
-                    .withExpiresAt(refreshTokenExpirationDate())
-                    .sign(algorithm);
+                    .withIssuedAt(Instant.now());
+
+            if (usuario.isRefreshTokenEnabled()) {
+                builder.withExpiresAt(refreshTokenExpirationDate());
+            }
+
+            return builder.sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("Erro enquanto gerava o token JWT de persistência (refresh).", exception);
         }
@@ -117,8 +120,22 @@ public class TokenService {
         }
     }
 
-    private Instant dateExpires() {
-        return LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.of("-03:00"));
+    public DecodedJWT parseClaims(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(refreshSecret);
+            JWTVerifier verifier = JWT.require(algorithm)
+                    .withIssuer("sisreserva-api")
+                    .build();
+
+            DecodedJWT decodedJWT = verifier.verify(token);
+            return decodedJWT;
+        } catch (JWTVerificationException | IllegalArgumentException e) {
+            throw new RuntimeException("Token inválido ou expirado.", e);
+        }
+    }
+
+    private Instant accessTokenExpirationDate() {
+        return LocalDateTime.now().plusMinutes(15).toInstant(ZoneOffset.of("-03:00"));
     }
 
     private Instant refreshTokenExpirationDate() {
