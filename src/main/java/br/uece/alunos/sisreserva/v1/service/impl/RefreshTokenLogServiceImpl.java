@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.refreshTokenLog.useCase.RegistrarLogRefreshToken;
 import br.uece.alunos.sisreserva.v1.domain.refreshTokenLog.useCase.RevogarRefreshToken;
+import br.uece.alunos.sisreserva.v1.domain.refreshTokenLog.useCase.ValidaSeFoiRevogado;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.service.RefreshTokenLogService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,12 @@ import java.time.LocalDateTime;
 public class RefreshTokenLogServiceImpl implements RefreshTokenLogService {
     private final RegistrarLogRefreshToken registrarLogRefreshToken;
     private final RevogarRefreshToken revogarRefreshToken;
+    private final ValidaSeFoiRevogado validaSeFoiRevogado;
+
+    @Override
+    public boolean foiRevogado(String refreshTokenId) {
+        return validaSeFoiRevogado.foiRevogado(refreshTokenId);
+    }
 
     @Override
     public void registrar(Usuario usuario, String refreshTokenId, LocalDateTime issuedAt, LocalDateTime expiresAt, HttpServletRequest request) {
