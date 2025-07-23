@@ -5,6 +5,7 @@ import br.uece.alunos.sisreserva.v1.dto.utils.TokenDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,5 +24,6 @@ public interface AuthService {
                                   String instituicaoId,
                                   String cargoId,
                                   String nome);
+    void logout(HttpServletRequest request, HttpServletResponse response);
     MessageResponseDTO resetarSenha(UsuarioTrocarSenhaDTO data);
 }

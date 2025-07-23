@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.dto.utils.TokenDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.TokenService;
+import br.uece.alunos.sisreserva.v1.service.RefreshTokenLogService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -11,10 +12,19 @@ import org.springframework.stereotype.Component;
 public class AtualizaTokenAcesso {
     private final UsuarioRepository repository;
     private final TokenService tokenService;
+    private final RefreshTokenLogService refreshTokenLogService;
 
     public TokenDTO atualizaToken(String refreshToken) {
         if (!tokenService.isRefreshTokenValid(refreshToken)) {
             throw new RuntimeException("Refresh token inválido ou expirado.");
+        }
+
+        var decoded = tokenService.parseClaims(refreshToken);
+        var refreshId = decoded.getClaim("refreshId").asString();
+
+        boolean revoked = refreshTokenLogService.foiRevogado(refreshId);
+        if (revoked) {
+            throw new RuntimeException("Refresh token foi revogado.");
         }
 
         var email = tokenService.getSubject(refreshToken);
