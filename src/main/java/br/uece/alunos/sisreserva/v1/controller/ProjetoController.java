@@ -20,7 +20,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/projeto")
-@Tag(name = "Rotas de espaço mapeadas no controller")
+@Tag(name = "Rotas de projeto mapeadas no controller")
 public class ProjetoController {
     @Autowired
     private ProjetoService projetoService;
