@@ -18,6 +18,8 @@ import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.useCase.ObterEntTipoEspacoPorId;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.useCase.ObterEntUsuarioPorId;
+import br.uece.alunos.sisreserva.v1.domain.projeto.Projeto;
+import br.uece.alunos.sisreserva.v1.domain.projeto.useCase.ObterEntProjetoPorId;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -91,5 +93,12 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
     @Override
     public Usuario obterUsuarioPorId(String id) {
         return obterEntUsuarioPorId.obterEntidade(id);
+    }
+
+    // Projeto
+    private final ObterEntProjetoPorId obterEntProjetoPorId;
+    @Override
+    public Projeto obterProjetoPorId(String id) {
+        return obterEntProjetoPorId.obterEntidade(id);
     }
 }
