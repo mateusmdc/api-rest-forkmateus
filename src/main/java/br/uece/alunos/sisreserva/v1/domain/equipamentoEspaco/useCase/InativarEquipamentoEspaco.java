@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Component
 @AllArgsConstructor
 public class InativarEquipamentoEspaco {
-
     private final EquipamentoEspacoRepository repository;
     private final EquipamentoEspacoValidator validator;
     private final ValidadorGestorEspaco validaSeGestorEspaco;
