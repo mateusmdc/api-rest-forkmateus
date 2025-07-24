@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.infra.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,6 +17,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -35,9 +38,15 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
-                    req.requestMatchers(HttpMethod.GET, "/auth/usuarios/todos").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.GET, "/auth/usuario/todos").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/espaco").hasRole("ADMIN");
-                    req.requestMatchers(HttpMethod.POST, "/espaco").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/equipamento/tipo").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/equipamento/tipo").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/comite").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/comite").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/comite/usuario").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/comite/usuario").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/comite/usuario").hasRole("ADMIN");
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilterApplication, UsernamePasswordAuthenticationFilter.class)
@@ -55,18 +64,18 @@ public class SecurityConfigurations {
     }
 
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsFilter corsFilter(@Value("${CORS_ALLOWED_ORIGINS:${cors.allowed-origins}}") String allowedOrigins) {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         config.addAllowedHeader("*");
         config.addAllowedMethod("OPTIONS");
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");
         config.addAllowedMethod("DELETE");
-        source.registerCorsConfiguration("/**", config);  //deve alterar aqui pelo endereço do front em produção
+        source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 }

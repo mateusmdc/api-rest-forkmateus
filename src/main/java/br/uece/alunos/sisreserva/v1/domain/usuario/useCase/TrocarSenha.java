@@ -5,6 +5,7 @@ import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioTrocarSenhaDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.MessageResponseDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -12,15 +13,11 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
+@AllArgsConstructor
 public class TrocarSenha {
-    @Autowired
-    private UsuarioRepository repository;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private UsuarioValidator usuarioValidator;
+    private final UsuarioRepository repository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UsuarioValidator usuarioValidator;
 
     public MessageResponseDTO resetarSenha(UsuarioTrocarSenhaDTO data) {
         try {

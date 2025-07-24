@@ -4,8 +4,9 @@ import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.LoginStatus;
 import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLog;
 import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
+import br.uece.alunos.sisreserva.v1.service.RefreshTokenLogService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,26 +14,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
-import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.TokenService;
 
+import java.time.ZoneId;
+
 @Component
+@AllArgsConstructor
 public class RealizarLogin {
-
-    @Autowired
-    private AuthenticationManager manager;
-    @Autowired
-    private TokenService tokenService;
-
-    @Autowired
-    private AtualizarUsuarioLoginErrado atualizarUsuarioLoginErrado;
-
-    @Autowired
-    private RegisterAuditLog registerAuditLog;
-
-    @Autowired
-    private UsuarioValidator usuarioValidator;
+    private final AuthenticationManager manager;
+    private final TokenService tokenService;
+    private final AtualizarUsuarioLoginErrado atualizarUsuarioLoginErrado;
+    private final RegisterAuditLog registerAuditLog;
+    private final RefreshTokenLogService refreshTokenLogService;
+    private final UsuarioValidator usuarioValidator;
 
     @Transactional
     public AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request) {
@@ -47,11 +42,21 @@ public class RealizarLogin {
 
             usuarioAutenticado.resetAccessCount();
 
-            String accessToken = tokenService.generateAccessToken(usuarioAutenticado);
-            String refreshToken = null;
-            if (usuarioAutenticado.isRefreshTokenEnabled()) {
-                refreshToken = tokenService.generateRefreshToken(usuarioAutenticado);
-            }
+            var accessToken = tokenService.generateAccessToken(usuarioAutenticado);
+            var refreshToken = tokenService.generateRefreshToken(usuarioAutenticado);
+
+            var refreshClaims = tokenService.parseClaims(refreshToken);
+            var refreshTokenId = refreshClaims.getClaim("refreshId").asString();
+            var issuedAt = refreshClaims.getIssuedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            var expiresAt = refreshClaims.getExpiresAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+            refreshTokenLogService.registrar(
+                    usuarioAutenticado,
+                    refreshTokenId,
+                    issuedAt,
+                    expiresAt,
+                    request
+            );
 
             registerAuditLog.logLogin(
                     data.email(),
@@ -63,7 +68,7 @@ public class RealizarLogin {
             return new AuthTokensDTO(accessToken, refreshToken);
         } catch (BadCredentialsException e) {
             handleFailedLogin(data.email(), request);
-            throw new BadCredentialsException("Wrong login or password.");
+            throw new BadCredentialsException("Login ou senha errados.");
         }
     }
 

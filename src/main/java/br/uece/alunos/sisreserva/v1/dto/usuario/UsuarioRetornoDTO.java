@@ -1,6 +1,8 @@
 package br.uece.alunos.sisreserva.v1.dto.usuario;
 
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
+import br.uece.alunos.sisreserva.v1.dto.cargo.CargoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.instituicao.InstituicaoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.UsuarioCargoRetornoDTO;
 
 import java.util.List;
@@ -14,11 +16,9 @@ public record UsuarioRetornoDTO(
         String fotoPerfil,
         int matricula,
         String telefone,
-        String instituicaoId,
-        String instituicaoNome,
+        InstituicaoRetornoDTO instituicao,
         boolean refreshTokenEnabled,
-        List<String> cargosId,
-        List<String> cargosNome
+        List<CargoRetornoDTO> cargos
 ) {
     public UsuarioRetornoDTO(Usuario usuario) {
         this(
@@ -29,34 +29,27 @@ public record UsuarioRetornoDTO(
                 usuario.getFotoPerfil(),
                 usuario.getMatricula(),
                 usuario.getTelefone(),
-                usuario.getInstituicao().getId(),
-                usuario.getInstituicao().getNome(),
+                new InstituicaoRetornoDTO(usuario.getInstituicao()),
                 usuario.isRefreshTokenEnabled(),
                 usuario.getUsuarioCargos()
                         .stream()
-                        .map(uc -> uc.getCargo().getId())
-                        .collect(Collectors.toList()),
-                usuario.getUsuarioCargos()
-                        .stream()
-                        .map(uc -> uc.getCargo().getNome())
-                        .collect(Collectors.toList())
+                        .map(uc -> new CargoRetornoDTO(uc.getCargo()))
+                        .toList()
         );
     }
 
-    public UsuarioRetornoDTO(Usuario usuario, List<UsuarioCargoRetornoDTO> cargos) {
+    public UsuarioRetornoDTO(Usuario usuario, List<UsuarioCargoRetornoDTO> usuarioCargos) {
         this(
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
-                usuario.getDocumentoFiscal(), 
+                usuario.getDocumentoFiscal(),
                 usuario.getFotoPerfil(),
                 usuario.getMatricula(),
                 usuario.getTelefone(),
-                usuario.getInstituicao().getId(),
-                usuario.getInstituicao().getNome(),
+                new InstituicaoRetornoDTO(usuario.getInstituicao()),
                 usuario.isRefreshTokenEnabled(),
-                cargos.stream().map(UsuarioCargoRetornoDTO::cargoId).toList(),
-                cargos.stream().map(UsuarioCargoRetornoDTO::cargoNome).toList()
+                usuarioCargos.stream().map(UsuarioCargoRetornoDTO::cargo).toList()
         );
     }
 }

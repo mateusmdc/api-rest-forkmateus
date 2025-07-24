@@ -1,6 +1,8 @@
 package br.uece.alunos.sisreserva.v1.domain.equipamento;
 
 import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
+import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
+import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,18 +21,16 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class Equipamento {
-
     @Id
     @Column(name = "id", nullable = false, length = 36, updatable = false)
     private String id;
 
-    @NotNull
     @Size(max = 100)
-    @Column(name = "tombamento", nullable = false, unique = true, length = 100)
+    @Column(name = "tombamento", length = 100)
     private String tombamento;
 
     @Size(max = 255)
-    @Column(name = "descricao", length = 255)
+    @Column(name = "descricao")
     private String descricao;
 
     @NotNull
@@ -50,11 +50,26 @@ public class Equipamento {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public Equipamento(EquipamentoDTO data, TipoEquipamento tipoEquipamento) {
+        this.tombamento = data.tombamento();
+        this.descricao = data.descricao();
+        this.status = data.statusEquipamento();
+        this.tipoEquipamento =  tipoEquipamento;
+    }
+
     @PrePersist
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void atualizar(EquipamentoAtualizarDTO data) {
+        if (data.descricao() != null && !data.descricao().isEmpty()) {
+            this.descricao = data.descricao();
+        }
+        if (data.status() != null) {
+            this.status = data.status();
+        }
     }
 
     @PreUpdate

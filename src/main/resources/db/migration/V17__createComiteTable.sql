@@ -1,7 +1,7 @@
 CREATE TABLE comite (
     id VARCHAR(36) PRIMARY KEY,
     descricao VARCHAR(255),
-    tipo INT NOT NULL CHECK (tipo BETWEEN 1 AND 4), -- 1: Gestor, 2: Usuários, 3: Técnicos, 4: Representante Discente
+    tipo INT NOT NULL CHECK (tipo BETWEEN 0 AND 3), -- 0: Gestor, 1: Usuários, 2: Técnicos, 3: Representante Discente
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );

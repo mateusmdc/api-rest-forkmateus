@@ -3,11 +3,12 @@ package br.uece.alunos.sisreserva.v1.domain.instituicao;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface InstituicaoRepository extends JpaRepository<Instituicao, String> {
+public interface InstituicaoRepository extends JpaRepository<Instituicao, String>, JpaSpecificationExecutor<Instituicao> {
     @Query("SELECT i FROM Instituicao i ORDER BY i.nome ASC")
     Page<Instituicao> findAllOrderedByNome(Pageable pageable);
 

@@ -10,26 +10,24 @@ import br.uece.alunos.sisreserva.v1.infra.exceptions.EmailSendingException;
 import br.uece.alunos.sisreserva.v1.infra.utils.mail.*;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
+@AllArgsConstructor
 public class EsqueciSenha {
-    @Autowired
-    private UsuarioRepository repository;
-    @Autowired
-    private GerarTokenEsqueciMinhaSenha mailToken;
-    @Autowired
-    private MailSenderMime mailSender;
-    @Autowired
-    private UsuarioValidator usuarioValidator;
+    private final UsuarioRepository repository;
+    private final GerarTokenEsqueciMinhaSenha mailToken;
+    private final MailSenderMime mailSender;
+    private final UsuarioValidator validator;
 
     public MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data) {
         var email = data.email();
 
-        usuarioValidator.validarEmailExistenteParaRecuperacao(email);
+        validator.validarEmailExistenteParaRecuperacao(email);
 
         var token = mailToken.gerarTokenEmail();
         var emUmaHora = LocalDateTime.now().plusHours(1);

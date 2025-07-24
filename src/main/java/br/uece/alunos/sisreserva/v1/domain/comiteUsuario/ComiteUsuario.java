@@ -3,6 +3,8 @@ package br.uece.alunos.sisreserva.v1.domain.comiteUsuario;
 import br.uece.alunos.sisreserva.v1.domain.comite.Comite;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
+import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioAtualizarDTO;
+import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -56,12 +58,35 @@ public class ComiteUsuario {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    public ComiteUsuario(ComiteUsuarioDTO data, Comite c, Usuario u, Departamento d) {
+        this.usuario = u;
+        this.comite = c;
+        this.departamento = d;
+        this.descricao = data.descricao();
+        this.portaria = data.portaria();
+        this.isTitular = data.isTitular();
+    }
+
     @PrePersist
     public void onCreate() {
         this.id = UUID.randomUUID().toString().toUpperCase();
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
+
+    public void atualizar(ComiteUsuarioAtualizarDTO data, Departamento departamento) {
+        if (data.descricao() != null && !data.descricao().isEmpty()) {
+            this.descricao = data.descricao();
+        }
+
+        if (data.isTitular() != null) {
+            this.isTitular = data.isTitular();
+        }
+
+        if (data.departamentoId() != null && departamento != null) {
+            this.departamento = departamento;
+        }
+    }
+
 
     @PreUpdate
     public void onUpdate() {

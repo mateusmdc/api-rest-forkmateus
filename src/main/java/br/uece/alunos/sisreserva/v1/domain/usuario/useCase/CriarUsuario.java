@@ -9,30 +9,23 @@ import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.CriarCargaUsuarioCargoDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import br.uece.alunos.sisreserva.v1.service.UsuarioCargoService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class CriarUsuario {
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private EntityHandlerService entityHandlerService;
-
-    @Autowired
-    private UsuarioCargoService usuarioCargoService;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private UsuarioValidator usuarioValidator;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EntityHandlerService entityHandlerService;
+    private final UsuarioCargoService usuarioCargoService;
+    private final UsuarioRepository repository;
+    private final UsuarioValidator validator;
 
     public UsuarioRetornoDTO criar(UsuarioDTO data) {
         try {
-            usuarioValidator.validarEmailJaExistente(data.email());
+            validator.validarEmailJaExistente(data.email());
 
             var instituicao = entityHandlerService.obterInstituicaoPorId(data.instituicaoId());
 
@@ -40,7 +33,7 @@ public class CriarUsuario {
             String senhaProtegida = bCryptPasswordEncoder.encode(data.senha());
             novoUsuario.setSenha(senhaProtegida);
 
-            var usuarioNoBanco = usuarioRepository.save(novoUsuario);
+            var usuarioNoBanco = repository.save(novoUsuario);
 
             if (data.cargosNome() != null && !data.cargosNome().isEmpty()) {
                 var cargaDTO = new CriarCargaUsuarioCargoDTO(usuarioNoBanco.getId(), data.cargosNome());

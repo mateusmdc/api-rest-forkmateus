@@ -3,8 +3,12 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
 import br.uece.alunos.sisreserva.v1.domain.cargo.useCase.ObterEntCargoPorId;
 import br.uece.alunos.sisreserva.v1.domain.cargo.useCase.ObterEntListaCargoPorNome;
+import br.uece.alunos.sisreserva.v1.domain.comite.Comite;
+import br.uece.alunos.sisreserva.v1.domain.comite.useCase.ObterEntComitePorId;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.departamento.useCase.ObterEntDepartamentoPorId;
+import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
+import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.ObterEntEquipamentoPorId;
 import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterEntEspacoPorId;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
@@ -14,6 +18,8 @@ import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.useCase.ObterEntLocalizacaoPorId;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.useCase.ObterEntTipoAtividadePorId;
+import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
+import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.useCase.ObterEntTipoEquipamentoPorId;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.useCase.ObterEntTipoEspacoPorId;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
@@ -43,11 +49,25 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
         return obterEntCargoPorId.obterEntidadeCargoPorId(id);
     }
 
+    // Comitê
+    private final ObterEntComitePorId obterEntComitePorId;
+    @Override
+    public Comite obterComitePorId(String id) {
+        return obterEntComitePorId.obterEntidadePorId(id);
+    }
+
     // Departamento
     private final ObterEntDepartamentoPorId obterEntDepartamentoPorId;
     @Override
     public Departamento obterDepartamentoPorId(String id) {
         return obterEntDepartamentoPorId.obterEntidadePorId(id);
+    }
+
+    // Equipamento
+    private final ObterEntEquipamentoPorId obterEntEquipamentoPorId;
+    @Override
+    public Equipamento obterEquipamentoPorId(String id) {
+        return obterEntEquipamentoPorId.obterEntidadePorId(id);
     }
 
     // Espaço
@@ -79,6 +99,13 @@ public class EntityHandlerServiceImpl implements EntityHandlerService {
     @Override
     public TipoAtividade obterTipoAtividadePorId(String id) {
         return obterEntTipoAtividadePorId.obterEntidadePorId(id);
+    }
+
+    // Tipo Equipamento
+    private final ObterEntTipoEquipamentoPorId obterEntTipoEquipamentoPorId;
+    @Override
+    public TipoEquipamento obterTipoEquipamentoPorId(String id) {
+        return obterEntTipoEquipamentoPorId.obterEntidadePorId(id);
     }
 
     // Tipo Espaco
