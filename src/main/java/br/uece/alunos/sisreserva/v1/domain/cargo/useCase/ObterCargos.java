@@ -3,19 +3,19 @@ package br.uece.alunos.sisreserva.v1.domain.cargo.useCase;
 import br.uece.alunos.sisreserva.v1.domain.cargo.CargoRepository;
 import br.uece.alunos.sisreserva.v1.domain.cargo.specification.CargoSpecification;
 import br.uece.alunos.sisreserva.v1.dto.cargo.CargoRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.uece.alunos.sisreserva.v1.service.UtilsService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
+@AllArgsConstructor
 public class ObterCargos {
 
-    @Autowired
-    private CargoRepository repository;
+    private final CargoRepository repository;
+    private final UtilsService utilsService;
 
     public Page<CargoRetornoDTO> obter(Pageable pageable, String id, String nome) {
         Map<String, Object> filtros = new HashMap<>();
@@ -26,9 +26,9 @@ public class ObterCargos {
 
         boolean filtrarPorNome = nome != null && !nome.isBlank();
         if (filtrarPorNome) {
-            String nomeBusca = normalize(nome);
+            String nomeBusca = utilsService.normalizeString(nome);
             results = results.stream()
-                    .filter(cargo -> normalize(cargo.getNome()).contains(nomeBusca))
+                    .filter(cargo -> utilsService.normalizeString(cargo.getNome()).contains(nomeBusca))
                     .toList();
         }
 
@@ -38,16 +38,8 @@ public class ObterCargos {
         List<CargoRetornoDTO> page = results.subList(start, end)
                 .stream()
                 .map(CargoRetornoDTO::new)
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(page, pageable, total);
-    }
-
-    private String normalize(String value) {
-        if (value == null) return "";
-        return Normalizer
-                .normalize(value.trim().toLowerCase(), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .replaceAll("[^\\p{ASCII}]", "");
     }
 }

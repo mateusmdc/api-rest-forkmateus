@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.controller;
 
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.InativarEquipamentoEspacoLoteDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoEspacoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -84,5 +85,12 @@ public class EquipamentoEspacoController {
     ) {
         var retorno = service.inativar(equipamentoEspacoId, usuarioId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/inativacoes")
+    @Operation(summary = "Inativa o vínculo entre a lista de equipamentos e espaço se o usuário for gestor autorizado")
+    @Transactional
+    public List<EquipamentoEspacoRetornoDTO> inativarEmLote(@Valid @RequestBody InativarEquipamentoEspacoLoteDTO dto) {
+        return service.inativarEmLote(dto.equipamentoEspacoIds(), dto.usuarioId());
     }
 }

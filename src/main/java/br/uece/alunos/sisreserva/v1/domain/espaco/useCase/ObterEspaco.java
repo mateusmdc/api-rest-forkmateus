@@ -4,25 +4,27 @@ import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.EspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.espaco.specification.EspacoSpecification;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import br.uece.alunos.sisreserva.v1.service.UtilsService;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
+@AllArgsConstructor
 public class ObterEspaco {
-    @Autowired
-    private EspacoRepository espacoRepository;
+
+    private final EspacoRepository espacoRepository;
+    private final UtilsService utilsService;
 
     public Page<EspacoRetornoDTO> obterEspacos(Pageable pageable,
                                                String id,
                                                String departamento,
                                                String localizacao,
                                                String tipoEspaco,
-                                               String tipoAtividade) {
+                                               String tipoAtividade,
+                                               String nome) {
 
         Map<String, Object> filtros = new HashMap<>();
         if (id != null) filtros.put("id", id);
@@ -31,20 +33,33 @@ public class ObterEspaco {
         if (tipoEspaco != null) filtros.put("tipoEspacoId", tipoEspaco);
         if (tipoAtividade != null) filtros.put("tipoAtividadeId", tipoAtividade);
 
-        return execute(filtros, pageable)
-                .map(EspacoRetornoDTO::new);
-    }
-
-    private Page<Espaco> execute(Map<String, Object> filtros, Pageable pageable) {
-        return espacoRepository.findAll(
-                EspacoSpecification.byFilter(
-                        (String) filtros.get("id"),
-                        (String) filtros.get("departamentoId"),
-                        (String) filtros.get("localizacaoId"),
-                        (String) filtros.get("tipoEspacoId"),
-                        (String) filtros.get("tipoAtividadeId")
-                ),
-                pageable
+        var spec = EspacoSpecification.byFilter(
+                (String) filtros.get("id"),
+                (String) filtros.get("departamentoId"),
+                (String) filtros.get("localizacaoId"),
+                (String) filtros.get("tipoEspacoId"),
+                (String) filtros.get("tipoAtividadeId")
         );
+
+        var results = espacoRepository.findAll(spec, Sort.unsorted());
+
+        boolean filtrarPorNome = nome != null && !nome.isBlank();
+        if (filtrarPorNome) {
+            String nomeBusca = utilsService.normalizeString(nome);
+            results = results.stream()
+                    .filter(e -> utilsService.normalizeString(e.getNome()).contains(nomeBusca))
+                    .toList();
+        }
+
+        int total = results.size();
+        int start = Math.toIntExact(pageable.getOffset());
+        int end = Math.min(start + pageable.getPageSize(), total);
+
+        List<EspacoRetornoDTO> page = results.subList(start, end)
+                .stream()
+                .map(EspacoRetornoDTO::new)
+                .toList();
+
+        return new PageImpl<>(page, pageable, total);
     }
 }
