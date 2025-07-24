@@ -3,18 +3,18 @@ package br.uece.alunos.sisreserva.v1.domain.localizacao.useCase;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.LocalizacaoRepository;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.specification.LocalizacaoSpecification;
 import br.uece.alunos.sisreserva.v1.dto.localizacao.LocalizacaoRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.uece.alunos.sisreserva.v1.service.UtilsService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
 import java.util.*;
 
 @Component
+@AllArgsConstructor
 public class ObterLocalizacoes {
-
-    @Autowired
-    private LocalizacaoRepository repository;
+    private final LocalizacaoRepository repository;
+    private final UtilsService utilsService;
 
     public Page<LocalizacaoRetornoDTO> obter(Pageable pageable, String id, String nome) {
         Map<String, Object> filtros = new HashMap<>();
@@ -25,9 +25,9 @@ public class ObterLocalizacoes {
 
         boolean filtrarPorNome = nome != null && !nome.isBlank();
         if (filtrarPorNome) {
-            String nomeBusca = normalize(nome);
+            String nomeBusca = utilsService.normalizeString(nome);
             results = results.stream()
-                    .filter(loc -> normalize(loc.getNome()).contains(nomeBusca))
+                    .filter(loc -> utilsService.normalizeString(loc.getNome()).contains(nomeBusca))
                     .toList();
         }
 
@@ -41,13 +41,5 @@ public class ObterLocalizacoes {
                 .toList();
 
         return new PageImpl<>(page, pageable, total);
-    }
-
-    private String normalize(String value) {
-        if (value == null) return "";
-        return Normalizer
-                .normalize(value.trim().toLowerCase(), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .replaceAll("[^\\p{ASCII}]", "");
     }
 }
