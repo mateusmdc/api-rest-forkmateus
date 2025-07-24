@@ -11,6 +11,7 @@ import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
 import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
+import br.uece.alunos.sisreserva.v1.domain.projeto.Projeto;
 
 import java.util.List;
 
@@ -49,4 +50,7 @@ public interface EntityHandlerService {
 
     //usuario
     Usuario obterUsuarioPorId(String id);
+
+    // projeto
+    Projeto obterProjetoPorId(String id);
 }
