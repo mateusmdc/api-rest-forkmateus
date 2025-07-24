@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +30,18 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     @Override
     public EquipamentoEspacoRetornoDTO inativar(String equipamentoEspacoId, String usuarioId) {
         return inativarEquipamentoEspaco.inativar(equipamentoEspacoId, usuarioId);
+    }
+
+    @Override
+    public List<EquipamentoEspacoRetornoDTO> inativarEmLote(List<String> equipamentoEspacoIds, String usuarioId) {
+        List<EquipamentoEspacoRetornoDTO> inativados = new ArrayList<>();
+
+        for (String id : equipamentoEspacoIds) {
+            var dto = inativarEquipamentoEspaco.inativar(id, usuarioId);
+            inativados.add(dto);
+        }
+
+        return inativados;
     }
 
     @Override
