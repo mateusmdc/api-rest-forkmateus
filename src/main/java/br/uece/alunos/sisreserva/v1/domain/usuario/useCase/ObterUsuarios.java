@@ -1,20 +1,21 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
-import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.domain.usuario.specification.UsuarioSpecification;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.uece.alunos.sisreserva.v1.service.UtilsService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
 import java.util.*;
 
 @Component
+@AllArgsConstructor
 public class ObterUsuarios {
-    @Autowired
-    private UsuarioRepository repository;
+
+    private final UsuarioRepository repository;
+    private final UtilsService utilsService;
 
     public Page<UsuarioRetornoDTO> obter(Pageable pageable,
                                          String id,
@@ -37,9 +38,9 @@ public class ObterUsuarios {
         var resultados = repository.findAll(spec, Sort.unsorted());
 
         if (nome != null && !nome.isBlank()) {
-            String nomeNormalizado = normalize(nome);
+            String nomeNormalizado = utilsService.normalizeString(nome);
             resultados = resultados.stream()
-                    .filter(u -> normalize(u.getNome()).contains(nomeNormalizado))
+                    .filter(u -> utilsService.normalizeString(u.getNome()).contains(nomeNormalizado))
                     .toList();
         }
 
@@ -52,13 +53,5 @@ public class ObterUsuarios {
                 .toList();
 
         return new PageImpl<>(page, pageable, total);
-    }
-
-
-    private String normalize(String valor) {
-        if (valor == null) return "";
-        return Normalizer.normalize(valor.trim().toLowerCase(), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .replaceAll("[^\\p{ASCII}]", "");
     }
 }

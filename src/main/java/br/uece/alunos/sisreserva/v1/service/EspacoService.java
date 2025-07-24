@@ -14,5 +14,6 @@ public interface EspacoService {
                                         String departamento,
                                         String localizacao,
                                         String tipoEspaco,
-                                        String tipoAtividade);
+                                        String tipoAtividade,
+                                        String nome);
 }
