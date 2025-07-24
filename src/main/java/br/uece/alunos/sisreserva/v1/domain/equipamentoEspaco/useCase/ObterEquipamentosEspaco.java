@@ -3,20 +3,20 @@ package br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.specification.EquipamentoEspacoSpecification;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.uece.alunos.sisreserva.v1.service.UtilsService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
+@AllArgsConstructor
 public class ObterEquipamentosEspaco {
 
-    @Autowired
-    private EquipamentoEspacoRepository repository;
+    private final EquipamentoEspacoRepository repository;
+    private final UtilsService utilsService;
 
     public Page<EquipamentoEspacoRetornoDTO> obter(Pageable pageable,
                                                    String id,
@@ -43,18 +43,18 @@ public class ObterEquipamentosEspaco {
                 (espacoNome != null && !espacoNome.isBlank());
 
         if (filtrarPorNome) {
-            String tipoEquipamentoNomeBusca = normalize(tipoEquipamentoNome);
-            String espacoNomeBusca = normalize(espacoNome);
+            String tipoEquipamentoNomeBusca = utilsService.normalizeString(tipoEquipamentoNome);
+            String espacoNomeBusca = utilsService.normalizeString(espacoNome);
 
             resultados = resultados.stream().filter(e -> {
                 boolean condicaoTipoEquipamento = true;
                 boolean condicaoEspaco = true;
 
                 if (!tipoEquipamentoNomeBusca.isBlank()) {
-                    condicaoTipoEquipamento = normalize(e.getEquipamento().getTipoEquipamento().getNome()).contains(tipoEquipamentoNomeBusca);
+                    condicaoTipoEquipamento = utilsService.normalizeString(e.getEquipamento().getTipoEquipamento().getNome()).contains(tipoEquipamentoNomeBusca);
                 }
                 if (!espacoNomeBusca.isBlank()) {
-                    condicaoEspaco = normalize(e.getEspaco().getNome()).contains(espacoNomeBusca);
+                    condicaoEspaco = utilsService.normalizeString(e.getEspaco().getNome()).contains(espacoNomeBusca);
                 }
 
                 return condicaoTipoEquipamento && condicaoEspaco;
@@ -68,16 +68,8 @@ public class ObterEquipamentosEspaco {
         List<EquipamentoEspacoRetornoDTO> page = resultados.subList(start, end)
                 .stream()
                 .map(EquipamentoEspacoRetornoDTO::new)
-                .collect(Collectors.toList());
+                .toList();
 
         return new PageImpl<>(page, pageable, total);
-    }
-
-    private String normalize(String value) {
-        if (value == null) return "";
-        return Normalizer
-                .normalize(value.trim().toLowerCase(), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .replaceAll("[^\\p{ASCII}]", "");
     }
 }

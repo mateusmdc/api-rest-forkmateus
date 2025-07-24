@@ -3,18 +3,19 @@ package br.uece.alunos.sisreserva.v1.domain.tipoEspaco.useCase;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.specification.TipoEspacoSpecification;
 import br.uece.alunos.sisreserva.v1.dto.tipoEspaco.TipoEspacoRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.uece.alunos.sisreserva.v1.service.UtilsService;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
 import java.util.*;
 
 @Component
+@AllArgsConstructor
 public class ObterTiposEspaco {
 
-    @Autowired
-    private TipoEspacoRepository repository;
+    private final TipoEspacoRepository repository;
+    private final UtilsService utilsService;
 
     public Page<TipoEspacoRetornoDTO> obter(Pageable pageable, String id, String nome) {
         Map<String, Object> filtros = new HashMap<>();
@@ -25,9 +26,9 @@ public class ObterTiposEspaco {
 
         boolean filtrarPorNome = nome != null && !nome.isBlank();
         if (filtrarPorNome) {
-            String nomeBusca = normalize(nome);
+            String nomeBusca = utilsService.normalizeString(nome);
             results = results.stream()
-                    .filter(te -> normalize(te.getNome()).contains(nomeBusca))
+                    .filter(te -> utilsService.normalizeString(te.getNome()).contains(nomeBusca))
                     .toList();
         }
 
@@ -41,13 +42,5 @@ public class ObterTiposEspaco {
                 .toList();
 
         return new PageImpl<>(page, pageable, total);
-    }
-
-    private String normalize(String value) {
-        if (value == null) return "";
-        return Normalizer
-                .normalize(value.trim().toLowerCase(), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .replaceAll("[^\\p{ASCII}]", "");
     }
 }
