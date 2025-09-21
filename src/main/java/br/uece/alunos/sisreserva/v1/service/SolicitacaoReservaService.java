@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.service;
 
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
 import org.springframework.data.domain.Page;
@@ -19,4 +20,7 @@ public interface SolicitacaoReservaService {
         Integer status,
         String projetoId
     );
+    
+    // Novo método para atualizar status
+    SolicitacaoReservaRetornoDTO atualizarStatus(String id, AtualizarStatusSolicitacaoDTO data);
 }

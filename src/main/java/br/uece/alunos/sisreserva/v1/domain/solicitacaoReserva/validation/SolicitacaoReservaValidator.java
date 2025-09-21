@@ -17,7 +17,7 @@ public class SolicitacaoReservaValidator {
      * Lança IllegalArgumentException se houver conflito.
      */
     public void validarConflitoReserva(String espacoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
-        boolean existeConflito = repository.existsByEspacoIdAndPeriodoConflitante(espacoId, dataInicio, dataFim);
+        boolean existeConflito = repository.existsByEspacoIdAndPeriodoConflitanteAprovado(espacoId, dataInicio, dataFim);
         if (existeConflito) {
             throw new IllegalArgumentException("Já existe uma solicitação de reserva para este espaço no período informado.");
         }

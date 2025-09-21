@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
@@ -50,5 +51,15 @@ public class SolicitacaoReservaController {
             pageable, id, dataInicio, dataFim, espacoId, usuarioSolicitanteId, statusCodigo, projetoId
         );
         return ResponseEntity.ok(ApiResponseDTO.success(solicitacoesPaginadas));
+    }
+
+    @PutMapping("/{id}/status")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<SolicitacaoReservaRetornoDTO>> atualizarStatus(
+        @PathVariable String id,
+        @RequestBody @Valid AtualizarStatusSolicitacaoDTO data
+    ) {
+        var solicitacaoAtualizada = solicitacaoReservaService.atualizarStatus(id, data);
+        return ResponseEntity.ok(ApiResponseDTO.success(solicitacaoAtualizada));
     }
 }
