@@ -26,5 +26,5 @@ public interface SolicitacaoReservaService {
     SolicitacaoReservaRetornoDTO atualizarStatus(String id, AtualizarStatusSolicitacaoDTO data);
     
     // Novo método para obter horários ocupados
-    HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano);
+    HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano, String espacoId);
 }

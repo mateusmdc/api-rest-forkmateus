@@ -53,7 +53,7 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
     }
 
     @Override
-    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano) {
-        return obterHorariosOcupados.obterHorariosOcupadosPorMes(mes, ano);
+    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano, String espacoId) {
+        return obterHorariosOcupados.obterHorariosOcupadosPorMes(mes, ano, espacoId);
     }
 }

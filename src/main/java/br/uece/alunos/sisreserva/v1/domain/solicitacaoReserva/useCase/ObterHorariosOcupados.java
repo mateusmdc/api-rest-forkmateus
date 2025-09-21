@@ -21,7 +21,7 @@ public class ObterHorariosOcupados {
     @Autowired
     private SolicitacaoReservaRepository repository;
 
-    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano) {
+    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano, String espacoId) {
         // Se não informado, usar mês e ano atual
         YearMonth yearMonth = (mes != null && ano != null) 
             ? YearMonth.of(ano, mes)
@@ -31,8 +31,13 @@ public class ObterHorariosOcupados {
         LocalDateTime inicioMes = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime fimMes = yearMonth.atEndOfMonth().atTime(23, 59, 59);
 
-        // Buscar reservas aprovadas do período
-        List<SolicitacaoReserva> reservasAprovadas = repository.findReservasAprovadasPorPeriodo(inicioMes, fimMes);
+        // Buscar reservas aprovadas do período (com ou sem filtro de espaço)
+        List<SolicitacaoReserva> reservasAprovadas;
+        if (espacoId != null && !espacoId.trim().isEmpty()) {
+            reservasAprovadas = repository.findReservasAprovadasPorPeriodoEEspaco(inicioMes, fimMes, espacoId.trim());
+        } else {
+            reservasAprovadas = repository.findReservasAprovadasPorPeriodo(inicioMes, fimMes);
+        }
 
         // Converter para DTOs
         List<HorarioOcupadoDTO> horariosOcupados = reservasAprovadas.stream()
