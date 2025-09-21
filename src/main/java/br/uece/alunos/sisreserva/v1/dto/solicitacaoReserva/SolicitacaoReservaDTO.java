@@ -18,8 +18,5 @@ public record SolicitacaoReservaDTO(
     @NotEmpty @NotNull
     String usuarioSolicitanteId,
 
-    @NotNull
-    Integer status, // Use ordinal value for StatusSolicitacao
-
     String projetoId // Optional
 ) {}
