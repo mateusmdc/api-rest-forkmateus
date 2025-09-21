@@ -45,4 +45,13 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
 
     @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.id = :id")
     Optional<SolicitacaoReserva> findById(String id);
+
+    @Query("""
+        SELECT s FROM SolicitacaoReserva s
+        WHERE s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.dataInicio >= :dataInicio
+          AND s.dataInicio < :dataFim
+        ORDER BY s.dataInicio ASC
+    """)
+    List<SolicitacaoReserva> findReservasAprovadasPorPeriodo(LocalDateTime dataInicio, LocalDateTime dataFim);
 }
