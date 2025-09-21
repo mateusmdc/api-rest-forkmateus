@@ -35,7 +35,10 @@ Substitua your-project-name.jar pelo nome real do seu arquivo JAR gerado.
 - [x] Inativação de gestores de espaço
 - [x] Listagem de gestores de espaço com suporte a paginação, ordenação e múltiplos filtros
 - [x] Possibilidade de retornar todos os gestores (ativos e inativos) com flag de controle
-
+- [x] Cadastro de projetos para atribuir a reservas
+- [x] Solicitar reservas, com validação de horários conflitantes
+- [x] Possibilidade de alterar status da solicitação de reserva para um dos status possíveis (APROVADO, PENDENTE, RECUSADO, PENDENTE_AJUSTE)
+- [x] Listagem de horários ocupados de cada dia de um mês específico (para exibição no front)
 ---
 
 ## 🛠 Tecnologias
