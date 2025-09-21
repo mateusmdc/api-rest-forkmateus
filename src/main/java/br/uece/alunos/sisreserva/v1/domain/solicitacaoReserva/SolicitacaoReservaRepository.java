@@ -54,4 +54,15 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         ORDER BY s.dataInicio ASC
     """)
     List<SolicitacaoReserva> findReservasAprovadasPorPeriodo(LocalDateTime dataInicio, LocalDateTime dataFim);
+
+    // Novo método para buscar por período e espaço
+    @Query("""
+        SELECT s FROM SolicitacaoReserva s
+        WHERE s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.dataInicio >= :dataInicio
+          AND s.dataInicio < :dataFim
+          AND s.espaco.id = :espacoId
+        ORDER BY s.dataInicio ASC
+    """)
+    List<SolicitacaoReserva> findReservasAprovadasPorPeriodoEEspaco(LocalDateTime dataInicio, LocalDateTime dataFim, String espacoId);
 }
