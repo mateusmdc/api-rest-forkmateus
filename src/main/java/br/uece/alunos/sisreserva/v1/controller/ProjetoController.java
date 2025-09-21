@@ -3,7 +3,7 @@ package br.uece.alunos.sisreserva.v1.controller;
 import br.uece.alunos.sisreserva.v1.dto.projeto.ProjetoDTO;
 import br.uece.alunos.sisreserva.v1.dto.projeto.ProjetoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioRetornoDTO;
-import br.uece.alunos.sisreserva.v1.dto.instituicao.InstituicaoReturnDTO;
+import br.uece.alunos.sisreserva.v1.dto.instituicao.InstituicaoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.ProjetoService;
 import io.swagger.v3.oas.annotations.tags.Tag;

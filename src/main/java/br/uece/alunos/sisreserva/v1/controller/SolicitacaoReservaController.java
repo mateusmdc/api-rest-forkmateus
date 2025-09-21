@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.controller;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.SolicitacaoReservaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -61,5 +62,15 @@ public class SolicitacaoReservaController {
     ) {
         var solicitacaoAtualizada = solicitacaoReservaService.atualizarStatus(id, data);
         return ResponseEntity.ok(ApiResponseDTO.success(solicitacaoAtualizada));
+    }
+
+    @GetMapping("/horarios-ocupados")
+    public ResponseEntity<ApiResponseDTO<HorariosOcupadosPorMesDTO>> obterHorariosOcupados(
+        @RequestParam(required = false) Integer mes,
+        @RequestParam(required = false) Integer ano,
+        @RequestParam(required = false) String espacoId
+    ) {
+        var horariosOcupados = solicitacaoReservaService.obterHorariosOcupadosPorMes(mes, ano, espacoId);
+        return ResponseEntity.ok(ApiResponseDTO.success(horariosOcupados));
     }
 }
