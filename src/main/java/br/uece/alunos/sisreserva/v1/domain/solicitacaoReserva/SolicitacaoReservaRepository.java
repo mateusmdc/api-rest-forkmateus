@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoReserva, String>,  JpaSpecificationExecutor<SolicitacaoReserva>{
     @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.usuarioSolicitante.id = :usuarioId")
@@ -28,15 +29,20 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.status = :status AND sr.espaco.id = :espacoId")
     List<SolicitacaoReserva> findByStatusAndEspacoId(StatusSolicitacao status, String espacoId);
 
+    // Novo método que verifica apenas reservas aprovadas
     @Query("""
         SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
         FROM SolicitacaoReserva s
         WHERE s.espaco.id = :espacoId
-          AND s.dataInicio < :dataFim
-          AND s.dataFim > :dataInicio
+        AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+        AND s.dataInicio < :dataFim
+        AND s.dataFim > :dataInicio
     """)
-    boolean existsByEspacoIdAndPeriodoConflitante(String espacoId, LocalDateTime dataInicio, LocalDateTime dataFim);
+    boolean existsByEspacoIdAndPeriodoConflitanteAprovado(String espacoId, LocalDateTime dataInicio, LocalDateTime dataFim);
 
     @Query("SELECT sr FROM SolicitacaoReserva sr ORDER BY sr.createdAt DESC")
     Page<SolicitacaoReserva> findAllPageable(Pageable pageable);
+
+    @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.id = :id")
+    Optional<SolicitacaoReserva> findById(String id);
 }
