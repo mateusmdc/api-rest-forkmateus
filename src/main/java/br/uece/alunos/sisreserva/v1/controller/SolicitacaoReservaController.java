@@ -67,9 +67,10 @@ public class SolicitacaoReservaController {
     @GetMapping("/horarios-ocupados")
     public ResponseEntity<ApiResponseDTO<HorariosOcupadosPorMesDTO>> obterHorariosOcupados(
         @RequestParam(required = false) Integer mes,
-        @RequestParam(required = false) Integer ano
+        @RequestParam(required = false) Integer ano,
+        @RequestParam(required = false) String espacoId
     ) {
-        var horariosOcupados = solicitacaoReservaService.obterHorariosOcupadosPorMes(mes, ano);
+        var horariosOcupados = solicitacaoReservaService.obterHorariosOcupadosPorMes(mes, ano, espacoId);
         return ResponseEntity.ok(ApiResponseDTO.success(horariosOcupados));
     }
 }
