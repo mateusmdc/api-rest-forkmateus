@@ -4,9 +4,11 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.CriarSolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterSolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.AtualizarStatusSolicitacao;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterHorariosOcupados;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import br.uece.alunos.sisreserva.v1.service.SolicitacaoReservaService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
     private final CriarSolicitacaoReserva criarSolicitacaoReserva;
     private final ObterSolicitacaoReserva obterSolicitacaoReserva;
     private final AtualizarStatusSolicitacao atualizarStatusSolicitacao;
+    private final ObterHorariosOcupados obterHorariosOcupados;
 
     @Override
     public SolicitacaoReservaRetornoDTO criarSolicitacaoReserva(SolicitacaoReservaDTO data) {
@@ -47,5 +50,10 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
     @Override
     public SolicitacaoReservaRetornoDTO atualizarStatus(String id, AtualizarStatusSolicitacaoDTO data) {
         return atualizarStatusSolicitacao.atualizarStatus(id, data);
+    }
+
+    @Override
+    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano, String espacoId) {
+        return obterHorariosOcupados.obterHorariosOcupadosPorMes(mes, ano, espacoId);
     }
 }
