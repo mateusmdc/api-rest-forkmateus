@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.service;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +17,7 @@ public interface EspacoService {
                                         String tipoEspaco,
                                         String tipoAtividade,
                                         String nome);
+    
+    // Novo método para horários ocupados do espaço
+    HorariosOcupadosPorMesDTO obterHorariosOcupadosPorEspaco(String espacoId, Integer mes, Integer ano);
 }
