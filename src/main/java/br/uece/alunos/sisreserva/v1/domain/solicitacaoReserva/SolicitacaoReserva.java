@@ -54,6 +54,17 @@ public class SolicitacaoReserva {
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Projeto projeto;
 
+    @NotNull
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "tipo_recorrencia", nullable = false)
+    private TipoRecorrencia tipoRecorrencia = TipoRecorrencia.NAO_REPETE;
+
+    @Column(name = "data_fim_recorrencia")
+    private LocalDateTime dataFimRecorrencia;
+
+    @Column(name = "reserva_pai_id", length = 36)
+    private String reservaPaiId;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
