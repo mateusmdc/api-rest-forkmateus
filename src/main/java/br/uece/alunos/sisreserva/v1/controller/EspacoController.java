@@ -52,10 +52,11 @@ public class EspacoController {
             @RequestParam(required = false) String localizacao,
             @RequestParam(required = false) String tipoEspaco,
             @RequestParam(required = false) String tipoAtividade,
-            @RequestParam(required = false) String nome) {
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Boolean multiusuario) {
 
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-        var espacosPaginados = espacoService.obterEspacos(pageable, id, departamento, localizacao, tipoEspaco, tipoAtividade, nome);
+        var espacosPaginados = espacoService.obterEspacos(pageable, id, departamento, localizacao, tipoEspaco, tipoAtividade, nome, multiusuario);
         return ResponseEntity.ok(ApiResponseDTO.success(espacosPaginados));
     }
 

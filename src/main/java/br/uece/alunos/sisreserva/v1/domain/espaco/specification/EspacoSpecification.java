@@ -24,7 +24,8 @@ public class EspacoSpecification {
             String departamentoId,
             String localizacaoId,
             String tipoEspacoId,
-            String tipoAtividadeId
+            String tipoAtividadeId,
+            Boolean multiusuario
     ) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -43,6 +44,9 @@ public class EspacoSpecification {
             }
             if (tipoAtividadeId != null && !tipoAtividadeId.isBlank()) {
                 predicates.add(cb.equal(root.get("tipoAtividade").get("id"), tipoAtividadeId));
+            }
+            if (multiusuario != null) {
+                predicates.add(cb.equal(root.get("multiusuario"), multiusuario));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
