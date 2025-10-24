@@ -16,7 +16,8 @@ public interface EspacoService {
                                         String localizacao,
                                         String tipoEspaco,
                                         String tipoAtividade,
-                                        String nome);
+                                        String nome,
+                                        Boolean multiusuario);
     
     // Novo método para horários ocupados do espaço
     HorariosOcupadosPorMesDTO obterHorariosOcupadosPorEspaco(String espacoId, Integer mes, Integer ano);
