@@ -37,6 +37,48 @@ public class SolicitacaoReservaValidator {
     }
 
     /**
+     * Valida as datas de início e fim de uma reserva.
+     * 
+     * <p>Verifica se:</p>
+     * <ul>
+     *   <li>A data de início não é anterior à data/hora atual</li>
+     *   <li>A data de fim não é anterior ou igual à data de início</li>
+     *   <li>As datas não são nulas</li>
+     * </ul>
+     * 
+     * @param dataInicio data e hora de início da reserva
+     * @param dataFim data e hora de fim da reserva
+     * @throws IllegalArgumentException se as datas forem inválidas
+     */
+    public void validarDatasReserva(LocalDateTime dataInicio, LocalDateTime dataFim) {
+        if (dataInicio == null) {
+            throw new IllegalArgumentException("Data de início da reserva não pode ser nula");
+        }
+
+        if (dataFim == null) {
+            throw new IllegalArgumentException("Data de fim da reserva não pode ser nula");
+        }
+
+        LocalDateTime agora = LocalDateTime.now();
+
+        // Validar que a data de início não é no passado
+        if (dataInicio.isBefore(agora)) {
+            throw new IllegalArgumentException(
+                "Não é possível criar reservas para datas passadas. " +
+                "A data de início deve ser igual ou posterior à data/hora atual."
+            );
+        }
+
+        // Validar que a data de fim é posterior à data de início
+        if (dataFim.isBefore(dataInicio) || dataFim.isEqual(dataInicio)) {
+            throw new IllegalArgumentException(
+                "A data de fim da reserva deve ser posterior à data de início. " +
+                "Data início: " + dataInicio + ", Data fim: " + dataFim
+            );
+        }
+    }
+
+    /**
      * Valida os dados de recorrência de uma reserva.
      * 
      * <p>Verifica se a data fim de recorrência foi informada quando necessária

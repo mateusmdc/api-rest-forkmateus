@@ -48,6 +48,9 @@ public class CriarSolicitacaoReserva {
      * @throws IllegalArgumentException se houver conflito de horários ou dados inválidos
      */
     public SolicitacaoReservaRetornoDTO criarSolicitacaoReserva(SolicitacaoReservaDTO data) {
+        // Validar datas da reserva (não pode ser no passado e data fim deve ser posterior à data início)
+        validator.validarDatasReserva(data.dataInicio(), data.dataFim());
+        
         // Determinar tipo de recorrência (default: NAO_REPETE)
         TipoRecorrencia tipoRecorrencia = data.tipoRecorrencia() != null 
             ? TipoRecorrencia.fromCodigo(data.tipoRecorrencia()) 
