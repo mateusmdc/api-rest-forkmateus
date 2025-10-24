@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TipoEspacoRepository extends JpaRepository<TipoEspaco, String>, JpaSpecificationExecutor<TipoEspaco> {
     @Query("SELECT te FROM TipoEspaco te ORDER BY te.nome ASC")
@@ -17,4 +18,7 @@ public interface TipoEspacoRepository extends JpaRepository<TipoEspaco, String>,
 
     @Query("SELECT te FROM TipoEspaco te WHERE LOWER(TRIM(te.nome)) IN :nomes")
     List<TipoEspaco> findAllByNomesIgnoreCaseAndTrimmed(List<String> nomes);
+    
+    @Query("SELECT te FROM TipoEspaco te WHERE LOWER(te.nome) = LOWER(:nome)")
+    Optional<TipoEspaco> findByNomeIgnoreCase(String nome);
 }
