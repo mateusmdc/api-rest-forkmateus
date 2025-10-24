@@ -15,7 +15,8 @@ public record EspacoRetornoDTO(
         LocalizacaoRetornoDTO localizacao,
         TipoEspacoRetornoDTO tipoEspaco,
         TipoAtividadeRetornoDTO tipoAtividade,
-        Boolean precisaProjeto
+        Boolean precisaProjeto,
+        Boolean multiusuario
 ) {
     public EspacoRetornoDTO(Espaco espaco) {
         this(
@@ -27,7 +28,8 @@ public record EspacoRetornoDTO(
                 new LocalizacaoRetornoDTO(espaco.getLocalizacao()),
                 new TipoEspacoRetornoDTO(espaco.getTipoEspaco()),
                 new TipoAtividadeRetornoDTO(espaco.getTipoAtividade()),
-                espaco.getPrecisaProjeto()
+                espaco.getPrecisaProjeto(),
+                espaco.getMultiusuario()
         );
     }
 }

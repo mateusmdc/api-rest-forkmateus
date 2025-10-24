@@ -64,6 +64,10 @@ public class Espaco {
     @Column(name = "precisa_projeto", nullable = false)
     private Boolean precisaProjeto = false;
 
+    @NotNull
+    @Column(name = "multiusuario", nullable = false)
+    private Boolean multiusuario = false;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -88,6 +92,9 @@ public class Espaco {
         }
         if (data.precisaProjeto() != null) {
             this.precisaProjeto = data.precisaProjeto();
+        }
+        if (data.multiusuario() != null) {
+            this.multiusuario = data.multiusuario();
         }
     }
 

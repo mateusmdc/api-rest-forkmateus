@@ -54,6 +54,7 @@ public class CriarEspaco {
         espaco.setTipoEspaco(tipoEspaco);
         espaco.setTipoAtividade(tipoAtividade);
         espaco.setPrecisaProjeto(dto.precisaProjeto());
+        espaco.setMultiusuario(dto.multiusuario() != null ? dto.multiusuario() : false);
         return espaco;
     }
 }
