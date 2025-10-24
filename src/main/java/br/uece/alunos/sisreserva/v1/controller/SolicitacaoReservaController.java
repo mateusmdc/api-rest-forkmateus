@@ -73,4 +73,20 @@ public class SolicitacaoReservaController {
         var horariosOcupados = solicitacaoReservaService.obterHorariosOcupadosPorMes(mes, ano, espacoId);
         return ResponseEntity.ok(ApiResponseDTO.success(horariosOcupados));
     }
+
+    /**
+     * Obtém informações completas sobre uma reserva recorrente.
+     * 
+     * <p>Retorna a reserva pai e todas as reservas filhas (ocorrências) geradas pela recorrência.</p>
+     * 
+     * @param id identificador da reserva (pode ser reserva pai ou filha)
+     * @return informações completas da recorrência
+     */
+    @GetMapping("/{id}/recorrencia")
+    public ResponseEntity<ApiResponseDTO<br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.RecorrenciaInfoDTO>> obterRecorrenciaInfo(
+        @PathVariable String id
+    ) {
+        var recorrenciaInfo = solicitacaoReservaService.obterRecorrenciaInfo(id);
+        return ResponseEntity.ok(ApiResponseDTO.success(recorrenciaInfo));
+    }
 }

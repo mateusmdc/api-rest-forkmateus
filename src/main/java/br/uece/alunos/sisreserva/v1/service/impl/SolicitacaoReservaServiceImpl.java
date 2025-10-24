@@ -5,6 +5,8 @@ import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.CriarSolic
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterSolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.AtualizarStatusSolicitacao;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterHorariosOcupados;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterRecorrenciaInfo;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.RecorrenciaInfoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
@@ -27,6 +29,7 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
     private final ObterSolicitacaoReserva obterSolicitacaoReserva;
     private final AtualizarStatusSolicitacao atualizarStatusSolicitacao;
     private final ObterHorariosOcupados obterHorariosOcupados;
+    private final ObterRecorrenciaInfo obterRecorrenciaInfo;
 
     @Override
     public SolicitacaoReservaRetornoDTO criarSolicitacaoReserva(SolicitacaoReservaDTO data) {
@@ -55,5 +58,10 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
     @Override
     public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano, String espacoId) {
         return obterHorariosOcupados.obterHorariosOcupadosPorMes(mes, ano, espacoId);
+    }
+
+    @Override
+    public RecorrenciaInfoDTO obterRecorrenciaInfo(String reservaId) {
+        return obterRecorrenciaInfo.obterRecorrenciaInfo(reservaId);
     }
 }
