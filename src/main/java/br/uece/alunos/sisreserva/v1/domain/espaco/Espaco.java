@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.espaco;
 
+import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.ComplexoEspacos;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
@@ -12,6 +13,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Table(name = "espaco")
@@ -67,6 +70,9 @@ public class Espaco {
     @NotNull
     @Column(name = "multiusuario", nullable = false)
     private Boolean multiusuario = false;
+
+    @ManyToMany(mappedBy = "espacos", fetch = FetchType.LAZY)
+    private List<ComplexoEspacos> complexos = new ArrayList<>();
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
