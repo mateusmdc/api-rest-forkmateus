@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.controller;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosVincularEspacosDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.ComplexoEspacosService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -59,5 +60,23 @@ public class ComplexoEspacosController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
         var complexos = service.obter(pageable, id, nome);
         return ResponseEntity.ok(ApiResponseDTO.success(complexos));
+    }
+
+    @PostMapping("/{id}/espacos")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<ComplexoEspacosRetornoDTO>> atribuirEspacos(
+            @PathVariable String id,
+            @RequestBody @Valid ComplexoEspacosVincularEspacosDTO data) {
+        var complexoAtualizado = service.atribuirEspacos(id, data.espacoIds());
+        return ResponseEntity.ok(ApiResponseDTO.success(complexoAtualizado));
+    }
+
+    @DeleteMapping("/{id}/espacos")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<ComplexoEspacosRetornoDTO>> desatribuirEspacos(
+            @PathVariable String id,
+            @RequestBody @Valid ComplexoEspacosVincularEspacosDTO data) {
+        var complexoAtualizado = service.desatribuirEspacos(id, data.espacoIds());
+        return ResponseEntity.ok(ApiResponseDTO.success(complexoAtualizado));
     }
 }

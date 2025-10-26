@@ -6,9 +6,13 @@ import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDT
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ComplexoEspacosService {
     ComplexoEspacosRetornoDTO criar(ComplexoEspacosDTO data);
     ComplexoEspacosRetornoDTO atualizar(String id, ComplexoEspacosAtualizarDTO data);
     void deletar(String id);
     Page<ComplexoEspacosRetornoDTO> obter(Pageable pageable, String id, String nome);
+    ComplexoEspacosRetornoDTO atribuirEspacos(String id, List<String> espacoIds);
+    ComplexoEspacosRetornoDTO desatribuirEspacos(String id, List<String> espacoIds);
 }

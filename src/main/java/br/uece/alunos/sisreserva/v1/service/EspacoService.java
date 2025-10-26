@@ -7,6 +7,8 @@ import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMe
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface EspacoService {
     EspacoRetornoDTO atualizar(String id, EspacoAtualizarDTO data);
     EspacoRetornoDTO criarEspaco(EspacoDTO data);
@@ -21,4 +23,8 @@ public interface EspacoService {
     
     // Novo método para horários ocupados do espaço
     HorariosOcupadosPorMesDTO obterHorariosOcupadosPorEspaco(String espacoId, Integer mes, Integer ano);
+    
+    // Métodos para gerenciar complexos
+    EspacoRetornoDTO atribuirComplexos(String id, List<String> complexoIds);
+    EspacoRetornoDTO desatribuirComplexos(String id, List<String> complexoIds);
 }

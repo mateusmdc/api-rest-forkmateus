@@ -1,7 +1,9 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
+import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.AtribuirEspacoAComplexos;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.AtualizarEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.CriarEspaco;
+import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.DesatribuirEspacoDeComplexos;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterHorariosOcupadosEspaco;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
@@ -15,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -23,6 +27,8 @@ public class EspacoServiceImpl implements EspacoService {
     private final CriarEspaco criarEspaco;
     private final ObterEspaco obterEspaco;
     private final ObterHorariosOcupadosEspaco obterHorariosOcupadosEspaco;
+    private final AtribuirEspacoAComplexos atribuirEspacoAComplexos;
+    private final DesatribuirEspacoDeComplexos desatribuirEspacoDeComplexos;
 
     @Override
     public EspacoRetornoDTO atualizar(String id, EspacoAtualizarDTO data) {
@@ -43,5 +49,15 @@ public class EspacoServiceImpl implements EspacoService {
     @Override
     public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorEspaco(String espacoId, Integer mes, Integer ano) {
         return obterHorariosOcupadosEspaco.obterHorariosOcupadosPorEspaco(espacoId, mes, ano);
+    }
+
+    @Override
+    public EspacoRetornoDTO atribuirComplexos(String id, List<String> complexoIds) {
+        return atribuirEspacoAComplexos.atribuir(id, complexoIds);
+    }
+
+    @Override
+    public EspacoRetornoDTO desatribuirComplexos(String id, List<String> complexoIds) {
+        return desatribuirEspacoDeComplexos.desatribuir(id, complexoIds);
     }
 }
