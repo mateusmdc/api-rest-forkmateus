@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
 import br.uece.alunos.sisreserva.v1.dto.comiteUsuario.ComiteUsuarioAtualizarDTO;
+import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/espaco")
@@ -87,6 +90,12 @@ public class EspacoController {
             @RequestBody @Valid EspacoVincularComplexosDTO data) {
         var espacoAtualizado = espacoService.desatribuirComplexos(id, data.complexoIds());
         return ResponseEntity.ok(ApiResponseDTO.success(espacoAtualizado));
+    }
+
+    @GetMapping("/{id}/complexos")
+    public ResponseEntity<ApiResponseDTO<List<ComplexoEspacosRetornoDTO>>> listarComplexos(@PathVariable String id) {
+        var complexos = espacoService.listarComplexos(id);
+        return ResponseEntity.ok(ApiResponseDTO.success(complexos));
     }
 }
 

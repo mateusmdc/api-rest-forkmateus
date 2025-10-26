@@ -5,10 +5,12 @@ import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.useCase.AtualizarComp
 import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.useCase.CriarComplexoEspacos;
 import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.useCase.DeletarComplexoEspacos;
 import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.useCase.DesatribuirEspacosDoComplexo;
+import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.useCase.ListarEspacosDoComplexo;
 import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.useCase.ObterComplexoEspacos;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.service.ComplexoEspacosService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class ComplexoEspacosServiceImpl implements ComplexoEspacosService {
     private final ObterComplexoEspacos obterComplexoEspacos;
     private final AtribuirEspacosAoComplexo atribuirEspacosAoComplexo;
     private final DesatribuirEspacosDoComplexo desatribuirEspacosDoComplexo;
+    private final ListarEspacosDoComplexo listarEspacosDoComplexo;
 
     @Override
     public ComplexoEspacosRetornoDTO criar(ComplexoEspacosDTO data) {
@@ -57,5 +60,10 @@ public class ComplexoEspacosServiceImpl implements ComplexoEspacosService {
     @Override
     public ComplexoEspacosRetornoDTO desatribuirEspacos(String id, List<String> espacoIds) {
         return desatribuirEspacosDoComplexo.desatribuir(id, espacoIds);
+    }
+
+    @Override
+    public List<EspacoRetornoDTO> listarEspacos(String id) {
+        return listarEspacosDoComplexo.listar(id);
     }
 }

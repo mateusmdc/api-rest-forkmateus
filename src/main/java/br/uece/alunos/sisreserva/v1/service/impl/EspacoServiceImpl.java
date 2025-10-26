@@ -4,8 +4,10 @@ import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.AtribuirEspacoAComplex
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.AtualizarEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.CriarEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.DesatribuirEspacoDeComplexos;
+import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ListarComplexosDoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterHorariosOcupadosEspaco;
+import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
@@ -29,6 +31,7 @@ public class EspacoServiceImpl implements EspacoService {
     private final ObterHorariosOcupadosEspaco obterHorariosOcupadosEspaco;
     private final AtribuirEspacoAComplexos atribuirEspacoAComplexos;
     private final DesatribuirEspacoDeComplexos desatribuirEspacoDeComplexos;
+    private final ListarComplexosDoEspaco listarComplexosDoEspaco;
 
     @Override
     public EspacoRetornoDTO atualizar(String id, EspacoAtualizarDTO data) {
@@ -59,5 +62,10 @@ public class EspacoServiceImpl implements EspacoService {
     @Override
     public EspacoRetornoDTO desatribuirComplexos(String id, List<String> complexoIds) {
         return desatribuirEspacoDeComplexos.desatribuir(id, complexoIds);
+    }
+
+    @Override
+    public List<ComplexoEspacosRetornoDTO> listarComplexos(String id) {
+        return listarComplexosDoEspaco.listar(id);
     }
 }

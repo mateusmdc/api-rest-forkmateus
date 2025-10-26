@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.service;
 
+import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
@@ -27,4 +28,5 @@ public interface EspacoService {
     // Métodos para gerenciar complexos
     EspacoRetornoDTO atribuirComplexos(String id, List<String> complexoIds);
     EspacoRetornoDTO desatribuirComplexos(String id, List<String> complexoIds);
+    List<ComplexoEspacosRetornoDTO> listarComplexos(String id);
 }

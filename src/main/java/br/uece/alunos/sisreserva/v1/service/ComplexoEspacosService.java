@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.service;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +16,5 @@ public interface ComplexoEspacosService {
     Page<ComplexoEspacosRetornoDTO> obter(Pageable pageable, String id, String nome);
     ComplexoEspacosRetornoDTO atribuirEspacos(String id, List<String> espacoIds);
     ComplexoEspacosRetornoDTO desatribuirEspacos(String id, List<String> espacoIds);
+    List<EspacoRetornoDTO> listarEspacos(String id);
 }

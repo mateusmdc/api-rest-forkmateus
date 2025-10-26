@@ -4,6 +4,7 @@ import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosAtualizar
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosVincularEspacosDTO;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.ComplexoEspacosService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/complexo-espacos")
@@ -78,5 +81,11 @@ public class ComplexoEspacosController {
             @RequestBody @Valid ComplexoEspacosVincularEspacosDTO data) {
         var complexoAtualizado = service.desatribuirEspacos(id, data.espacoIds());
         return ResponseEntity.ok(ApiResponseDTO.success(complexoAtualizado));
+    }
+
+    @GetMapping("/{id}/espacos")
+    public ResponseEntity<ApiResponseDTO<List<EspacoRetornoDTO>>> listarEspacos(@PathVariable String id) {
+        var espacos = service.listarEspacos(id);
+        return ResponseEntity.ok(ApiResponseDTO.success(espacos));
     }
 }
