@@ -25,11 +25,18 @@ public class DesatribuirEspacoDeComplexos {
             throw new ValidationException("Um ou mais complexos não foram encontrados");
         }
 
-        // Remove os complexos especificados
-        espaco.getComplexos().removeAll(complexos);
+        // Remove o espaço do lado proprietário da relação (ComplexoEspacos)
+        complexos.forEach(complexo -> {
+            complexo.getEspacos().remove(espaco);
+        });
 
-        var espacoSalvo = espacoRepository.save(espaco);
+        // Salva os complexos (lado proprietário)
+        complexoRepository.saveAll(complexos);
 
-        return new EspacoRetornoDTO(espacoSalvo);
+        // Recarrega o espaço para obter as relações atualizadas
+        var espacoAtualizado = espacoRepository.findById(espacoId)
+                .orElseThrow(() -> new ValidationException("Espaço não encontrado"));
+
+        return new EspacoRetornoDTO(espacoAtualizado);
     }
 }

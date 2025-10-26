@@ -25,15 +25,20 @@ public class AtribuirEspacoAComplexos {
             throw new ValidationException("Um ou mais complexos não foram encontrados");
         }
 
-        // Adiciona os novos complexos sem remover os existentes
+        // Adiciona o espaço ao lado proprietário da relação (ComplexoEspacos)
         complexos.forEach(complexo -> {
-            if (!espaco.getComplexos().contains(complexo)) {
-                espaco.getComplexos().add(complexo);
+            if (!complexo.getEspacos().contains(espaco)) {
+                complexo.getEspacos().add(espaco);
             }
         });
 
-        var espacoSalvo = espacoRepository.save(espaco);
+        // Salva os complexos (lado proprietário)
+        complexoRepository.saveAll(complexos);
 
-        return new EspacoRetornoDTO(espacoSalvo);
+        // Recarrega o espaço para obter as relações atualizadas
+        var espacoAtualizado = espacoRepository.findById(espacoId)
+                .orElseThrow(() -> new ValidationException("Espaço não encontrado"));
+
+        return new EspacoRetornoDTO(espacoAtualizado);
     }
 }
