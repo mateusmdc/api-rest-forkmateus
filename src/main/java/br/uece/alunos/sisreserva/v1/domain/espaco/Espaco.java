@@ -57,11 +57,18 @@ public class Espaco {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private TipoEspaco tipoEspaco;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tipo_atividade_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private TipoAtividade tipoAtividade;
+    /**
+     * Relacionamento ManyToMany com TipoAtividade.
+     * Um espaço pode ter múltiplos tipos de atividade e um tipo de atividade pode estar em múltiplos espaços.
+     * O lado proprietário da relação é Espaco (possui @JoinTable).
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "espaco_tipo_atividade",
+        joinColumns = @JoinColumn(name = "espaco_id"),
+        inverseJoinColumns = @JoinColumn(name = "tipo_atividade_id")
+    )
+    private List<TipoAtividade> tiposAtividade = new ArrayList<>();
 
     @NotNull
     @Column(name = "precisa_projeto", nullable = false)
@@ -101,6 +108,19 @@ public class Espaco {
         }
         if (data.multiusuario() != null) {
             this.multiusuario = data.multiusuario();
+        }
+    }
+
+    /**
+     * Atualiza os tipos de atividade do espaço.
+     * Remove todos os tipos de atividade existentes e adiciona os novos.
+     * 
+     * @param novosTiposAtividade nova lista de tipos de atividade
+     */
+    public void atualizarTiposAtividade(List<TipoAtividade> novosTiposAtividade) {
+        this.tiposAtividade.clear();
+        if (novosTiposAtividade != null && !novosTiposAtividade.isEmpty()) {
+            this.tiposAtividade.addAll(novosTiposAtividade);
         }
     }
 

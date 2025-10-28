@@ -1,5 +1,7 @@
 package br.uece.alunos.sisreserva.v1.dto.espaco;
 
+import java.util.List;
+
 /**
  * DTO para atualização parcial de espaço.
  * Todos os campos são opcionais.
@@ -9,12 +11,14 @@ package br.uece.alunos.sisreserva.v1.dto.espaco;
  * @param observacao observações sobre o espaço
  * @param precisaProjeto indica se o espaço precisa de projeto vinculado
  * @param multiusuario indica se o espaço pode ser usado por diferentes tipos de usuários
+ * @param tipoAtividadeIds lista de IDs dos tipos de atividade (opcional)
  */
 public record EspacoAtualizarDTO(
         String nome, 
         String urlCnpq, 
         String observacao, 
         Boolean precisaProjeto,
-        Boolean multiusuario
+        Boolean multiusuario,
+        List<String> tipoAtividadeIds
 ) {
 }
