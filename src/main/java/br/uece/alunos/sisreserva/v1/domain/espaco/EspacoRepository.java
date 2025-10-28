@@ -27,8 +27,8 @@ public interface EspacoRepository extends JpaRepository<Espaco, String>, JpaSpec
     @Query("SELECT e FROM Espaco e WHERE LOWER(TRIM(e.nome)) IN :nomes")
     List<Espaco> findAllByNomesIgnoreCaseAndTrimmed(List<String> nomes);
 
-    @Query("SELECT e FROM Espaco e WHERE e.tipoAtividade.id = :tipoAtividadeId")
-    List<Espaco> findByTipoAtividade(String tipoAtividadeId);
+  @Query("SELECT e FROM Espaco e JOIN e.tiposAtividade t WHERE t.id = :tipoAtividadeId")
+  List<Espaco> findByTipoAtividade(String tipoAtividadeId);
 
     @Query("SELECT e FROM Espaco e WHERE e.tipoEspaco.id = :tipoEspacoId")
     List<Espaco> findByTipoEspaco(String tipoEspacoId);

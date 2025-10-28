@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.domain.espaco.specification;
 
 import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -14,9 +15,15 @@ import java.util.List;
 public class EspacoSpecification {
 
     /**
-     * Metodo que cria uma Specification baseada nos parâmetros passados.
-     * A ideia é receber um mapa de filtros (nome do campo -> valor)
-     * e construir uma query dinâmica.
+     * Método que cria uma Specification baseada nos parâmetros passados.
+     * A ideia é receber filtros e construir uma query dinâmica.
+     * 
+     * @param id identificador do espaço
+     * @param departamentoId identificador do departamento
+     * @param localizacaoId identificador da localização
+     * @param tipoEspacoId identificador do tipo de espaço
+     * @param tipoAtividadeId identificador do tipo de atividade (verifica se está na lista)
+     * @param multiusuario flag de multiusuário
      * @return Specification<Espaco> que pode ser usada no repository para consultas dinâmicas
      */
     public static Specification<Espaco> byFilter(
@@ -42,8 +49,10 @@ public class EspacoSpecification {
             if (tipoEspacoId != null && !tipoEspacoId.isBlank()) {
                 predicates.add(cb.equal(root.get("tipoEspaco").get("id"), tipoEspacoId));
             }
+            // Para filtrar por tipo de atividade, verifica se o ID está na lista de tipos de atividade do espaço
             if (tipoAtividadeId != null && !tipoAtividadeId.isBlank()) {
-                predicates.add(cb.equal(root.get("tipoAtividade").get("id"), tipoAtividadeId));
+                var tiposAtividadeJoin = root.join("tiposAtividade", JoinType.LEFT);
+                predicates.add(cb.equal(tiposAtividadeJoin.get("id"), tipoAtividadeId));
             }
             if (multiusuario != null) {
                 predicates.add(cb.equal(root.get("multiusuario"), multiusuario));
