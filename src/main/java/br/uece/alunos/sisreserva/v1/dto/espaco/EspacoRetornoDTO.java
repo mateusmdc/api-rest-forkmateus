@@ -6,6 +6,22 @@ import br.uece.alunos.sisreserva.v1.dto.localizacao.LocalizacaoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.tipoEspaco.TipoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.tipoAtividade.TipoAtividadeRetornoDTO;
 
+import java.util.List;
+
+/**
+ * DTO para retorno de informações de espaço.
+ * 
+ * @param id identificador único do espaço
+ * @param nome nome do espaço
+ * @param urlCnpq URL do CNPq
+ * @param observacao observações sobre o espaço
+ * @param departamento dados do departamento
+ * @param localizacao dados da localização
+ * @param tipoEspaco dados do tipo de espaço
+ * @param tiposAtividade lista de tipos de atividade do espaço
+ * @param precisaProjeto indica se o espaço precisa de projeto
+ * @param multiusuario indica se o espaço é multiusuário
+ */
 public record EspacoRetornoDTO(
         String id,
         String nome,
@@ -14,9 +30,15 @@ public record EspacoRetornoDTO(
         DepartamentoRetornoDTO departamento,
         LocalizacaoRetornoDTO localizacao,
         TipoEspacoRetornoDTO tipoEspaco,
-        TipoAtividadeRetornoDTO tipoAtividade,
-        Boolean precisaProjeto
+        List<TipoAtividadeRetornoDTO> tiposAtividade,
+        Boolean precisaProjeto,
+        Boolean multiusuario
 ) {
+    /**
+     * Construtor que converte uma entidade Espaco para o DTO de retorno.
+     * 
+     * @param espaco entidade Espaco a ser convertida
+     */
     public EspacoRetornoDTO(Espaco espaco) {
         this(
                 espaco.getId(),
@@ -26,8 +48,13 @@ public record EspacoRetornoDTO(
                 new DepartamentoRetornoDTO(espaco.getDepartamento()),
                 new LocalizacaoRetornoDTO(espaco.getLocalizacao()),
                 new TipoEspacoRetornoDTO(espaco.getTipoEspaco()),
-                new TipoAtividadeRetornoDTO(espaco.getTipoAtividade()),
-                espaco.getPrecisaProjeto()
+                espaco.getTiposAtividade() != null 
+                    ? espaco.getTiposAtividade().stream()
+                        .map(TipoAtividadeRetornoDTO::new)
+                        .toList()
+                    : List.of(),
+                espaco.getPrecisaProjeto(),
+                espaco.getMultiusuario()
         );
     }
 }
