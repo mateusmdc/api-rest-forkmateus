@@ -10,6 +10,7 @@ import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.validation.Solicit
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
+import br.uece.alunos.sisreserva.v1.infra.utils.mail.ReservaEmailService;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,8 @@ public class CriarSolicitacaoReserva {
     private SolicitacaoReservaValidator validator;
     @Autowired
     private SolicitacaoReservaRepository repository;
+    @Autowired
+    private ReservaEmailService reservaEmailService;
 
     /**
      * Cria uma ou mais solicitações de reserva baseado nos dados fornecidos.
@@ -81,6 +84,13 @@ public class CriarSolicitacaoReserva {
         var solicitacao = obterSolicitacaoComEntidadesRelacionadas(data, TipoRecorrencia.NAO_REPETE, null);
 
         var solicitacaoSalva = repository.save(solicitacao);
+
+        // Recarregar com relações para enviar notificação (evitar LazyInitializationException)
+        var solicitacaoComRelacoes = repository.findByIdWithRelations(solicitacaoSalva.getId())
+                .orElse(solicitacaoSalva);
+        
+        // Enviar notificação para gestores do espaço
+        reservaEmailService.notificarGestoresSobreNovaSolicitacao(solicitacaoComRelacoes);
 
         return new SolicitacaoReservaRetornoDTO(solicitacaoSalva);
     }
@@ -138,6 +148,13 @@ public class CriarSolicitacaoReserva {
         );
         
         SolicitacaoReserva reservaPaiSalva = repository.save(reservaPai);
+        
+        // Recarregar com relações para enviar notificação (evitar LazyInitializationException)
+        var reservaPaiComRelacoes = repository.findByIdWithRelations(reservaPaiSalva.getId())
+                .orElse(reservaPaiSalva);
+        
+        // Enviar notificação para gestores do espaço sobre a reserva pai
+        reservaEmailService.notificarGestoresSobreNovaSolicitacao(reservaPaiComRelacoes);
         
         // Criar reservas filhas (demais ocorrências)
         if (datasOcorrencias.size() > 1) {
