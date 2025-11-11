@@ -7,4 +7,7 @@ INSERT INTO cargo (id, nome, descricao) VALUES
 ('dba2b2cb-4ce4-4c79-a9f0-3e75c1e88c27', 'COMISSIONADO', 'Servidor com cargo comissionado'),
 ('2c972ac5-50ce-489b-8b77-dab1d4de5a3e', 'PESQUISADOR', 'Usuário vinculado a projetos de pesquisa'),
 ('2b7d43c5-0428-4742-8894-5d7cf8f2a9e2', 'COORDENADOR', 'Usuário com responsabilidade de coordenação de curso ou setor'),
-('690a2454-4d36-4e9b-8c0b-40196f0fd74d', 'SUPORTE', 'Usuário encarregado de manter a infraestrutura tecnológica');
+('690a2454-4d36-4e9b-8c0b-40196f0fd74d', 'SUPORTE', 'Usuário encarregado de manter a infraestrutura tecnológica'),
+('8f3a5d12-9c4e-4b7a-a1f2-6e8d9c0b5a3f', 'USUARIO_EXTERNO_VISITANTE', 'Usuário externo visitante sem vínculo institucional'),
+('7b2c8e45-1f9a-4d3c-b6e7-9a4f5c8d2b1e', 'SECRETARIA', 'Membro da secretaria administrativa')
+ON CONFLICT (id) DO NOTHING;
