@@ -47,6 +47,15 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     Optional<SolicitacaoReserva> findById(String id);
 
     @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        LEFT JOIN FETCH sr.usuarioSolicitante
+        LEFT JOIN FETCH sr.espaco
+        LEFT JOIN FETCH sr.projeto
+        WHERE sr.id = :id
+    """)
+    Optional<SolicitacaoReserva> findByIdWithRelations(String id);
+
+    @Query("""
         SELECT s FROM SolicitacaoReserva s
         WHERE s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
           AND s.dataInicio >= :dataInicio
@@ -65,4 +74,35 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         ORDER BY s.dataInicio ASC
     """)
     List<SolicitacaoReserva> findReservasAprovadasPorPeriodoEEspaco(LocalDateTime dataInicio, LocalDateTime dataFim, String espacoId);
+
+    /**
+     * Busca todas as reservas filhas de uma reserva pai.
+     * 
+     * @param reservaPaiId ID da reserva pai
+     * @return lista de reservas filhas
+     */
+    @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.reservaPaiId = :reservaPaiId ORDER BY sr.dataInicio ASC")
+    List<SolicitacaoReserva> findByReservaPaiId(String reservaPaiId);
+
+    /**
+     * Busca todas as reservas (pai e filhas) de um grupo de recorrência.
+     * 
+     * @param reservaPaiId ID da reserva pai
+     * @return lista contendo a reserva pai e todas as filhas
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr 
+        WHERE sr.id = :reservaPaiId OR sr.reservaPaiId = :reservaPaiId 
+        ORDER BY sr.dataInicio ASC
+    """)
+    List<SolicitacaoReserva> findReservasPaiEFilhas(String reservaPaiId);
+
+    /**
+     * Conta quantas reservas filhas existem para uma reserva pai.
+     * 
+     * @param reservaPaiId ID da reserva pai
+     * @return número de reservas filhas
+     */
+    @Query("SELECT COUNT(sr) FROM SolicitacaoReserva sr WHERE sr.reservaPaiId = :reservaPaiId")
+    Long countByReservaPaiId(String reservaPaiId);
 }

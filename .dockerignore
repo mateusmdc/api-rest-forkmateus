@@ -1,0 +1,16 @@
+# Git and Docker
+.git
+.gitignore
+Dockerfile
+.dockerignore
+
+# IDE and OS specific
+.idea
+*.iml
+.DS_Store
+
+# Maven build output (very important)
+target/
+
+# Log files and temp files
+*.log

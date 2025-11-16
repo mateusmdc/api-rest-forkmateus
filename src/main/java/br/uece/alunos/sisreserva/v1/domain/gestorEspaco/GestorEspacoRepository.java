@@ -16,6 +16,14 @@ public interface GestorEspacoRepository extends JpaRepository<GestorEspaco, Stri
     @Query("SELECT g FROM GestorEspaco g WHERE g.espaco.id = :espacoId")
     List<GestorEspaco> findByEspacoId(String espacoId);
 
+    @Query("""
+        SELECT g FROM GestorEspaco g
+        JOIN FETCH g.usuarioGestor
+        WHERE g.espaco.id = :espacoId
+          AND g.estaAtivo = true
+    """)
+    List<GestorEspaco> findGestoresAtivosComUsuarioByEspacoId(String espacoId);
+
     @Query("SELECT g FROM GestorEspaco g ORDER BY g.id ASC")
     Page<GestorEspaco> findAllOrderedById(Pageable pageable);
 

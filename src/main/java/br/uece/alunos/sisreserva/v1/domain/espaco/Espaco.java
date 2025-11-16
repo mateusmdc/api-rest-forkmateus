@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.espaco;
 
+import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.ComplexoEspacos;
 import br.uece.alunos.sisreserva.v1.domain.departamento.Departamento;
 import br.uece.alunos.sisreserva.v1.domain.localizacao.Localizacao;
 import br.uece.alunos.sisreserva.v1.domain.tipoAtividade.TipoAtividade;
@@ -12,6 +13,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Table(name = "espaco")
@@ -54,15 +57,29 @@ public class Espaco {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private TipoEspaco tipoEspaco;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tipo_atividade_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private TipoAtividade tipoAtividade;
+    /**
+     * Relacionamento ManyToMany com TipoAtividade.
+     * Um espaço pode ter múltiplos tipos de atividade e um tipo de atividade pode estar em múltiplos espaços.
+     * O lado proprietário da relação é Espaco (possui @JoinTable).
+     */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "espaco_tipo_atividade",
+        joinColumns = @JoinColumn(name = "espaco_id"),
+        inverseJoinColumns = @JoinColumn(name = "tipo_atividade_id")
+    )
+    private List<TipoAtividade> tiposAtividade = new ArrayList<>();
 
     @NotNull
     @Column(name = "precisa_projeto", nullable = false)
     private Boolean precisaProjeto = false;
+
+    @NotNull
+    @Column(name = "multiusuario", nullable = false)
+    private Boolean multiusuario = false;
+
+    @ManyToMany(mappedBy = "espacos", fetch = FetchType.LAZY)
+    private List<ComplexoEspacos> complexos = new ArrayList<>();
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -88,6 +105,22 @@ public class Espaco {
         }
         if (data.precisaProjeto() != null) {
             this.precisaProjeto = data.precisaProjeto();
+        }
+        if (data.multiusuario() != null) {
+            this.multiusuario = data.multiusuario();
+        }
+    }
+
+    /**
+     * Atualiza os tipos de atividade do espaço.
+     * Remove todos os tipos de atividade existentes e adiciona os novos.
+     * 
+     * @param novosTiposAtividade nova lista de tipos de atividade
+     */
+    public void atualizarTiposAtividade(List<TipoAtividade> novosTiposAtividade) {
+        this.tiposAtividade.clear();
+        if (novosTiposAtividade != null && !novosTiposAtividade.isEmpty()) {
+            this.tiposAtividade.addAll(novosTiposAtividade);
         }
     }
 

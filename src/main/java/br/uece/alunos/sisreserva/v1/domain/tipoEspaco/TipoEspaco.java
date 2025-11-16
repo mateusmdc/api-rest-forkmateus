@@ -39,4 +39,10 @@ public class TipoEspaco {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void atualizar(br.uece.alunos.sisreserva.v1.dto.tipoEspaco.TipoEspacoAtualizarDTO data) {
+        if (data.nome() != null && !data.nome().isBlank()) {
+            this.nome = data.nome();
+        }
+    }
 }

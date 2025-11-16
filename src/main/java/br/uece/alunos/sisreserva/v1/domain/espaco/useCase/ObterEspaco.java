@@ -24,7 +24,8 @@ public class ObterEspaco {
                                                String localizacao,
                                                String tipoEspaco,
                                                String tipoAtividade,
-                                               String nome) {
+                                               String nome,
+                                               Boolean multiusuario) {
 
         Map<String, Object> filtros = new HashMap<>();
         if (id != null) filtros.put("id", id);
@@ -32,13 +33,15 @@ public class ObterEspaco {
         if (localizacao != null) filtros.put("localizacaoId", localizacao);
         if (tipoEspaco != null) filtros.put("tipoEspacoId", tipoEspaco);
         if (tipoAtividade != null) filtros.put("tipoAtividadeId", tipoAtividade);
+        if (multiusuario != null) filtros.put("multiusuario", multiusuario);
 
         var spec = EspacoSpecification.byFilter(
                 (String) filtros.get("id"),
                 (String) filtros.get("departamentoId"),
                 (String) filtros.get("localizacaoId"),
                 (String) filtros.get("tipoEspacoId"),
-                (String) filtros.get("tipoAtividadeId")
+                (String) filtros.get("tipoAtividadeId"),
+                (Boolean) filtros.get("multiusuario")
         );
 
         var results = espacoRepository.findAll(spec, Sort.unsorted());
