@@ -54,6 +54,9 @@ public class CriarSolicitacaoReserva {
         // Validar datas da reserva (não pode ser no passado e data fim deve ser posterior à data início)
         validator.validarDatasReserva(data.dataInicio(), data.dataFim());
         
+        // Validar permissão de usuário externo para reservar o espaço
+        validator.validarPermissaoUsuarioExterno(data.espacoId());
+        
         // Determinar tipo de recorrência (default: NAO_REPETE)
         TipoRecorrencia tipoRecorrencia = data.tipoRecorrencia() != null 
             ? TipoRecorrencia.fromCodigo(data.tipoRecorrencia()) 
