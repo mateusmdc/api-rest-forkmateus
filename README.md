@@ -1,11 +1,15 @@
 ## 🐳 Docker
 
-Para rodar a aplicação utilizando Docker, é necessário configurar as variáveis de ambiente antes de iniciar os containers.
+Para rodar a aplicação utilizando Docker, é **OBRIGATÓRIO** configurar as variáveis de ambiente antes de iniciar os containers.
 
-### 1. Configuração (`.env`)
+> ⚠️ **IMPORTANTE**: O arquivo `.env` é obrigatório. Se as variáveis não forem definidas, o Docker Compose falhará com mensagens de erro indicando quais variáveis estão faltando.
+
+### 1. Configuração (`.env`) - OBRIGATÓRIA
 
 Crie um arquivo chamado `.env` na raiz do projeto (no mesmo nível do `docker-compose.yml`). Copie e cole o conteúdo abaixo:
 (caso precise, já existe um arquivo de exemplo dentro projeto chamado '.env.example', na pasta raíz do projeto)
+
+> 🔒 **SEGURANÇA**: Nunca commite o arquivo `.env` no repositório Git. Ele contém informações sensíveis.
 
 ```properties
 # Banco de Dados
@@ -36,20 +40,26 @@ POSTGRES_DB=sisreserva
 
 ### 2. Execução
 
-Após criar o arquivo `.env`, execute o comando abaixo para compilar a aplicação e subir os containers (API e Banco de Dados):
+Após criar e configurar o arquivo `.env` com todos os valores necessários, execute o comando abaixo para compilar a aplicação e subir os containers (API e Banco de Dados):
 
 ```bash
 docker-compose up --build
 ```
 
 O Docker irá:
-1. Criar o container do PostgreSQL (`sisreserva-db`).
-2. Compilar o projeto Java utilizando Maven (num container multi-stage).
-3. Iniciar a API (`sisreserva-api`) na porta **8080**.
+1. **Validar** que todas as variáveis de ambiente obrigatórias estão definidas no `.env`
+2. Criar o container do PostgreSQL (`sisreserva-db`)
+3. Compilar o projeto Java utilizando Maven (num container multi-stage)
+4. Iniciar a API (`sisreserva-api`) na porta especificada
+5. **Executar automaticamente** as migrations do Flyway para criar e popular o banco de dados
+
+> 📋 **Migrations Automáticas**: O Flyway está configurado para executar automaticamente:
+> - Scripts de migração (`db/migration/V*.sql`) - Criam a estrutura do banco
+> - Scripts de dados (`db/data/R*.sql`) - Populam o banco com dados iniciais
 
 ### 3. Acesso
 
-- **API:** http://localhost:8080
+- **API:** http://localhost:8080 (ou a porta definida em `SERVER_PORT`)
 - **Swagger UI:** http://localhost:8080/swagger-ui/index.html
 - **Banco de Dados:** Acessível externamente na porta `5432` (se mapeada) ou internamente via network do docker.
 
@@ -57,6 +67,46 @@ Para parar os serviços:
 ```bash
 docker-compose down
 ```
+
+### 4. Ambientes Específicos (Teste/Produção)
+
+Para diferentes ambientes, crie arquivos `.env` específicos:
+
+**Ambiente de Teste:**
+```bash
+# Copie o .env.example e ajuste os valores
+cp .env.example .env.test
+# Edite .env.test com as configurações de teste
+# Execute com:
+docker-compose --env-file .env.test up --build
+```
+
+**Ambiente de Produção:**
+```bash
+# Copie o .env.example e ajuste os valores
+cp .env.example .env.prod
+# Edite .env.prod com as configurações de produção
+# Execute com:
+docker-compose --env-file .env.prod up --build
+```
+
+**Valores importantes para ajustar por ambiente:**
+- `SPRING_DATASOURCE_URL`: URL do banco de dados do ambiente
+- `CORS_ALLOWED_ORIGINS`: URL do frontend (ex: `https://sisreserva-teste.uece.br`)
+- `API_SECURITY_*_SECRET`: Use secrets fortes e únicos para cada ambiente
+- `SPRING_MAIL_*`: Configurações SMTP do ambiente
+
+### 5. Troubleshooting
+
+**Erro: "ERROR: variável não definida"**
+- Verifique se o arquivo `.env` existe na raiz do projeto
+- Confirme que todas as variáveis listadas no `.env.example` estão presentes
+- Certifique-se de que não há linhas em branco ou comentários mal formatados
+
+**Migrations não executaram:**
+- Verifique os logs do container: `docker logs sisreserva-api`
+- Confirme que a URL do banco está correta no `.env`
+- O Flyway executa automaticamente na inicialização do Spring Boot
 
 ## 💻 Sobre
 
