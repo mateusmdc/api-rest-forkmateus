@@ -24,6 +24,7 @@ public class EspacoSpecification {
      * @param tipoEspacoId identificador do tipo de espaço
      * @param tipoAtividadeId identificador do tipo de atividade (verifica se está na lista)
      * @param multiusuario flag de multiusuário
+     * @param restringirApenasMultiusuario flag para restringir apenas espaços multiusuário (para usuários externos)
      * @return Specification<Espaco> que pode ser usada no repository para consultas dinâmicas
      */
     public static Specification<Espaco> byFilter(
@@ -32,7 +33,8 @@ public class EspacoSpecification {
             String localizacaoId,
             String tipoEspacoId,
             String tipoAtividadeId,
-            Boolean multiusuario
+            Boolean multiusuario,
+            Boolean restringirApenasMultiusuario
     ) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -56,6 +58,11 @@ public class EspacoSpecification {
             }
             if (multiusuario != null) {
                 predicates.add(cb.equal(root.get("multiusuario"), multiusuario));
+            }
+            
+            // Restrição para usuários externos: apenas espaços multiusuário
+            if (restringirApenasMultiusuario != null && restringirApenasMultiusuario) {
+                predicates.add(cb.isTrue(root.get("multiusuario")));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
