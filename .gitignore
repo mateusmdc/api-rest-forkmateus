@@ -8,6 +8,10 @@ target/
 **/src/main/resources/application.properties
 **/src/test/resources/application.properties
 
+# Logs directory
+logs/
+*.log
+
 # Application Certificates
 /src/main/resources/certificates/
 
