@@ -5,6 +5,7 @@ import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.TipoRecorrencia;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
  * @author Sistema de Reservas UECE
  * @version 1.0
  */
+@Slf4j
 @Component
 public class SolicitacaoReservaValidator {
 
@@ -142,10 +144,25 @@ public class SolicitacaoReservaValidator {
 
         // Se o espaço não é multiusuário, usuário externo não pode reservar
         if (!espaco.getMultiusuario()) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            
+            // Log de auditoria: registra tentativa de acesso negado
+            if (usuario != null) {
+                log.warn("[AUDIT] ACESSO_NEGADO - Usuário externo '{}' (ID: {}) tentou reservar espaço não-multiusuário '{}' (ID: {}, multiusuario: false)",
+                        usuario.getEmail(), usuario.getId(), espaco.getNome(), espaco.getId());
+            }
+            
             throw new ValidationException(
                 "Usuários externos só podem solicitar reservas para espaços multiusuário. " +
                 "O espaço selecionado não está disponível para usuários externos."
             );
+        }
+        
+        // Log de auditoria: registra validação bem-sucedida
+        var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+        if (usuario != null) {
+            log.info("[AUDIT] VALIDACAO_SUCESSO - Usuário externo '{}' (ID: {}) validado para reservar espaço multiusuário '{}' (ID: {})",
+                    usuario.getEmail(), usuario.getId(), espaco.getNome(), espaco.getId());
         }
     }
 }
