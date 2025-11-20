@@ -6,6 +6,7 @@ import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
 import br.uece.alunos.sisreserva.v1.service.UtilsService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ import java.util.*;
  * Aplica restrições de visualização baseadas no cargo do usuário autenticado.
  * Usuários externos só podem visualizar espaços multiusuário.
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class ObterEspaco {
@@ -58,6 +60,15 @@ public class ObterEspaco {
         // Verifica se o usuário autenticado é externo e deve ter restrições
         boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveRestringirEspacos();
 
+        // Log de auditoria: registra quando filtro de restrição é aplicado
+        if (restringirApenasMultiusuario) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            if (usuario != null) {
+                log.info("[AUDIT] FILTRO_APLICADO - Usuário externo '{}' (ID: {}) listando espaços - Restrição multiusuario=true aplicada",
+                        usuario.getEmail(), usuario.getId());
+            }
+        }
+
         var spec = EspacoSpecification.byFilter(
                 (String) filtros.get("id"),
                 (String) filtros.get("departamentoId"),
@@ -86,6 +97,15 @@ public class ObterEspaco {
                 .stream()
                 .map(EspacoRetornoDTO::new)
                 .toList();
+
+        // Log de auditoria: registra quantidade de resultados quando há restrição
+        if (restringirApenasMultiusuario) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            if (usuario != null) {
+                log.info("[AUDIT] RESULTADO_LISTAGEM - Usuário externo '{}' visualizou {} espaços multiusuário (total no sistema pode ser maior)",
+                        usuario.getEmail(), total);
+            }
+        }
 
         return new PageImpl<>(page, pageable, total);
     }
