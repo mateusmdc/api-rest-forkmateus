@@ -4,10 +4,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-# Ignore application properties file
-**/src/main/resources/application.properties
-**/src/test/resources/application.properties
-
 # Logs directory
 logs/
 *.log
@@ -43,4 +39,14 @@ build/
 ### VS Code ###
 .vscode/
 
-*.properties
+### Environment Variables ###
+# Arquivos .env com secrets NÃO devem ser commitados
+.env
+.env.test
+.env.prod
+.env.local
+
+### Application Properties Locais ###
+# Ignora apenas properties locais com valores sensíveis
+application-local.properties
+*-local.properties
