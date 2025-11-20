@@ -1,7 +1,10 @@
 package br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.validation;
 
+import br.uece.alunos.sisreserva.v1.domain.espaco.EspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReservaRepository;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.TipoRecorrencia;
+import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
+import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,7 +13,7 @@ import java.time.LocalDateTime;
 /**
  * Validador de regras de negócio para solicitações de reserva.
  * 
- * <p>Valida conflitos de horários e regras de recorrência.</p>
+ * <p>Valida conflitos de horários, regras de recorrência e permissões de acesso.</p>
  * 
  * @author Sistema de Reservas UECE
  * @version 1.0
@@ -20,6 +23,12 @@ public class SolicitacaoReservaValidator {
 
     @Autowired
     private SolicitacaoReservaRepository repository;
+    
+    @Autowired
+    private EspacoRepository espacoRepository;
+    
+    @Autowired
+    private UsuarioAutenticadoService usuarioAutenticadoService;
 
     /**
      * Valida se já existe uma solicitação de reserva aprovada para o mesmo espaço e período informado.
@@ -109,6 +118,34 @@ public class SolicitacaoReservaValidator {
                     "Data fim de recorrência não pode ser superior a 1 ano a partir de hoje"
                 );
             }
+        }
+    }
+
+    /**
+     * Valida se um usuário externo tem permissão para reservar o espaço informado.
+     * 
+     * <p>Usuários externos só podem reservar espaços marcados como multiusuário.
+     * Administradores e usuários internos não possuem essa restrição.</p>
+     * 
+     * @param espacoId identificador do espaço a ser reservado
+     * @throws ValidationException se o usuário externo tentar reservar um espaço não-multiusuário
+     */
+    public void validarPermissaoUsuarioExterno(String espacoId) {
+        // Verifica se o usuário autenticado é externo e não é admin
+        if (!usuarioAutenticadoService.deveRestringirEspacos()) {
+            return; // Usuário não tem restrições
+        }
+
+        // Busca o espaço para verificar se é multiusuário
+        var espaco = espacoRepository.findById(espacoId)
+                .orElseThrow(() -> new ValidationException("Espaço não encontrado com o ID: " + espacoId));
+
+        // Se o espaço não é multiusuário, usuário externo não pode reservar
+        if (!espaco.getMultiusuario()) {
+            throw new ValidationException(
+                "Usuários externos só podem solicitar reservas para espaços multiusuário. " +
+                "O espaço selecionado não está disponível para usuários externos."
+            );
         }
     }
 }
