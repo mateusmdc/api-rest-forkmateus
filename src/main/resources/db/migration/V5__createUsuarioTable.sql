@@ -13,7 +13,7 @@ CREATE TABLE usuario (
     lockout_end TIMESTAMP,
     token_expiration TIMESTAMP,
     token_mail VARCHAR(255),
-    refresh_token_enabled BOOLEAN DEFAULT false,
+    refresh_token_enabled BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP
 );
