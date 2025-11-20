@@ -1,3 +1,63 @@
+## 🐳 Docker
+
+Para rodar a aplicação utilizando Docker, é necessário configurar as variáveis de ambiente antes de iniciar os containers.
+
+### 1. Configuração (`.env`)
+
+Crie um arquivo chamado `.env` na raiz do projeto (no mesmo nível do `docker-compose.yml`). Copie e cole o conteúdo abaixo:
+(caso precise, já existe um arquivo de exemplo dentro projeto chamado '.env.example', na pasta raíz do projeto)
+
+```properties
+# Banco de Dados
+SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/sisreserva?currentSchema=dev
+SPRING_DATASOURCE_USERNAME=postgres
+SPRING_DATASOURCE_PASSWORD=admin
+
+# Configuração do Servidor
+SERVER_PORT=8080
+
+# Segurança (JWT e CORS)
+API_SECURITY_TOKEN_SECRET=123456
+API_SECURITY_ACCESS_SECRET=123456
+API_SECURITY_REFRESH_SECRET=123456
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+
+# E-mail (SMTP)
+SPRING_MAIL_HOST=smtp.gmail.com
+SPRING_MAIL_PORT=587
+SPRING_MAIL_USERNAME=andredev.invasao@gmail.com
+SPRING_MAIL_PASSWORD=ceuxqdpkkaygfmzl
+SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=true
+SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=true
+
+# Configuração do Container Postgres
+POSTGRES_DB=sisreserva
+```
+
+### 2. Execução
+
+Após criar o arquivo `.env`, execute o comando abaixo para compilar a aplicação e subir os containers (API e Banco de Dados):
+
+```bash
+docker-compose up --build
+```
+
+O Docker irá:
+1. Criar o container do PostgreSQL (`sisreserva-db`).
+2. Compilar o projeto Java utilizando Maven (num container multi-stage).
+3. Iniciar a API (`sisreserva-api`) na porta **8080**.
+
+### 3. Acesso
+
+- **API:** http://localhost:8080
+- **Swagger UI:** http://localhost:8080/swagger-ui/index.html
+- **Banco de Dados:** Acessível externamente na porta `5432` (se mapeada) ou internamente via network do docker.
+
+Para parar os serviços:
+```bash
+docker-compose down
+```
+
 ## 💻 Sobre
 
 SisReserva API foi projetada para lidar com os pedidos de Reserva de espaços da UECE.
