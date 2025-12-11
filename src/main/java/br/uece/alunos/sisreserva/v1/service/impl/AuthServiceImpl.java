@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public Page<UsuarioRetornoDTO> obter(Pageable pageable, String id, Integer matricula, String email, String documentoFiscal, String instituicaoId, String cargoId, String nome) {
+    public Page<UsuarioRetornoDTO> obter(Pageable pageable, String id, String matricula, String email, String documentoFiscal, String instituicaoId, String cargoId, String nome) {
         return obterUsuarios.obter(pageable, id, matricula, email, documentoFiscal, instituicaoId, cargoId, nome);
     }
 

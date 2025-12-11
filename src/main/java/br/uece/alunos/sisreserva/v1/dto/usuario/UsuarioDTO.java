@@ -21,8 +21,7 @@ public record UsuarioDTO(
 
         String fotoPerfil,
 
-        @Positive(message = "A matrícula deve ser um número positivo")
-        int matricula,
+        String matricula,
 
         String telefone,
 

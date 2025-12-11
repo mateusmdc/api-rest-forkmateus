@@ -18,7 +18,7 @@ public interface AuthService {
     UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT);
     Page<UsuarioRetornoDTO> obter(Pageable pageable,
                                   String id,
-                                  Integer matricula,
+                                  String matricula,
                                   String email,
                                   String documentoFiscal,
                                   String instituicaoId,

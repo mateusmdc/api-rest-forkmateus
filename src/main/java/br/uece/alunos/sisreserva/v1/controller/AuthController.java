@@ -80,7 +80,7 @@ public class AuthController {
             @RequestParam(defaultValue = "nome") String sortField,
             @RequestParam(defaultValue = "asc") String sortOrder,
             @RequestParam(required = false) String id,
-            @RequestParam(required = false) Integer matricula,
+            @RequestParam(required = false) String matricula,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String documentoFiscal,
             @RequestParam(required = false) String instituicaoId,

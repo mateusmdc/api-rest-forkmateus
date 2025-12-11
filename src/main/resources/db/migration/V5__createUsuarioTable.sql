@@ -2,7 +2,7 @@ CREATE TABLE usuario (
     id VARCHAR(36) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    matricula INT NOT NULL,
+    matricula VARCHAR(20),
     email VARCHAR(100) UNIQUE NOT NULL,
     documento_fiscal VARCHAR(18) NOT NULL,
     foto_perfil VARCHAR(100),
