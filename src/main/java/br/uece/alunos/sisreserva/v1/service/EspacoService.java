@@ -4,6 +4,7 @@ import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDT
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EstatisticasGeralDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,4 +30,7 @@ public interface EspacoService {
     EspacoRetornoDTO atribuirComplexos(String id, List<String> complexoIds);
     EspacoRetornoDTO desatribuirComplexos(String id, List<String> complexoIds);
     List<ComplexoEspacosRetornoDTO> listarComplexos(String id);
+    
+    // Método para obter estatísticas de uso dos espaços
+    EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds);
 }

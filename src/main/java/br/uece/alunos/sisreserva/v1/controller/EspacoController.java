@@ -6,6 +6,7 @@ import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EspacoVincularComplexosDTO;
+import br.uece.alunos.sisreserva.v1.dto.espaco.EstatisticasGeralDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EspacoService;
@@ -96,6 +97,33 @@ public class EspacoController {
     public ResponseEntity<ApiResponseDTO<List<ComplexoEspacosRetornoDTO>>> listarComplexos(@PathVariable String id) {
         var complexos = espacoService.listarComplexos(id);
         return ResponseEntity.ok(ApiResponseDTO.success(complexos));
+    }
+
+    /**
+     * Obtém estatísticas de uso dos espaços.
+     * 
+     * <p>Retorna estatísticas detalhadas sobre o uso dos espaços, incluindo:</p>
+     * <ul>
+     *   <li>Reservas feitas no mês (filtrado ou mês atual)</li>
+     *   <li>Mês com mais reservas</li>
+     *   <li>Usuários que mais reservaram</li>
+     * </ul>
+     * 
+     * <p>As estatísticas são agrupadas por espaço e podem ser filtradas
+     * para espaços específicos através do parâmetro espacoIds.</p>
+     * 
+     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
+     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param espacoIds lista de IDs de espaços para filtrar (opcional, padrão = todos os espaços)
+     * @return estatísticas agrupadas por espaço
+     */
+    @GetMapping("/estatisticas")
+    public ResponseEntity<ApiResponseDTO<EstatisticasGeralDTO>> obterEstatisticas(
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) List<String> espacoIds) {
+        var estatisticas = espacoService.obterEstatisticas(mes, ano, espacoIds);
+        return ResponseEntity.ok(ApiResponseDTO.success(estatisticas));
     }
 }
 
