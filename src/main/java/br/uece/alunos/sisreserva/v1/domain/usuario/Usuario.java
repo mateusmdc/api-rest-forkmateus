@@ -38,8 +38,8 @@ public class Usuario implements UserDetails {
     @Column(name = "senha", nullable = false, length = 100)
     private String senha;
 
-    @Column(name = "matricula", nullable = false)
-    private Integer matricula;
+    @Column(name = "matricula", length = 20)
+    private String matricula;
 
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
@@ -129,7 +129,7 @@ public class Usuario implements UserDetails {
             this.fotoPerfil = data.fotoPerfil();
         }
 
-        if (data.matricula() != null && data.matricula() > 0) {
+        if (data.matricula() != null && data.matricula().isBlank()) {
             this.matricula = data.matricula();
         }
 

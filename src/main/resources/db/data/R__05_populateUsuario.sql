@@ -12,7 +12,7 @@ INSERT INTO usuario (
     'Admin da Silva',
     'admin@aluno.uece.br',
     '56489577825',
-    123456,
+    '123456',
     '$2a$12$vDmU1Y8jaeYAGaSdk.aiaePOVIb0wWKYq4Fgg/zsnQ2MVofJmF9ya', -- Senha: admin (BCrypt)
     '9a379f24-abe3-49a4-b8fd-1d8a9149f3d1', -- UECE
     NOW()

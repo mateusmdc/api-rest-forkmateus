@@ -14,7 +14,7 @@ public record UsuarioRetornoDTO(
         String email,
         String documentoFiscal,
         String fotoPerfil,
-        int matricula,
+        String matricula,
         String telefone,
         InstituicaoRetornoDTO instituicao,
         boolean refreshTokenEnabled,
