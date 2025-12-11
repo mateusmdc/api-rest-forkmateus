@@ -19,7 +19,7 @@ public class ObterUsuarios {
 
     public Page<UsuarioRetornoDTO> obter(Pageable pageable,
                                          String id,
-                                         Integer matricula,
+                                         String matricula,
                                          String email,
                                          String documentoFiscal,
                                          String instituicaoId,
