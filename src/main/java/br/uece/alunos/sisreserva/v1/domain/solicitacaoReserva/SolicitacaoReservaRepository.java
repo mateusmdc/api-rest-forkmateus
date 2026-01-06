@@ -1,10 +1,13 @@
 package br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva;
 
+import br.uece.alunos.sisreserva.v1.dto.espaco.ReservasPorMesProjection;
+import br.uece.alunos.sisreserva.v1.dto.espaco.ReservasPorUsuarioProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -105,4 +108,68 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
      */
     @Query("SELECT COUNT(sr) FROM SolicitacaoReserva sr WHERE sr.reservaPaiId = :reservaPaiId")
     Long countByReservaPaiId(String reservaPaiId);
+
+    /**
+     * Conta reservas de um espaço em um mês/ano específico (query agregada otimizada).
+     * 
+     * @param espacoId ID do espaço
+     * @param mes mês (1-12)
+     * @param ano ano
+     * @return projeção com totais de reservas solicitadas e confirmadas
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+          AND MONTH(sr.dataInicio) = :mes
+          AND YEAR(sr.dataInicio) = :ano
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+    """)
+    Optional<ReservasPorMesProjection> contarReservasPorEspacoEMes(
+        @Param("espacoId") String espacoId, 
+        @Param("mes") int mes, 
+        @Param("ano") int ano
+    );
+
+    /**
+     * Agrupa e conta reservas de um espaço por mês/ano (query agregada otimizada).
+     * 
+     * @param espacoId ID do espaço
+     * @return lista de projeções com totais agrupados por mês/ano, ordenada por quantidade decrescente
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+        ORDER BY COUNT(sr) DESC
+    """)
+    List<ReservasPorMesProjection> contarReservasPorEspacoAgrupadoPorMes(@Param("espacoId") String espacoId);
+
+    /**
+     * Agrupa e conta reservas de um espaço por usuário (query agregada otimizada).
+     * 
+     * @param espacoId ID do espaço
+     * @return lista de projeções com totais agrupados por usuário, ordenada por quantidade decrescente
+     */
+    @Query("""
+        SELECT 
+            sr.usuarioSolicitante.id as usuarioId,
+            sr.usuarioSolicitante.nome as usuarioNome,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+        GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
+        ORDER BY COUNT(sr) DESC
+    """)
+    List<ReservasPorUsuarioProjection> contarReservasPorEspacoAgrupadoPorUsuario(@Param("espacoId") String espacoId);
 }

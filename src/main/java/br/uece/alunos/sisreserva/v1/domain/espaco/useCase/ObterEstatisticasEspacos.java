@@ -2,20 +2,17 @@ package br.uece.alunos.sisreserva.v1.domain.espaco.useCase;
 
 import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.EspacoRepository;
-import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReservaRepository;
-import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao;
-import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EstatisticasEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.EstatisticasGeralDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.ReservasMesDTO;
+import br.uece.alunos.sisreserva.v1.dto.espaco.ReservasPorMesProjection;
+import br.uece.alunos.sisreserva.v1.dto.espaco.ReservasPorUsuarioProjection;
 import br.uece.alunos.sisreserva.v1.dto.espaco.UsuarioEstatisticaDTO;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,6 +23,9 @@ import java.util.stream.Collectors;
  * <p>Calcula e retorna estatísticas detalhadas sobre o uso dos espaços,
  * incluindo reservas do mês, mês com mais reservas e usuários que mais
  * reservaram.</p>
+ * 
+ * <p>Utiliza queries agregadas otimizadas para evitar carregar grandes
+ * volumes de dados na memória.</p>
  */
 @Component
 @RequiredArgsConstructor
@@ -89,7 +89,7 @@ public class ObterEstatisticasEspacos {
     }
     
     /**
-     * Calcula as estatísticas de um espaço específico.
+     * Calcula as estatísticas de um espaço específico usando queries agregadas otimizadas.
      * 
      * @param espaco espaço a ser analisado
      * @param mes mês para consulta de reservas
@@ -97,17 +97,14 @@ public class ObterEstatisticasEspacos {
      * @return estatísticas do espaço
      */
     private EstatisticasEspacoDTO calcularEstatisticasEspaco(Espaco espaco, int mes, int ano) {
-        // Obtém todas as reservas do espaço
-        List<SolicitacaoReserva> todasReservas = solicitacaoReservaRepository.findByEspacoId(espaco.getId());
+        // Calcula reservas do mês especificado usando query agregada
+        ReservasMesDTO reservasDoMes = calcularReservasMesOtimizado(espaco.getId(), mes, ano);
         
-        // Calcula reservas do mês especificado
-        ReservasMesDTO reservasDoMes = calcularReservasMes(todasReservas, mes, ano);
+        // Calcula mês com mais reservas usando query agregada
+        ReservasMesDTO mesComMaisReservas = calcularMesComMaisReservasOtimizado(espaco.getId());
         
-        // Calcula mês com mais reservas
-        ReservasMesDTO mesComMaisReservas = calcularMesComMaisReservas(todasReservas);
-        
-        // Calcula usuários que mais reservaram
-        List<UsuarioEstatisticaDTO> usuariosQueMaisReservaram = calcularUsuariosQueMaisReservaram(todasReservas);
+        // Calcula usuários que mais reservaram usando query agregada
+        List<UsuarioEstatisticaDTO> usuariosQueMaisReservaram = calcularUsuariosQueMaisReservaramOtimizado(espaco.getId());
         
         return new EstatisticasEspacoDTO(
             espaco.getId(),
@@ -119,108 +116,76 @@ public class ObterEstatisticasEspacos {
     }
     
     /**
-     * Calcula a quantidade de reservas em um mês específico.
+     * Calcula a quantidade de reservas em um mês específico usando query agregada.
      * 
-     * @param reservas lista de todas as reservas
+     * @param espacoId ID do espaço
      * @param mes mês
      * @param ano ano
      * @return estatísticas do mês
      */
-    private ReservasMesDTO calcularReservasMes(List<SolicitacaoReserva> reservas, int mes, int ano) {
-        // Filtra reservas do mês
-        List<SolicitacaoReserva> reservasDoMes = reservas.stream()
-            .filter(r -> {
-                LocalDateTime dataInicio = r.getDataInicio();
-                return dataInicio.getMonthValue() == mes && dataInicio.getYear() == ano;
-            })
-            .collect(Collectors.toList());
+    private ReservasMesDTO calcularReservasMesOtimizado(String espacoId, int mes, int ano) {
+        Optional<ReservasPorMesProjection> resultado = solicitacaoReservaRepository
+            .contarReservasPorEspacoEMes(espacoId, mes, ano);
         
-        // Conta todas as solicitadas e confirmadas (status = APROVADO)
-        long solicitadas = reservasDoMes.size();
+        if (resultado.isPresent()) {
+            ReservasPorMesProjection projection = resultado.get();
+            return new ReservasMesDTO(
+                projection.getMes(),
+                projection.getAno(),
+                projection.getTotalReservas(),
+                projection.getReservasConfirmadas()
+            );
+        }
         
-        long confirmadas = reservasDoMes.stream()
-            .filter(r -> r.getStatus() == StatusSolicitacao.APROVADO)
-            .count();
-        
-        return new ReservasMesDTO(mes, ano, solicitadas, confirmadas);
+        // Se não houver reservas no mês, retorna zeros
+        return new ReservasMesDTO(mes, ano, 0L, 0L);
     }
     
     /**
-     * Calcula o mês com mais reservas.
+     * Calcula o mês com mais reservas usando query agregada.
      * 
-     * @param reservas lista de todas as reservas
+     * @param espacoId ID do espaço
      * @return estatísticas do mês com mais reservas
      */
-    private ReservasMesDTO calcularMesComMaisReservas(List<SolicitacaoReserva> reservas) {
-        if (reservas.isEmpty()) {
+    private ReservasMesDTO calcularMesComMaisReservasOtimizado(String espacoId) {
+        List<ReservasPorMesProjection> reservasPorMes = solicitacaoReservaRepository
+            .contarReservasPorEspacoAgrupadoPorMes(espacoId);
+        
+        if (reservasPorMes.isEmpty()) {
             // Retorna mês atual com zeros se não houver reservas
             YearMonth mesAtual = YearMonth.now();
             return new ReservasMesDTO(mesAtual.getMonthValue(), mesAtual.getYear(), 0L, 0L);
         }
         
-        // Agrupa reservas por mês/ano
-        Map<YearMonth, List<SolicitacaoReserva>> reservasPorMes = reservas.stream()
-            .collect(Collectors.groupingBy(r -> 
-                YearMonth.from(r.getDataInicio())
-            ));
+        // A query já retorna ordenada por quantidade decrescente, pegamos o primeiro
+        ReservasPorMesProjection mesComMais = reservasPorMes.get(0);
         
-        // Encontra o mês com mais reservas totais
-        YearMonth mesComMais = reservasPorMes.entrySet().stream()
-            .max(Comparator.comparingInt(entry -> entry.getValue().size()))
-            .map(Map.Entry::getKey)
-            .orElse(YearMonth.now());
-        
-        List<SolicitacaoReserva> reservasDoMes = reservasPorMes.get(mesComMais);
-        
-        // Conta todas as solicitadas e confirmadas (status = APROVADO)
-        long solicitadas = reservasDoMes.size();
-        
-        long confirmadas = reservasDoMes.stream()
-            .filter(r -> r.getStatus() == StatusSolicitacao.APROVADO)
-            .count();
-        
-        return new ReservasMesDTO(mesComMais.getMonthValue(), mesComMais.getYear(), solicitadas, confirmadas);
+        return new ReservasMesDTO(
+            mesComMais.getMes(),
+            mesComMais.getAno(),
+            mesComMais.getTotalReservas(),
+            mesComMais.getReservasConfirmadas()
+        );
     }
     
     /**
-     * Calcula os usuários que mais reservaram o espaço.
+     * Calcula os usuários que mais reservaram o espaço usando query agregada.
      * 
-     * @param reservas lista de todas as reservas
+     * @param espacoId ID do espaço
      * @return lista de usuários ordenada por quantidade de reservas (decrescente)
      */
-    private List<UsuarioEstatisticaDTO> calcularUsuariosQueMaisReservaram(List<SolicitacaoReserva> reservas) {
-        // Agrupa reservas por usuário
-        Map<Usuario, List<SolicitacaoReserva>> reservasPorUsuario = reservas.stream()
-            .collect(Collectors.groupingBy(SolicitacaoReserva::getUsuarioSolicitante));
+    private List<UsuarioEstatisticaDTO> calcularUsuariosQueMaisReservaramOtimizado(String espacoId) {
+        List<ReservasPorUsuarioProjection> reservasPorUsuario = solicitacaoReservaRepository
+            .contarReservasPorEspacoAgrupadoPorUsuario(espacoId);
         
-        // Calcula estatísticas por usuário
-        List<UsuarioEstatisticaDTO> usuarios = reservasPorUsuario.entrySet().stream()
-            .map(entry -> {
-                Usuario usuario = entry.getKey();
-                List<SolicitacaoReserva> reservasUsuario = entry.getValue();
-                
-                // Conta todas as solicitadas e confirmadas (status = APROVADO)
-                long solicitadas = reservasUsuario.size();
-                
-                long confirmadas = reservasUsuario.stream()
-                    .filter(r -> r.getStatus() == StatusSolicitacao.APROVADO)
-                    .count();
-                
-                return new UsuarioEstatisticaDTO(
-                    usuario.getId(),
-                    usuario.getNome(),
-                    solicitadas,
-                    confirmadas
-                );
-            })
-            .sorted((u1, u2) -> {
-                // Ordena por total de reservas (solicitadas + confirmadas) em ordem decrescente
-                long total1 = u1.reservasSolicitadas() + u1.reservasConfirmadas();
-                long total2 = u2.reservasSolicitadas() + u2.reservasConfirmadas();
-                return Long.compare(total2, total1);
-            })
+        // A query já retorna ordenada por quantidade decrescente
+        return reservasPorUsuario.stream()
+            .map(projection -> new UsuarioEstatisticaDTO(
+                projection.getUsuarioId(),
+                projection.getUsuarioNome(),
+                projection.getTotalReservas(),
+                projection.getReservasConfirmadas()
+            ))
             .collect(Collectors.toList());
-        
-        return usuarios;
     }
 }
