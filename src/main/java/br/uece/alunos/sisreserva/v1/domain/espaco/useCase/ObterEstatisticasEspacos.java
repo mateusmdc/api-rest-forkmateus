@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,8 +42,23 @@ public class ObterEstatisticasEspacos {
      * @param ano ano para filtrar reservas (opcional, padrão = ano atual)
      * @param espacoIds lista de IDs de espaços para filtrar (opcional, padrão = todos os espaços)
      * @return estatísticas agrupadas por espaço
+     * @throws IllegalArgumentException se o mês ou ano fornecido for inválido
      */
     public EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds) {
+        // Valida mês se informado
+        if (mes != null && (mes < 1 || mes > 12)) {
+            throw new IllegalArgumentException("Mês inválido. Deve estar entre 1 e 12");
+        }
+        
+        // Valida ano se informado
+        if (ano != null) {
+            int anoAtual = Year.now().getValue();
+            int anoMaximo = anoAtual + 50;
+            if (ano < 1900 || ano > anoMaximo) {
+                throw new IllegalArgumentException("Ano inválido. Deve estar entre 1900 e " + anoMaximo);
+            }
+        }
+        
         // Define mês e ano padrão como atual se não informado
         YearMonth mesAtual = YearMonth.now();
         int mesConsulta = (mes != null) ? mes : mesAtual.getMonthValue();
