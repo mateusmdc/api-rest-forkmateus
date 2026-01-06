@@ -129,7 +129,7 @@ public class Usuario implements UserDetails {
             this.fotoPerfil = data.fotoPerfil();
         }
 
-        if (data.matricula() != null && data.matricula().isBlank()) {
+        if (data.matricula() != null && !data.matricula().isBlank()) {
             this.matricula = data.matricula();
         }
 
