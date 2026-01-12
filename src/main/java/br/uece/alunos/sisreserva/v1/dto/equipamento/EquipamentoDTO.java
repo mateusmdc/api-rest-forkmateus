@@ -10,5 +10,6 @@ public record EquipamentoDTO(
         @NotNull(message = "O status do equipamento é obrigatório")
         StatusEquipamento statusEquipamento,
         @NotBlank(message = "O ID do tipo de equipamento é obrigatório")
-        String tipoEquipamentoId
+        String tipoEquipamentoId,
+        Boolean multiusuario
 ) {}

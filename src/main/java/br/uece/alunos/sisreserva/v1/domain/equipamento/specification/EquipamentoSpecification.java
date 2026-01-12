@@ -11,32 +11,57 @@ import java.util.Map;
 
 public class EquipamentoSpecification {
 
-    public static Specification<Equipamento> byFilters(Map<String, Object> filtros) {
+    /**
+     * Cria uma Specification para filtrar equipamentos baseado em múltiplos critérios.
+     * Suporta filtro de multiusuário e restrição para usuários externos.
+     * 
+     * @param id identificador do equipamento
+     * @param tombamento número de tombamento do equipamento
+     * @param status status do equipamento
+     * @param tipoEquipamento identificador do tipo de equipamento
+     * @param multiusuario flag de multiusuário
+     * @param restringirApenasMultiusuario flag para restringir apenas equipamentos multiusuário (para usuários externos)
+     * @return Specification<Equipamento> que pode ser usada no repository para consultas dinâmicas
+     */
+    public static Specification<Equipamento> byFilters(
+            String id,
+            String tombamento,
+            String status,
+            String tipoEquipamento,
+            Boolean multiusuario,
+            Boolean restringirApenasMultiusuario
+    ) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
-            if (filtros == null) return cb.conjunction();
-
-            if (filtros.containsKey("id")) {
-                predicates.add(cb.equal(root.get("id"), filtros.get("id")));
+            if (id != null && !id.isBlank()) {
+                predicates.add(cb.equal(root.get("id"), id));
             }
 
-            if (filtros.containsKey("tombamento")) {
-                String tombamento = filtros.get("tombamento").toString().toLowerCase();
-                predicates.add(cb.like(cb.lower(root.get("tombamento")), "%" + tombamento + "%"));
+            if (tombamento != null && !tombamento.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("tombamento")), "%" + tombamento.toLowerCase() + "%"));
             }
 
-            if (filtros.containsKey("status")) {
+            if (status != null && !status.isBlank()) {
                 try {
-                    StatusEquipamento status = StatusEquipamento.valueOf(filtros.get("status").toString());
-                    predicates.add(cb.equal(root.get("status"), status));
+                    StatusEquipamento statusEnum = StatusEquipamento.valueOf(status.toUpperCase());
+                    predicates.add(cb.equal(root.get("status"), statusEnum));
                 } catch (IllegalArgumentException ignored) {
                     // Ignora status inválido
                 }
             }
 
-            if (filtros.containsKey("tipoEquipamento")) {
-                predicates.add(cb.equal(root.get("tipoEquipamento").get("id"), filtros.get("tipoEquipamento")));
+            if (tipoEquipamento != null && !tipoEquipamento.isBlank()) {
+                predicates.add(cb.equal(root.get("tipoEquipamento").get("id"), tipoEquipamento));
+            }
+
+            if (multiusuario != null) {
+                predicates.add(cb.equal(root.get("multiusuario"), multiusuario));
+            }
+            
+            // Restrição para usuários externos: apenas equipamentos multiusuário
+            if (restringirApenasMultiusuario != null && restringirApenasMultiusuario) {
+                predicates.add(cb.isTrue(root.get("multiusuario")));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
