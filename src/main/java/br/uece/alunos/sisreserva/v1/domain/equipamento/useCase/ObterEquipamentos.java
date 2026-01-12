@@ -1,40 +1,72 @@
 package br.uece.alunos.sisreserva.v1.domain.equipamento.useCase;
 
-import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.EquipamentoRepository;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.specification.EquipamentoSpecification;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoRetornoDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * Caso de uso para obter equipamentos com filtros e paginação.
+ * Aplica restrições de visualização baseadas no cargo do usuário autenticado.
+ * Usuários externos só podem visualizar equipamentos multiusuário.
+ */
+@Slf4j
 @Component
+@AllArgsConstructor
 public class ObterEquipamentos {
 
-    @Autowired
-    private EquipamentoRepository repository;
+    private final EquipamentoRepository repository;
+    private final UsuarioAutenticadoService usuarioAutenticadoService;
 
+    /**
+     * Obtém equipamentos com filtros e paginação.
+     * Aplica automaticamente restrição para usuários externos (apenas equipamentos multiusuário).
+     * 
+     * @param pageable Informações de paginação
+     * @param id Filtro por ID do equipamento
+     * @param tombamento Filtro por tombamento
+     * @param status Filtro por status
+     * @param tipoEquipamento Filtro por ID do tipo de equipamento
+     * @return Página com os equipamentos encontrados
+     */
     public Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento) {
-        Map<String, Object> filtros = new HashMap<>();
+        // Verifica se o usuário autenticado é externo e deve ter restrições
+        boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveRestringirEspacos();
 
-        if (id != null) filtros.put("id", id);
-        if (tombamento != null) filtros.put("tombamento", tombamento);
-        if (status != null) filtros.put("status", status);
-        if (tipoEquipamento != null) filtros.put("tipoEquipamento", tipoEquipamento);
+        // Log de auditoria: registra quando filtro de restrição é aplicado
+        if (restringirApenasMultiusuario) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            if (usuario != null) {
+                log.info("[AUDIT] FILTRO_APLICADO - Usuário externo '{}' (ID: {}) listando equipamentos - Restrição multiusuario=true aplicada",
+                        usuario.getEmail(), usuario.getId());
+            }
+        }
 
-        var spec = EquipamentoSpecification.byFilters(filtros);
-
-        return repository.findAll(spec, pageable).map(EquipamentoRetornoDTO::new);
-    }
-
-    private Page<Equipamento> execute(Map<String, Object> filtros, Pageable pageable) {
-        return repository.findAll(
-                EquipamentoSpecification.byFilters(filtros),
-                pageable
+        var spec = EquipamentoSpecification.byFilters(
+                id,
+                tombamento,
+                status,
+                tipoEquipamento,
+                null,  // multiusuario - não passado explicitamente pelo usuário
+                restringirApenasMultiusuario  // Restrição para usuários externos
         );
+
+        var page = repository.findAll(spec, pageable);
+
+        // Log de auditoria: registra quantidade de resultados quando há restrição
+        if (restringirApenasMultiusuario) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            if (usuario != null) {
+                log.info("[AUDIT] RESULTADO_LISTAGEM - Usuário externo '{}' visualizou {} equipamentos multiusuário (total no sistema pode ser maior)",
+                        usuario.getEmail(), page.getTotalElements());
+            }
+        }
+
+        return page.map(EquipamentoRetornoDTO::new);
     }
 }

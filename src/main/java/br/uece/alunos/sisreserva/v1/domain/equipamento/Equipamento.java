@@ -44,6 +44,10 @@ public class Equipamento {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private TipoEquipamento tipoEquipamento;
 
+    @NotNull
+    @Column(name = "multiusuario", nullable = false)
+    private Boolean multiusuario = false;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -55,6 +59,7 @@ public class Equipamento {
         this.descricao = data.descricao();
         this.status = data.statusEquipamento();
         this.tipoEquipamento =  tipoEquipamento;
+        this.multiusuario = data.multiusuario() != null ? data.multiusuario() : false;
     }
 
     @PrePersist
@@ -69,6 +74,9 @@ public class Equipamento {
         }
         if (data.status() != null) {
             this.status = data.status();
+        }
+        if (data.multiusuario() != null) {
+            this.multiusuario = data.multiusuario();
         }
     }
 

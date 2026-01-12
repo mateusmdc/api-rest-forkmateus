@@ -8,7 +8,8 @@ public record EquipamentoRetornoDTO(
         String tombamento,
         String descricao,
         int status,
-        TipoEquipamentoRetornoDTO tipoEquipamento
+        TipoEquipamentoRetornoDTO tipoEquipamento,
+        Boolean multiusuario
 ) {
     public EquipamentoRetornoDTO(Equipamento e) {
         this(
@@ -16,7 +17,8 @@ public record EquipamentoRetornoDTO(
                 e.getTombamento(),
                 e.getDescricao(),
                 e.getStatus().getCodigo(),
-                new TipoEquipamentoRetornoDTO(e.getTipoEquipamento())
+                new TipoEquipamentoRetornoDTO(e.getTipoEquipamento()),
+                e.getMultiusuario()
         );
     }
 }
