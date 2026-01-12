@@ -8,7 +8,7 @@ package br.uece.alunos.sisreserva.v1.dto.espaco;
  * 
  * @param mes mês (1-12)
  * @param ano ano
- * @param reservasSolicitadas quantidade de reservas solicitadas (status != APROVADO)
+ * @param reservasSolicitadas quantidade de reservas solicitadas (qualquer status)
  * @param reservasConfirmadas quantidade de reservas confirmadas (status = APROVADO)
  */
 public record ReservasMesDTO(
