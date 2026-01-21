@@ -172,4 +172,58 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         ORDER BY COUNT(sr) DESC
     """)
     List<ReservasPorUsuarioProjection> contarReservasPorEspacoAgrupadoPorUsuario(@Param("espacoId") String espacoId);
+
+    /**
+     * Verifica se existe conflito de horários para um equipamento específico.
+     * Considera apenas reservas aprovadas.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @param dataInicio data e hora de início
+     * @param dataFim data e hora de fim
+     * @return true se houver conflito, false caso contrário
+     */
+    @Query("""
+        SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+        FROM SolicitacaoReserva s
+        WHERE s.equipamento.id = :equipamentoId
+        AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+        AND s.dataInicio < :dataFim
+        AND s.dataFim > :dataInicio
+    """)
+    boolean existsByEquipamentoIdAndPeriodoConflitanteAprovado(
+        @Param("equipamentoId") String equipamentoId, 
+        @Param("dataInicio") LocalDateTime dataInicio, 
+        @Param("dataFim") LocalDateTime dataFim
+    );
+
+    /**
+     * Busca reservas de um equipamento específico.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @return lista de reservas do equipamento
+     */
+    @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.equipamento.id = :equipamentoId ORDER BY sr.dataInicio DESC")
+    List<SolicitacaoReserva> findByEquipamentoId(@Param("equipamentoId") String equipamentoId);
+
+    /**
+     * Busca reservas aprovadas de um equipamento em um período específico.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @param dataInicio data e hora de início do período
+     * @param dataFim data e hora de fim do período
+     * @return lista de reservas aprovadas no período
+     */
+    @Query("""
+        SELECT s FROM SolicitacaoReserva s
+        WHERE s.equipamento.id = :equipamentoId
+          AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.dataInicio >= :dataInicio
+          AND s.dataInicio < :dataFim
+        ORDER BY s.dataInicio ASC
+    """)
+    List<SolicitacaoReserva> findReservasAprovadasPorPeriodoEEquipamento(
+        @Param("dataInicio") LocalDateTime dataInicio, 
+        @Param("dataFim") LocalDateTime dataFim, 
+        @Param("equipamentoId") String equipamentoId
+    );
 }

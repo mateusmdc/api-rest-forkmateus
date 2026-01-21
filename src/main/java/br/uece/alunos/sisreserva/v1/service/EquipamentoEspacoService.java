@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.service;
 
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.VincularEquipamentoEspacoDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 public interface EquipamentoEspacoService {
     List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data);
+    EquipamentoEspacoRetornoDTO vincularEquipamentoExistente(VincularEquipamentoEspacoDTO data);
     EquipamentoEspacoRetornoDTO inativar(String equipamentoEspacoId, String usuarioId);
     List<EquipamentoEspacoRetornoDTO> inativarEmLote(List<String> equipamentoEspacoIds, String usuarioId);
     Page<EquipamentoEspacoRetornoDTO> obter(Pageable pageable,

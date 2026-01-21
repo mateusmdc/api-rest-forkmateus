@@ -43,13 +43,14 @@ public class SolicitacaoReservaController {
         @RequestParam(required = false) LocalDate dataInicio,
         @RequestParam(required = false) LocalDate dataFim,
         @RequestParam(required = false) String espacoId,
+        @RequestParam(required = false) String equipamentoId,
         @RequestParam(required = false) String usuarioSolicitanteId,
         @RequestParam(required = false) Integer statusCodigo,
         @RequestParam(required = false) String projetoId
     ) {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
         var solicitacoesPaginadas = solicitacaoReservaService.obterSolicitacaoReserva(
-            pageable, id, dataInicio, dataFim, espacoId, usuarioSolicitanteId, statusCodigo, projetoId
+            pageable, id, dataInicio, dataFim, espacoId, equipamentoId, usuarioSolicitanteId, statusCodigo, projetoId
         );
         return ResponseEntity.ok(ApiResponseDTO.success(solicitacoesPaginadas));
     }

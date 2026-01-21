@@ -6,12 +6,14 @@ import java.time.LocalDateTime;
 /**
  * DTO de retorno para solicitação de reserva.
  * Contém todas as informações da reserva incluindo dados de recorrência.
+ * Uma reserva pode ser de espaço OU equipamento (campos mutuamente exclusivos).
  */
 public record SolicitacaoReservaRetornoDTO(
     String id,
     LocalDateTime dataInicio,
     LocalDateTime dataFim,
     String espacoId,
+    String equipamentoId,
     String usuarioSolicitanteId,
     Integer status,
     String projetoId,
@@ -26,7 +28,8 @@ public record SolicitacaoReservaRetornoDTO(
             solicitacaoReserva.getId(),
             solicitacaoReserva.getDataInicio(),
             solicitacaoReserva.getDataFim(),
-            solicitacaoReserva.getEspaco().getId(),
+            solicitacaoReserva.getEspaco() != null ? solicitacaoReserva.getEspaco().getId() : null,
+            solicitacaoReserva.getEquipamento() != null ? solicitacaoReserva.getEquipamento().getId() : null,
             solicitacaoReserva.getUsuarioSolicitante().getId(),
             solicitacaoReserva.getStatus().getCodigo(),
             solicitacaoReserva.getProjeto() != null ? solicitacaoReserva.getProjeto().getId() : null,

@@ -38,6 +38,7 @@ public interface SolicitacaoReservaService {
      * @param dataInicio filtro por data de início
      * @param dataFim filtro por data de fim
      * @param espacoId filtro por espaço
+     * @param equipamentoId filtro por equipamento
      * @param usuarioSolicitanteId filtro por usuário solicitante
      * @param status filtro por status
      * @param projetoId filtro por projeto
@@ -49,6 +50,7 @@ public interface SolicitacaoReservaService {
         LocalDate dataInicio,
         LocalDate dataFim,
         String espacoId,
+        String equipamentoId,
         String usuarioSolicitanteId,
         Integer status,
         String projetoId

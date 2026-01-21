@@ -18,7 +18,7 @@ public class SolicitacaoReservaSpecification {
      * Cria uma Specification baseada nos parâmetros passados.
      * A ideia é receber um mapa de filtros (nome do campo -> valor)
      * e construir uma query dinâmica.
-     * Permite filtrar por id, datas, espaço, usuário solicitante, status e projeto.
+     * Permite filtrar por id, datas, espaço, equipamento, usuário solicitante, status e projeto.
      * @return Specification<Projeto> que pode ser usada no repository para consultas dinâmicas
      */
     public static Specification<SolicitacaoReserva> byFilter(
@@ -26,6 +26,7 @@ public class SolicitacaoReservaSpecification {
         LocalDate dataInicio,
         LocalDate dataFim,
         String espacoId,
+        String equipamentoId,
         String usuarioSolicitanteId,
         Integer statusCodigo,
         String projetoId
@@ -44,6 +45,9 @@ public class SolicitacaoReservaSpecification {
             }
             if (espacoId != null && !espacoId.isBlank()) {
                 predicates.add(cb.equal(root.get("espaco").get("id"), espacoId));
+            }
+            if (equipamentoId != null && !equipamentoId.isBlank()) {
+                predicates.add(cb.equal(root.get("equipamento").get("id"), equipamentoId));
             }
             if (usuarioSolicitanteId != null && !usuarioSolicitanteId.isBlank()) {
                 predicates.add(cb.equal(root.get("usuarioSolicitante").get("id"), usuarioSolicitanteId));
