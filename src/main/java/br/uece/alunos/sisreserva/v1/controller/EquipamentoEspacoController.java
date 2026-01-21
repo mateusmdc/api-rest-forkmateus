@@ -4,6 +4,7 @@ package br.uece.alunos.sisreserva.v1.controller;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.InativarEquipamentoEspacoLoteDTO;
+import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.VincularEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoEspacoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,9 +71,19 @@ public class EquipamentoEspacoController {
 
     @PostMapping
     @Transactional
+    @Operation(summary = "Cria novos equipamentos e já os aloca ao espaço especificado")
     public ResponseEntity<ApiResponseDTO<List<EquipamentoEspacoRetornoDTO>>> cadastrar(
             @RequestBody @Valid CriarEquipamentoEspacoDTO data) {
         var retornoDTO = service.criarEquipamentoAlocandoAoEspaco(data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(retornoDTO));
+    }
+
+    @PostMapping("/vincular")
+    @Transactional
+    @Operation(summary = "Vincula um equipamento existente a um espaço existente")
+    public ResponseEntity<ApiResponseDTO<EquipamentoEspacoRetornoDTO>> vincular(
+            @RequestBody @Valid VincularEquipamentoEspacoDTO data) {
+        var retornoDTO = service.vincularEquipamentoExistente(data);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(retornoDTO));
     }
 

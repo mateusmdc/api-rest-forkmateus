@@ -3,8 +3,10 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.CriarEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.InativarEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.ObterEquipamentosEspaco;
+import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.VincularEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.VincularEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoEspacoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,12 +21,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     private final CriarEquipamentoEspaco criarEquipamentoEspaco;
+    private final VincularEquipamentoEspaco vincularEquipamentoEspaco;
     private final InativarEquipamentoEspaco inativarEquipamentoEspaco;
     private final ObterEquipamentosEspaco obterEquipamentosEspaco;
 
     @Override
     public List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
         return criarEquipamentoEspaco.criarEquipamentosAlocandoAoEspaco(data);
+    }
+
+    @Override
+    public EquipamentoEspacoRetornoDTO vincularEquipamentoExistente(VincularEquipamentoEspacoDTO data) {
+        var vinculo = vincularEquipamentoEspaco.executar(data);
+        return new EquipamentoEspacoRetornoDTO(vinculo);
     }
 
     @Override

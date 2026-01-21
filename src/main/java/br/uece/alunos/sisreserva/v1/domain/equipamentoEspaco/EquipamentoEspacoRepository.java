@@ -31,4 +31,14 @@ public interface EquipamentoEspacoRepository extends JpaRepository<EquipamentoEs
 
     @Query("SELECT ee FROM EquipamentoEspaco ee WHERE ee.espaco.id = :espacoId AND ee.dataAlocacao BETWEEN :startDate AND :endDate")
     List<EquipamentoEspaco> findAdicionadosByEspacoAndPeriodo(String espacoId, LocalDateTime startDate, LocalDateTime endDate);
+
+    /**
+     * Busca vinculação ativa de equipamento por ID do equipamento.
+     * Retorna apenas equipamentos que não foram removidos (dataRemocao = null).
+     * 
+     * @param equipamentoId ID do equipamento
+     * @return lista de vinculações ativas (geralmente apenas uma)
+     */
+    @Query("SELECT ee FROM EquipamentoEspaco ee WHERE ee.equipamento.id = :equipamentoId AND ee.dataRemocao IS NULL")
+    List<EquipamentoEspaco> findByEquipamentoIdAndDataRemocaoIsNull(String equipamentoId);
 }

@@ -58,7 +58,7 @@ public class ObterEspaco {
         if (multiusuario != null) filtros.put("multiusuario", multiusuario);
 
         // Verifica se o usuário autenticado é externo e deve ter restrições
-        boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveRestringirEspacos();
+        boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveAplicarRestricoesMultiusuario();
 
         // Log de auditoria: registra quando filtro de restrição é aplicado
         if (restringirApenasMultiusuario) {

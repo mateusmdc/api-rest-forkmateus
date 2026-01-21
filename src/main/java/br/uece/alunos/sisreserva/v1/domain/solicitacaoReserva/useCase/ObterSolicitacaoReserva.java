@@ -24,6 +24,7 @@ public class ObterSolicitacaoReserva {
         LocalDate dataInicio,
         LocalDate dataFim,
         String espacoId,
+        String equipamentoId,
         String usuarioSolicitanteId,
         Integer statusCodigo,
         String projetoId
@@ -33,6 +34,7 @@ public class ObterSolicitacaoReserva {
         if (dataInicio != null) filtros.put("dataInicio", dataInicio);
         if (dataFim != null) filtros.put("dataFim", dataFim);
         if (espacoId != null) filtros.put("espacoId", espacoId);
+        if (equipamentoId != null) filtros.put("equipamentoId", equipamentoId);
         if (usuarioSolicitanteId != null) filtros.put("usuarioSolicitanteId", usuarioSolicitanteId);
         if (statusCodigo != null) filtros.put("statusCodigo", statusCodigo);
         if (projetoId != null) filtros.put("projetoId", projetoId);
@@ -47,6 +49,7 @@ public class ObterSolicitacaoReserva {
                 (LocalDate) filtros.get("dataInicio"),
                 (LocalDate) filtros.get("dataFim"),
                 (String) filtros.get("espacoId"),
+                (String) filtros.get("equipamentoId"),
                 (String) filtros.get("usuarioSolicitanteId"),
                 (Integer) filtros.get("statusCodigo"),
                 (String) filtros.get("projetoId")
