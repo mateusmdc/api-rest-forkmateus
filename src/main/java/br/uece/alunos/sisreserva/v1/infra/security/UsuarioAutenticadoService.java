@@ -92,13 +92,13 @@ public class UsuarioAutenticadoService {
     }
 
     /**
-     * Verifica se o usuário autenticado deve ter restrições de visualização de espaços.
-     * Usuários externos só podem visualizar espaços multiusuário.
+     * Verifica se o usuário autenticado deve ter restrições de visualização de recursos multiusuário.
+     * Usuários externos só podem visualizar/reservar espaços e equipamentos multiusuário.
      * Admins e usuários internos não possuem restrições.
      * 
-     * @return true se o usuário deve ver apenas espaços multiusuário, false caso contrário
+     * @return true se o usuário deve ter acesso apenas a recursos multiusuário, false caso contrário
      */
-    public boolean deveRestringirEspacos() {
+    public boolean deveAplicarRestricoesMultiusuario() {
         return isUsuarioExterno() && !isAdmin();
     }
 }

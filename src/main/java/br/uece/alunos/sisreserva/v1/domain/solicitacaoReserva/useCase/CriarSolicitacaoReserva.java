@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase;
 
+import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
 import br.uece.alunos.sisreserva.v1.domain.espaco.Espaco;
 import br.uece.alunos.sisreserva.v1.domain.projeto.Projeto;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva;
@@ -46,16 +47,33 @@ public class CriarSolicitacaoReserva {
      * <p>Se o tipo de recorrência for diferente de NAO_REPETE, cria múltiplas
      * reservas para cada ocorrência calculada. Caso contrário, cria apenas uma reserva.</p>
      * 
+     * <p>Suporta tanto reservas de espaço quanto reservas de equipamento.</p>
+     * 
      * @param data dados da solicitação de reserva
      * @return DTO com os dados da primeira reserva criada (reserva pai)
      * @throws IllegalArgumentException se houver conflito de horários ou dados inválidos
      */
     public SolicitacaoReservaRetornoDTO criarSolicitacaoReserva(SolicitacaoReservaDTO data) {
+        // Validar que foi informado ou espaço ou equipamento (mutuamente exclusivo)
+        validator.validarTipoReserva(data.espacoId(), data.equipamentoId());
+        
+        // Determinar se é reserva de espaço ou equipamento
+        boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
+        
         // Validar datas da reserva (não pode ser no passado e data fim deve ser posterior à data início)
         validator.validarDatasReserva(data.dataInicio(), data.dataFim());
         
-        // Validar permissão de usuário externo para reservar o espaço
-        validator.validarPermissaoUsuarioExterno(data.espacoId());
+        // Validações específicas por tipo de reserva
+        if (isReservaEspaco) {
+            // Validar permissão de usuário externo para reservar o espaço
+            validator.validarPermissaoUsuarioExterno(data.espacoId());
+        } else {
+            // Validar que equipamento está vinculado a um espaço
+            validator.validarEquipamentoVinculadoAEspaco(data.equipamentoId());
+            
+            // Validar permissão de usuário externo para reservar o equipamento
+            validator.validarPermissaoUsuarioExternoEquipamento(data.equipamentoId());
+        }
         
         // Determinar tipo de recorrência (default: NAO_REPETE)
         TipoRecorrencia tipoRecorrencia = data.tipoRecorrencia() != null 
@@ -81,8 +99,15 @@ public class CriarSolicitacaoReserva {
      * @return DTO com os dados da reserva criada
      */
     private SolicitacaoReservaRetornoDTO criarReservaUnica(SolicitacaoReservaDTO data) {
+        // Determinar se é reserva de espaço ou equipamento
+        boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
+        
         // Validação de conflito de reserva
-        validator.validarConflitoReserva(data.espacoId(), data.dataInicio(), data.dataFim());
+        if (isReservaEspaco) {
+            validator.validarConflitoReserva(data.espacoId(), data.dataInicio(), data.dataFim());
+        } else {
+            validator.validarConflitoReservaEquipamento(data.equipamentoId(), data.dataInicio(), data.dataFim());
+        }
 
         var solicitacao = obterSolicitacaoComEntidadesRelacionadas(data, TipoRecorrencia.NAO_REPETE, null);
 
@@ -114,6 +139,10 @@ public class CriarSolicitacaoReserva {
             SolicitacaoReservaDTO data, 
             TipoRecorrencia tipoRecorrencia) {
         
+        // Determinar se é reserva de espaço ou equipamento
+        boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
+        String targetId = isReservaEspaco ? data.espacoId() : data.equipamentoId();
+        
         // Gerar todas as datas de ocorrência
         List<LocalDateTime> datasOcorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
             data.dataInicio(), 
@@ -128,10 +157,18 @@ public class CriarSolicitacaoReserva {
         );
         
         // Validar conflitos para todas as ocorrências
-        validarTodasOcorrencias(datasOcorrencias, duracaoMinutos, data.espacoId());
+        validarTodasOcorrencias(datasOcorrencias, duracaoMinutos, targetId, isReservaEspaco);
         
         // Obter entidades relacionadas uma única vez
-        Espaco espaco = entityHandlerService.obterEspacoPorId(data.espacoId());
+        Espaco espaco = null;
+        Equipamento equipamento = null;
+        
+        if (isReservaEspaco) {
+            espaco = entityHandlerService.obterEspacoPorId(data.espacoId());
+        } else {
+            equipamento = entityHandlerService.obterEquipamentoPorId(data.equipamentoId());
+        }
+        
         Usuario usuario = entityHandlerService.obterUsuarioPorId(data.usuarioSolicitanteId());
         Projeto projeto = null;
         if (data.projetoId() != null && !data.projetoId().isBlank()) {
@@ -143,6 +180,7 @@ public class CriarSolicitacaoReserva {
             datasOcorrencias.get(0),
             duracaoMinutos,
             espaco,
+            equipamento,
             usuario,
             projeto,
             tipoRecorrencia,
@@ -168,6 +206,7 @@ public class CriarSolicitacaoReserva {
                     datasOcorrencias.get(i),
                     duracaoMinutos,
                     espaco,
+                    equipamento,
                     usuario,
                     projeto,
                     tipoRecorrencia,
@@ -189,17 +228,23 @@ public class CriarSolicitacaoReserva {
      * 
      * @param datasOcorrencias lista de datas das ocorrências
      * @param duracaoMinutos duração de cada reserva em minutos
-     * @param espacoId identificador do espaço
+     * @param targetId identificador do espaço ou equipamento
+     * @param isReservaEspaco true se for reserva de espaço, false se for de equipamento
      * @throws IllegalArgumentException se houver conflito em alguma data
      */
     private void validarTodasOcorrencias(
             List<LocalDateTime> datasOcorrencias, 
             long duracaoMinutos, 
-            String espacoId) {
+            String targetId,
+            boolean isReservaEspaco) {
         
         for (LocalDateTime dataInicio : datasOcorrencias) {
             LocalDateTime dataFim = dataInicio.plusMinutes(duracaoMinutos);
-            validator.validarConflitoReserva(espacoId, dataInicio, dataFim);
+            if (isReservaEspaco) {
+                validator.validarConflitoReserva(targetId, dataInicio, dataFim);
+            } else {
+                validator.validarConflitoReservaEquipamento(targetId, dataInicio, dataFim);
+            }
         }
     }
 
@@ -208,7 +253,8 @@ public class CriarSolicitacaoReserva {
      * 
      * @param dataInicio data e hora de início
      * @param duracaoMinutos duração em minutos
-     * @param espaco espaço reservado
+     * @param espaco espaço reservado (null se for reserva de equipamento)
+     * @param equipamento equipamento reservado (null se for reserva de espaço)
      * @param usuario usuário solicitante
      * @param projeto projeto associado (opcional)
      * @param tipoRecorrencia tipo de recorrência
@@ -220,6 +266,7 @@ public class CriarSolicitacaoReserva {
             LocalDateTime dataInicio,
             long duracaoMinutos,
             Espaco espaco,
+            Equipamento equipamento,
             Usuario usuario,
             Projeto projeto,
             TipoRecorrencia tipoRecorrencia,
@@ -230,6 +277,7 @@ public class CriarSolicitacaoReserva {
         solicitacao.setDataInicio(dataInicio);
         solicitacao.setDataFim(dataInicio.plusMinutes(duracaoMinutos));
         solicitacao.setEspaco(espaco);
+        solicitacao.setEquipamento(equipamento);
         solicitacao.setUsuarioSolicitante(usuario);
         solicitacao.setStatus(StatusSolicitacao.PENDENTE);
         solicitacao.setProjeto(projeto);
@@ -253,21 +301,33 @@ public class CriarSolicitacaoReserva {
             TipoRecorrencia tipoRecorrencia,
             String reservaPaiId) {
         
-        Espaco espaco = entityHandlerService.obterEspacoPorId(data.espacoId());
+        // Determinar se é reserva de espaço ou equipamento
+        boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
+        
+        Espaco espaco = null;
+        Equipamento equipamento = null;
+        
+        if (isReservaEspaco) {
+            espaco = entityHandlerService.obterEspacoPorId(data.espacoId());
+        } else {
+            equipamento = entityHandlerService.obterEquipamentoPorId(data.equipamentoId());
+        }
+        
         Usuario usuario = entityHandlerService.obterUsuarioPorId(data.usuarioSolicitanteId());
         Projeto projeto = null;
         if (data.projetoId() != null && !data.projetoId().isBlank()) {
             projeto = entityHandlerService.obterProjetoPorId(data.projetoId());
         }
 
-        return fromDTO(data, espaco, usuario, projeto, tipoRecorrencia, reservaPaiId);
+        return fromDTO(data, espaco, equipamento, usuario, projeto, tipoRecorrencia, reservaPaiId);
     }
 
     /**
      * Converte um DTO em uma entidade SolicitacaoReserva.
      * 
      * @param dto dados da solicitação
-     * @param espaco espaço reservado
+     * @param espaco espaço reservado (null se for reserva de equipamento)
+     * @param equipamento equipamento reservado (null se for reserva de espaço)
      * @param usuario usuário solicitante
      * @param projeto projeto associado (opcional)
      * @param tipoRecorrencia tipo de recorrência
@@ -276,7 +336,8 @@ public class CriarSolicitacaoReserva {
      */
     public static SolicitacaoReserva fromDTO(
             SolicitacaoReservaDTO dto, 
-            Espaco espaco, 
+            Espaco espaco,
+            Equipamento equipamento,
             Usuario usuario, 
             Projeto projeto,
             TipoRecorrencia tipoRecorrencia,
@@ -286,6 +347,7 @@ public class CriarSolicitacaoReserva {
         solicitacao.setDataInicio(dto.dataInicio());
         solicitacao.setDataFim(dto.dataFim());
         solicitacao.setEspaco(espaco);
+        solicitacao.setEquipamento(equipamento);
         solicitacao.setUsuarioSolicitante(usuario);
         solicitacao.setStatus(StatusSolicitacao.PENDENTE);
         solicitacao.setProjeto(projeto);

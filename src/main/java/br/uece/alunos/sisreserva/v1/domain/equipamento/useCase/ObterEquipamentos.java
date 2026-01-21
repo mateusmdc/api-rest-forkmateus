@@ -36,7 +36,7 @@ public class ObterEquipamentos {
      */
     public Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento) {
         // Verifica se o usuário autenticado é externo e deve ter restrições
-        boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveRestringirEspacos();
+        boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveAplicarRestricoesMultiusuario();
 
         // Log de auditoria: registra quando filtro de restrição é aplicado
         if (restringirApenasMultiusuario) {

@@ -1,6 +1,10 @@
 package br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.validation;
 
+import br.uece.alunos.sisreserva.v1.domain.equipamento.EquipamentoRepository;
+import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.espaco.EspacoRepository;
+import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.GestorEspacoRepository;
+import br.uece.alunos.sisreserva.v1.domain.secretariaEspaco.SecretariaEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReservaRepository;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.TipoRecorrencia;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
@@ -14,10 +18,11 @@ import java.time.LocalDateTime;
 /**
  * Validador de regras de negócio para solicitações de reserva.
  * 
- * <p>Valida conflitos de horários, regras de recorrência e permissões de acesso.</p>
+ * <p>Valida conflitos de horários, regras de recorrência, permissões de acesso
+ * e validações específicas para reservas de equipamentos.</p>
  * 
  * @author Sistema de Reservas UECE
- * @version 1.0
+ * @version 2.0
  */
 @Slf4j
 @Component
@@ -28,6 +33,18 @@ public class SolicitacaoReservaValidator {
     
     @Autowired
     private EspacoRepository espacoRepository;
+    
+    @Autowired
+    private EquipamentoRepository equipamentoRepository;
+    
+    @Autowired
+    private EquipamentoEspacoRepository equipamentoEspacoRepository;
+    
+    @Autowired
+    private GestorEspacoRepository gestorEspacoRepository;
+    
+    @Autowired
+    private SecretariaEspacoRepository secretariaEspacoRepository;
     
     @Autowired
     private UsuarioAutenticadoService usuarioAutenticadoService;
@@ -134,7 +151,7 @@ public class SolicitacaoReservaValidator {
      */
     public void validarPermissaoUsuarioExterno(String espacoId) {
         // Verifica se o usuário autenticado é externo e não é admin
-        if (!usuarioAutenticadoService.deveRestringirEspacos()) {
+        if (!usuarioAutenticadoService.deveAplicarRestricoesMultiusuario()) {
             return; // Usuário não tem restrições
         }
 
@@ -164,5 +181,161 @@ public class SolicitacaoReservaValidator {
             log.info("[AUDIT] VALIDACAO_SUCESSO - Usuário externo '{}' (ID: {}) validado para reservar espaço multiusuário '{}' (ID: {})",
                     usuario.getEmail(), usuario.getId(), espaco.getNome(), espaco.getId());
         }
+    }
+
+    /**
+     * Valida se exatamente um tipo de reserva foi especificado (espaço OU equipamento).
+     * 
+     * @param espacoId identificador do espaço
+     * @param equipamentoId identificador do equipamento
+     * @throws ValidationException se ambos ou nenhum estiverem preenchidos
+     */
+    public void validarTipoReserva(String espacoId, String equipamentoId) {
+        boolean temEspaco = espacoId != null && !espacoId.isBlank();
+        boolean temEquipamento = equipamentoId != null && !equipamentoId.isBlank();
+        
+        if (!temEspaco && !temEquipamento) {
+            throw new ValidationException(
+                "É necessário especificar o espaço OU o equipamento a ser reservado"
+            );
+        }
+        
+        if (temEspaco && temEquipamento) {
+            throw new ValidationException(
+                "Não é possível reservar espaço e equipamento na mesma solicitação. " +
+                "Por favor, crie solicitações separadas para cada tipo de reserva"
+            );
+        }
+    }
+
+    /**
+     * Valida se o equipamento existe e está vinculado a um espaço ativo.
+     * Equipamentos só podem ser reservados se estiverem alocados a um espaço.
+     * 
+     * @param equipamentoId identificador do equipamento
+     * @return ID do espaço ao qual o equipamento está vinculado
+     * @throws ValidationException se o equipamento não existe ou não está vinculado a um espaço
+     */
+    public String validarEquipamentoVinculadoAEspaco(String equipamentoId) {
+        // Verifica se o equipamento existe
+        var equipamento = equipamentoRepository.findById(equipamentoId)
+                .orElseThrow(() -> new ValidationException("Equipamento não encontrado com o ID: " + equipamentoId));
+        
+        // Verifica se o equipamento está vinculado a algum espaço (ativo)
+        var equipamentoEspaco = equipamentoEspacoRepository.findByEquipamentoIdAndDataRemocaoIsNull(equipamentoId);
+        
+        if (equipamentoEspaco == null || equipamentoEspaco.isEmpty()) {
+            log.warn("[VALIDATION] Tentativa de reservar equipamento '{}' (ID: {}) que não está vinculado a nenhum espaço",
+                    equipamento.getTombamento(), equipamentoId);
+            throw new ValidationException(
+                "Este equipamento não está disponível para reserva. " +
+                "Equipamentos só podem ser reservados quando estão vinculados a um espaço"
+            );
+        }
+        
+        String espacoId = equipamentoEspaco.get(0).getEspaco().getId();
+        log.debug("[VALIDATION] Equipamento '{}' (ID: {}) vinculado ao espaço ID: {}",
+                equipamento.getTombamento(), equipamentoId, espacoId);
+        
+        return espacoId;
+    }
+
+    /**
+     * Valida conflito de reserva para equipamento específico.
+     * 
+     * @param equipamentoId identificador do equipamento
+     * @param dataInicio data e hora de início da reserva
+     * @param dataFim data e hora de fim da reserva
+     * @throws ValidationException se houver conflito de horários
+     */
+    public void validarConflitoReservaEquipamento(String equipamentoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        boolean existeConflito = repository.existsByEquipamentoIdAndPeriodoConflitanteAprovado(
+                equipamentoId, dataInicio, dataFim);
+        
+        if (existeConflito) {
+            log.warn("[VALIDATION] Conflito de reserva para equipamento ID: {} no período {} a {}",
+                    equipamentoId, dataInicio, dataFim);
+            throw new ValidationException(
+                "Já existe uma solicitação de reserva aprovada para este equipamento no período informado"
+            );
+        }
+    }
+
+    /**
+     * Valida permissões do usuário para reservar equipamento.
+     * Usuários externos só podem reservar equipamentos marcados como multiusuário.
+     * 
+     * @param equipamentoId ID do equipamento a ser reservado
+     * @throws ValidationException se o usuário não tem permissão
+     */
+    public void validarPermissaoUsuarioExternoEquipamento(String equipamentoId) {
+        // Verifica se o usuário autenticado é externo e não é admin
+        if (!usuarioAutenticadoService.deveAplicarRestricoesMultiusuario()) {
+            return; // Usuário não tem restrições
+        }
+
+        // Busca o equipamento para verificar se é multiusuário
+        var equipamento = equipamentoRepository.findById(equipamentoId)
+                .orElseThrow(() -> new ValidationException("Equipamento não encontrado com o ID: " + equipamentoId));
+
+        // Se o equipamento não é multiusuário, usuário externo não pode reservar
+        if (!equipamento.getMultiusuario()) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            
+            // Log de auditoria: registra tentativa de acesso negado
+            if (usuario != null) {
+                log.warn("[AUDIT] ACESSO_NEGADO - Usuário externo '{}' (ID: {}) tentou reservar equipamento não-multiusuário '{}' (ID: {}, multiusuario: false)",
+                        usuario.getEmail(), usuario.getId(), equipamento.getTombamento(), equipamento.getId());
+            }
+            
+            throw new ValidationException(
+                "Usuários externos só podem solicitar reservas para equipamentos multiusuário. " +
+                "O equipamento selecionado não está disponível para usuários externos."
+            );
+        }
+        
+        // Log de auditoria: registra validação bem-sucedida
+        var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+        if (usuario != null) {
+            log.info("[AUDIT] VALIDACAO_SUCESSO - Usuário externo '{}' (ID: {}) validado para reservar equipamento multiusuário '{}' (ID: {})",
+                    usuario.getEmail(), usuario.getId(), equipamento.getTombamento(), equipamento.getId());
+        }
+    }
+
+    /**
+     * Valida se o usuário tem permissão para gerenciar reservas de equipamentos do espaço.
+     * Gestores e secretários de um espaço podem gerenciar reservas de equipamentos daquele espaço.
+     * 
+     * @param usuarioId ID do usuário
+     * @param espacoId ID do espaço
+     * @param operacao Descrição da operação sendo realizada (para logs)
+     * @throws ValidationException se o usuário não tem permissão
+     */
+    public void validarPermissaoGerenciamentoEquipamento(String usuarioId, String espacoId, String operacao) {
+        // Admin sempre tem permissão
+        if (usuarioAutenticadoService.isAdmin()) {
+            return;
+        }
+        
+        // Verifica se é gestor do espaço
+        boolean isGestor = gestorEspacoRepository.existsByUsuarioGestorIdAndEspacoIdAndEstaAtivoTrue(
+                usuarioId, espacoId);
+        
+        // Verifica se é secretário do espaço  
+        boolean isSecretaria = secretariaEspacoRepository.existsByUsuarioSecretariaIdAndEspacoIdAndEstaAtivoTrue(
+                usuarioId, espacoId);
+        
+        if (!isGestor && !isSecretaria) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            log.warn("[AUDIT] ACESSO_NEGADO - Usuário '{}' (ID: {}) tentou {} sem ser gestor/secretário do espaço ID: {}",
+                    usuario != null ? usuario.getEmail() : "desconhecido", usuarioId, operacao, espacoId);
+            throw new ValidationException(
+                "Você não tem permissão para gerenciar reservas de equipamentos deste espaço. " +
+                "Apenas gestores e secretários do espaço podem realizar esta operação"
+            );
+        }
+        
+        log.info("[AUDIT] PERMISSAO_VALIDADA - Usuário ID: {} autorizado para {} no espaço ID: {} (Gestor: {}, Secretaria: {})",
+                usuarioId, operacao, espacoId, isGestor, isSecretaria);
     }
 }
