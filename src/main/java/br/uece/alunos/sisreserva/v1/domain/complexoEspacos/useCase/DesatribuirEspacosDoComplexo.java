@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.domain.complexoEspacos.useCase;
 import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.ComplexoEspacosRepository;
 import br.uece.alunos.sisreserva.v1.domain.espaco.EspacoRepository;
 import br.uece.alunos.sisreserva.v1.dto.complexoEspacos.ComplexoEspacosRetornoDTO;
+import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.validation.ComplexoEspacosValidator;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,10 +15,13 @@ import java.util.List;
 public class DesatribuirEspacosDoComplexo {
     private final ComplexoEspacosRepository complexoRepository;
     private final EspacoRepository espacoRepository;
+    private final ComplexoEspacosValidator validator;
 
     public ComplexoEspacosRetornoDTO desatribuir(String complexoId, List<String> espacoIds) {
         var complexo = complexoRepository.findById(complexoId)
                 .orElseThrow(() -> new ValidationException("Complexo de espaços não encontrado"));
+
+        validator.validarPermissaoParaModificarComplexo(complexoId);
 
         var espacos = espacoRepository.findAllById(espacoIds);
 

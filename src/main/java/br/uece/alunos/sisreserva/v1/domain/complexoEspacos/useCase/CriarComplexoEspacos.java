@@ -15,6 +15,7 @@ public class CriarComplexoEspacos {
     private final ComplexoEspacosValidator validator;
 
     public ComplexoEspacosRetornoDTO criar(ComplexoEspacosDTO data) {
+        validator.validarPermissaoAdmin();
         validator.validarSeComplexoJaExiste(data.nome());
 
         ComplexoEspacos complexo = new ComplexoEspacos();
