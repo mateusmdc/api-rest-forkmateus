@@ -12,7 +12,7 @@ import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.tipoEspaco.TipoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.projeto.Projeto;
-
+import br.uece.alunos.sisreserva.v1.domain.complexoEspacos.ComplexoEspacos;
 import java.util.List;
 
 public interface EntityHandlerService {
@@ -53,4 +53,7 @@ public interface EntityHandlerService {
 
     // projeto
     Projeto obterProjetoPorId(String id);
+
+    // complexo de espaços
+    ComplexoEspacos obterComplexoEspacosPorId(String id);
 }
