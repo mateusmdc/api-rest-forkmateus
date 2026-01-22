@@ -18,6 +18,7 @@ public class AtualizarComplexoEspacos {
         var complexo = repository.findById(id)
                 .orElseThrow(() -> new ValidationException("Complexo de espaços não encontrado"));
 
+        validator.validarPermissaoParaModificarComplexo(id);
         validator.validarSeComplexoJaExisteParaAtualizacao(id, data.nome());
 
         complexo.atualizar(data);
