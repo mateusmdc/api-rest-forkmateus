@@ -226,4 +226,28 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         @Param("dataFim") LocalDateTime dataFim, 
         @Param("equipamentoId") String equipamentoId
     );
+
+    /**
+     * Verifica se o usuário já possui uma solicitação de reserva ativa (pendente ou aprovada)
+     * para o mesmo período informado. Considera conflitos quando há sobreposição de horários.
+     * 
+     * @param usuarioId ID do usuário solicitante
+     * @param dataInicio data e hora de início da nova reserva
+     * @param dataFim data e hora de fim da nova reserva
+     * @return true se já existe uma solicitação do usuário no período, false caso contrário
+     */
+    @Query("""
+        SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+        FROM SolicitacaoReserva s
+        WHERE s.usuarioSolicitante.id = :usuarioId
+        AND (s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.PENDENTE
+             OR s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO)
+        AND s.dataInicio < :dataFim
+        AND s.dataFim > :dataInicio
+    """)
+    boolean existsByUsuarioIdAndPeriodoConflitante(
+        @Param("usuarioId") String usuarioId,
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim
+    );
 }

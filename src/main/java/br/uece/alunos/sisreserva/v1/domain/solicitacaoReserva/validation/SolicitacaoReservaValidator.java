@@ -338,4 +338,37 @@ public class SolicitacaoReservaValidator {
         log.info("[AUDIT] PERMISSAO_VALIDADA - Usuário ID: {} autorizado para {} no espaço ID: {} (Gestor: {}, Secretaria: {})",
                 usuarioId, operacao, espacoId, isGestor, isSecretaria);
     }
+
+    /**
+     * Valida se o usuário já possui uma solicitação de reserva ativa para o mesmo período.
+     * 
+     * <p>Evita que um usuário crie múltiplas solicitações de reserva para o mesmo intervalo de horários.
+     * Considera conflito quando já existe uma solicitação com status PENDENTE ou APROVADO que 
+     * sobrepõe o período informado.</p>
+     * 
+     * @param usuarioId ID do usuário solicitante
+     * @param dataInicio data e hora de início da nova reserva
+     * @param dataFim data e hora de fim da nova reserva
+     * @throws ValidationException se o usuário já possui solicitação ativa no período
+     */
+    public void validarSolicitacaoDuplicada(String usuarioId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        boolean existeSolicitacaoDuplicada = repository.existsByUsuarioIdAndPeriodoConflitante(
+                usuarioId, dataInicio, dataFim);
+        
+        if (existeSolicitacaoDuplicada) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            
+            log.warn("[VALIDATION] Usuário '{}' (ID: {}) tentou criar solicitação duplicada no período {} a {}",
+                    usuario != null ? usuario.getEmail() : "desconhecido", 
+                    usuarioId, dataInicio, dataFim);
+            
+            throw new ValidationException(
+                "Você já possui uma solicitação de reserva pendente ou aprovada para este período. " +
+                "Não é permitido criar múltiplas solicitações para o mesmo intervalo de horários"
+            );
+        }
+        
+        log.debug("[VALIDATION] Nenhuma solicitação duplicada encontrada para usuário ID: {} no período {} a {}",
+                usuarioId, dataInicio, dataFim);
+    }
 }

@@ -102,6 +102,9 @@ public class CriarSolicitacaoReserva {
         // Determinar se é reserva de espaço ou equipamento
         boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
         
+        // Validar se usuário já possui solicitação para o mesmo período
+        validator.validarSolicitacaoDuplicada(data.usuarioSolicitanteId(), data.dataInicio(), data.dataFim());
+        
         // Validação de conflito de reserva
         if (isReservaEspaco) {
             validator.validarConflitoReserva(data.espacoId(), data.dataInicio(), data.dataFim());
@@ -157,7 +160,7 @@ public class CriarSolicitacaoReserva {
         );
         
         // Validar conflitos para todas as ocorrências
-        validarTodasOcorrencias(datasOcorrencias, duracaoMinutos, targetId, isReservaEspaco);
+        validarTodasOcorrencias(datasOcorrencias, duracaoMinutos, targetId, isReservaEspaco, data.usuarioSolicitanteId());
         
         // Obter entidades relacionadas uma única vez
         Espaco espaco = null;
@@ -236,10 +239,15 @@ public class CriarSolicitacaoReserva {
             List<LocalDateTime> datasOcorrencias, 
             long duracaoMinutos, 
             String targetId,
-            boolean isReservaEspaco) {
+            boolean isReservaEspaco,
+            String usuarioSolicitanteId) {
         
         for (LocalDateTime dataInicio : datasOcorrencias) {
             LocalDateTime dataFim = dataInicio.plusMinutes(duracaoMinutos);
+            
+            // Validar se usuário já possui solicitação para o mesmo período
+            validator.validarSolicitacaoDuplicada(usuarioSolicitanteId, dataInicio, dataFim);
+            
             if (isReservaEspaco) {
                 validator.validarConflitoReserva(targetId, dataInicio, dataFim);
             } else {
