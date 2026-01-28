@@ -85,6 +85,11 @@ public class AtualizarStatusSolicitacao {
         // Enviar notificação para o solicitante sobre a mudança de status
         reservaEmailService.notificarSolicitanteSobreAlteracaoStatus(solicitacaoComRelacoes, statusAnterior);
 
+        // Se a solicitação foi cancelada, notificar gestores/secretários
+        if (data.status() == StatusSolicitacao.CANCELADO) {
+            reservaEmailService.notificarGestoresSobreCancelamento(solicitacaoComRelacoes);
+        }
+
         // Retornar DTO de resposta seguindo o padrão do projeto
         return new SolicitacaoReservaRetornoDTO(solicitacaoAtualizada);
     }

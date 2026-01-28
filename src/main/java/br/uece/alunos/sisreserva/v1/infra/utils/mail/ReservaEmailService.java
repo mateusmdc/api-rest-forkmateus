@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -31,6 +32,8 @@ public class ReservaEmailService {
     
     private final MailSenderMime mailSenderMime;
     private final GestorEspacoRepository gestorEspacoRepository;
+    private final br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository equipamentoEspacoRepository;
+    private final br.uece.alunos.sisreserva.v1.domain.secretariaEspaco.SecretariaEspacoRepository secretariaEspacoRepository;
     
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm");
     
@@ -336,5 +339,145 @@ public class ReservaEmailService {
             case PENDENTE_AJUSTE -> "Pendente de Ajuste";
             case CANCELADO -> "Cancelado";
         };
+    }
+
+    /**
+     * Envia notificação para os gestores e secretários do espaço/equipamento quando
+     * um usuário cancela sua própria solicitação de reserva.
+     * 
+     * <p>Método assíncrono que busca todos os gestores e secretários ativos do espaço
+     * (ou do espaço vinculado ao equipamento) e envia um email informando sobre o cancelamento.</p>
+     * 
+     * @param solicitacao a solicitação de reserva cancelada
+     */
+    @Async
+    public void notificarGestoresSobreCancelamento(SolicitacaoReserva solicitacao) {
+        try {
+            // Determinar o ID do espaço (direto ou via equipamento)
+            String espacoId = null;
+            String nomeRecurso = null;
+            String tipoRecurso = null;
+
+            if (solicitacao.getEspaco() != null) {
+                espacoId = solicitacao.getEspaco().getId();
+                nomeRecurso = solicitacao.getEspaco().getNome();
+                tipoRecurso = "espaço";
+            } else if (solicitacao.getEquipamento() != null) {
+                // Buscar o espaço vinculado ao equipamento
+                var equipamentoEspaco = equipamentoEspacoRepository
+                        .findByEquipamentoIdAndDataRemocaoIsNull(solicitacao.getEquipamento().getId());
+                
+                if (equipamentoEspaco == null || equipamentoEspaco.isEmpty()) {
+                    log.warn("Equipamento {} não está vinculado a nenhum espaço. Não é possível notificar gestores.",
+                            solicitacao.getEquipamento().getId());
+                    return;
+                }
+                
+                espacoId = equipamentoEspaco.get(0).getEspaco().getId();
+                nomeRecurso = solicitacao.getEquipamento().getDescricao();
+                tipoRecurso = "equipamento";
+            }
+
+            if (espacoId == null) {
+                log.error("Não foi possível determinar o espaço para notificação de cancelamento da solicitação: {}",
+                        solicitacao.getId());
+                return;
+            }
+
+            // Buscar gestores ativos do espaço
+            List<String> emailsGestores = gestorEspacoRepository
+                    .findGestoresAtivosComUsuarioByEspacoId(espacoId)
+                    .stream()
+                    .map(gestor -> gestor.getUsuarioGestor().getEmail())
+                    .distinct()
+                    .toList();
+
+            // Buscar secretários ativos do espaço
+            List<String> emailsSecretarios = secretariaEspacoRepository
+                    .findSecretariasAtivasComUsuarioByEspacoId(espacoId)
+                    .stream()
+                    .map(secretaria -> secretaria.getUsuarioSecretaria().getEmail())
+                    .distinct()
+                    .toList();
+
+            // Combinar emails de gestores e secretários
+            List<String> todosEmails = new java.util.ArrayList<>();
+            todosEmails.addAll(emailsGestores);
+            todosEmails.addAll(emailsSecretarios);
+            
+            // Remover duplicatas
+            todosEmails = todosEmails.stream().distinct().toList();
+
+            if (todosEmails.isEmpty()) {
+                log.warn("Nenhum gestor ou secretário ativo encontrado para o espaço ID: {}", espacoId);
+                return;
+            }
+
+            // Criar conteúdo do email
+            String assunto = String.format("[SISRESERVA] Solicitação de Reserva Cancelada - %s", nomeRecurso);
+            
+            String corpo = construirEmailCancelamento(solicitacao, nomeRecurso, tipoRecurso);
+
+            // Enviar email para cada gestor/secretário
+            for (String email : todosEmails) {
+                MailDTO mailDTO = new MailDTO(assunto, email, corpo);
+                mailSenderMime.sendMail(mailDTO);
+                log.info("Email de cancelamento enviado para: {} sobre solicitação: {}", email, solicitacao.getId());
+            }
+
+        } catch (Exception e) {
+            log.error("Erro ao enviar notificação de cancelamento para gestores/secretários sobre solicitação: {}",
+                    solicitacao.getId(), e);
+        }
+    }
+
+    /**
+     * Constrói o corpo do email para notificação de cancelamento aos gestores/secretários.
+     * 
+     * @param solicitacao a solicitação de reserva cancelada
+     * @param nomeRecurso nome do espaço ou equipamento
+     * @param tipoRecurso "espaço" ou "equipamento"
+     * @return corpo do email em formato texto
+     */
+    private String construirEmailCancelamento(SolicitacaoReserva solicitacao, String nomeRecurso, String tipoRecurso) {
+        StringBuilder corpo = new StringBuilder();
+        
+        corpo.append("Olá,\n\n");
+        corpo.append("Uma solicitação de reserva para um ").append(tipoRecurso).append(" sob sua gestão foi CANCELADA pelo solicitante.\n\n");
+        
+        corpo.append("DETALHES DA SOLICITAÇÃO CANCELADA:\n");
+        corpo.append("─────────────────────────────────────────\n\n");
+        corpo.append(tipoRecurso.substring(0, 1).toUpperCase() + tipoRecurso.substring(1))
+              .append(": ").append(nomeRecurso).append("\n");
+        corpo.append("Solicitante: ").append(solicitacao.getUsuarioSolicitante().getNome()).append("\n");
+        corpo.append("Email do Solicitante: ").append(solicitacao.getUsuarioSolicitante().getEmail()).append("\n");
+        corpo.append("Data/Hora Início: ").append(solicitacao.getDataInicio().format(DATE_TIME_FORMATTER)).append("\n");
+        corpo.append("Data/Hora Fim: ").append(solicitacao.getDataFim().format(DATE_TIME_FORMATTER)).append("\n");
+        corpo.append("Status: ").append(obterDescricaoStatus(solicitacao.getStatus())).append("\n");
+        corpo.append("Data do Cancelamento: ").append(
+            solicitacao.getUpdatedAt() != null 
+                ? solicitacao.getUpdatedAt().format(DATE_TIME_FORMATTER) 
+                : LocalDateTime.now().format(DATE_TIME_FORMATTER)
+        ).append("\n");
+        
+        if (solicitacao.getProjeto() != null) {
+            corpo.append("Projeto Vinculado: ").append(solicitacao.getProjeto().getNome()).append("\n");
+        }
+        
+        if (solicitacao.getTipoRecorrencia() != null && 
+            solicitacao.getTipoRecorrencia().getCodigo() != 0) {
+            corpo.append("\nRECORRÊNCIA:\n");
+            corpo.append("Tipo: ").append(solicitacao.getTipoRecorrencia().getDescricao()).append("\n");
+            if (solicitacao.getDataFimRecorrencia() != null) {
+                corpo.append("Repete até: ").append(solicitacao.getDataFimRecorrencia().format(DATE_TIME_FORMATTER)).append("\n");
+            }
+        }
+        
+        corpo.append("\n─────────────────────────────────────────\n\n");
+        corpo.append("O ").append(tipoRecurso).append(" está novamente disponível para este período.\n\n");
+        corpo.append("Atenciosamente,\n");
+        corpo.append("Sistema de Reservas - UECE");
+        
+        return corpo.toString();
     }
 }
