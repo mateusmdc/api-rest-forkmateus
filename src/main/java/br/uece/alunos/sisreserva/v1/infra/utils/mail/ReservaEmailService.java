@@ -220,6 +220,104 @@ public class ReservaEmailService {
     }
     
     /**
+     * Envia notificação para o solicitante quando sua reserva é recusada automaticamente
+     * devido à aprovação de outra solicitação para o mesmo período.
+     * 
+     * <p>Método assíncrono que informa ao usuário que sua solicitação foi recusada
+     * automaticamente porque outra reserva para o mesmo espaço/equipamento e horário
+     * foi aprovada antes.</p>
+     * 
+     * @param solicitacaoRecusada a solicitação que foi recusada automaticamente
+     * @param solicitacaoAprovada a solicitação que foi aprovada e causou a recusa automática
+     */
+    @Async
+    public void notificarRecusaAutomatica(
+            SolicitacaoReserva solicitacaoRecusada,
+            SolicitacaoReserva solicitacaoAprovada) {
+        try {
+            String emailSolicitante = solicitacaoRecusada.getUsuarioSolicitante().getEmail();
+            
+            // Determinar o nome do recurso (espaço ou equipamento)
+            String nomeRecurso = solicitacaoRecusada.getEspaco() != null 
+                ? solicitacaoRecusada.getEspaco().getNome()
+                : solicitacaoRecusada.getEquipamento().getDescricao();
+            
+            // Criar conteúdo do email
+            String assunto = String.format("[SISRESERVA] Solicitação de Reserva Recusada - %s", nomeRecurso);
+            
+            String corpo = construirEmailRecusaAutomatica(solicitacaoRecusada, solicitacaoAprovada);
+            
+            // Enviar email
+            MailDTO mailDTO = new MailDTO(assunto, emailSolicitante, corpo);
+            mailSenderMime.sendMail(mailDTO);
+            
+            log.info("Email de recusa automática enviado para: {} sobre solicitação: {}", 
+                    emailSolicitante, solicitacaoRecusada.getId());
+            
+        } catch (Exception e) {
+            log.error("Erro ao enviar notificação de recusa automática para solicitação: {}", 
+                    solicitacaoRecusada.getId(), e);
+        }
+    }
+    
+    /**
+     * Constrói o corpo do email para notificação de recusa automática.
+     * 
+     * @param solicitacaoRecusada a solicitação que foi recusada automaticamente
+     * @param solicitacaoAprovada a solicitação que foi aprovada
+     * @return corpo do email em formato texto
+     */
+    private String construirEmailRecusaAutomatica(
+            SolicitacaoReserva solicitacaoRecusada,
+            SolicitacaoReserva solicitacaoAprovada) {
+        StringBuilder corpo = new StringBuilder();
+        
+        corpo.append("Olá, ").append(solicitacaoRecusada.getUsuarioSolicitante().getNome()).append(",\n\n");
+        
+        corpo.append("Sua solicitação de reserva foi RECUSADA AUTOMATICAMENTE.\n\n");
+        
+        corpo.append("Isso ocorreu porque outra solicitação para o mesmo período foi aprovada antes da sua.\n");
+        corpo.append("O sistema recusa automaticamente solicitações conflitantes para evitar reservas duplicadas.\n\n");
+        
+        corpo.append("DETALHES DA SUA SOLICITAÇÃO (RECUSADA):\n");
+        corpo.append("─────────────────────────────────────────\n\n");
+        
+        // Verificar se é reserva de espaço ou equipamento
+        if (solicitacaoRecusada.getEspaco() != null) {
+            corpo.append("Espaço: ").append(solicitacaoRecusada.getEspaco().getNome()).append("\n");
+        } else if (solicitacaoRecusada.getEquipamento() != null) {
+            corpo.append("Equipamento: ").append(solicitacaoRecusada.getEquipamento().getDescricao()).append("\n");
+        }
+        
+        corpo.append("Data/Hora Início: ").append(solicitacaoRecusada.getDataInicio().format(DATE_TIME_FORMATTER)).append("\n");
+        corpo.append("Data/Hora Fim: ").append(solicitacaoRecusada.getDataFim().format(DATE_TIME_FORMATTER)).append("\n");
+        corpo.append("Status: Recusado (automático)\n");
+        
+        if (solicitacaoRecusada.getProjeto() != null) {
+            corpo.append("Projeto: ").append(solicitacaoRecusada.getProjeto().getNome()).append("\n");
+        }
+        
+        corpo.append("\n─────────────────────────────────────────\n\n");
+        
+        corpo.append("MOTIVO DA RECUSA:\n");
+        corpo.append("Uma reserva para o mesmo período foi aprovada:\n");
+        corpo.append("• Solicitante aprovado: ").append(solicitacaoAprovada.getUsuarioSolicitante().getNome()).append("\n");
+        corpo.append("• Período aprovado: ").append(solicitacaoAprovada.getDataInicio().format(DATE_TIME_FORMATTER))
+              .append(" até ").append(solicitacaoAprovada.getDataFim().format(DATE_TIME_FORMATTER)).append("\n\n");
+        
+        corpo.append("─────────────────────────────────────────\n\n");
+        
+        corpo.append("PRÓXIMOS PASSOS:\n");
+        corpo.append("• Você pode criar uma nova solicitação para outro horário disponível\n");
+        corpo.append("• Caso tenha dúvidas, entre em contato com os gestores do espaço/equipamento\n\n");
+        
+        corpo.append("Atenciosamente,\n");
+        corpo.append("Sistema de Reservas - UECE");
+        
+        return corpo.toString();
+    }
+
+    /**
      * Obtém a descrição legível do status da solicitação.
      * 
      * @param status o status da solicitação
