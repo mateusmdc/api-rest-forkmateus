@@ -2,18 +2,36 @@ package br.uece.alunos.sisreserva.v1.domain.secretariaEspaco.validation;
 
 import br.uece.alunos.sisreserva.v1.domain.secretariaEspaco.SecretariaEspacoRepository;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
+import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * Componente responsável pelas validações de negócio relacionadas à SecretariaEspaco.
- * Centraliza as regras de validação para garantir consistência dos dados.
+ * Centraliza as regras de validação para garantir consistência e segurança dos dados.
  */
 @Component
 public class SecretariaEspacoValidator {
     
     @Autowired
     private SecretariaEspacoRepository repository;
+
+    @Autowired
+    private UsuarioAutenticadoService usuarioAutenticadoService;
+
+    /**
+     * Valida se o usuário autenticado possui permissão para vincular secretaria de espaço.
+     * Apenas administradores podem realizar esta operação.
+     * 
+     * @throws ValidationException se o usuário não for administrador
+     */
+    public void validarPermissaoParaVincular() {
+        if (!usuarioAutenticadoService.isAdmin()) {
+            throw new ValidationException(
+                "Apenas administradores podem vincular secretarias de espaço."
+            );
+        }
+    }
 
     /**
      * Valida se já existe uma secretaria ativa para o usuário e espaço especificados.
