@@ -102,8 +102,14 @@ public class CriarSolicitacaoReserva {
         // Determinar se é reserva de espaço ou equipamento
         boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
         
-        // Validar se usuário já possui solicitação para o mesmo período
-        validator.validarSolicitacaoDuplicada(data.usuarioSolicitanteId(), data.dataInicio(), data.dataFim());
+        // Validar se usuário já possui solicitação para o mesmo espaço/equipamento no período
+        validator.validarSolicitacaoDuplicada(
+            data.usuarioSolicitanteId(), 
+            data.espacoId(), 
+            data.equipamentoId(), 
+            data.dataInicio(), 
+            data.dataFim()
+        );
         
         // Validação de conflito de reserva
         if (isReservaEspaco) {
@@ -233,6 +239,7 @@ public class CriarSolicitacaoReserva {
      * @param duracaoMinutos duração de cada reserva em minutos
      * @param targetId identificador do espaço ou equipamento
      * @param isReservaEspaco true se for reserva de espaço, false se for de equipamento
+     * @param usuarioSolicitanteId ID do usuário solicitante
      * @throws IllegalArgumentException se houver conflito em alguma data
      */
     private void validarTodasOcorrencias(
@@ -245,8 +252,14 @@ public class CriarSolicitacaoReserva {
         for (LocalDateTime dataInicio : datasOcorrencias) {
             LocalDateTime dataFim = dataInicio.plusMinutes(duracaoMinutos);
             
-            // Validar se usuário já possui solicitação para o mesmo período
-            validator.validarSolicitacaoDuplicada(usuarioSolicitanteId, dataInicio, dataFim);
+            // Validar se usuário já possui solicitação para o mesmo espaço/equipamento no período
+            validator.validarSolicitacaoDuplicada(
+                usuarioSolicitanteId,
+                isReservaEspaco ? targetId : null,
+                isReservaEspaco ? null : targetId,
+                dataInicio,
+                dataFim
+            );
             
             if (isReservaEspaco) {
                 validator.validarConflitoReserva(targetId, dataInicio, dataFim);
