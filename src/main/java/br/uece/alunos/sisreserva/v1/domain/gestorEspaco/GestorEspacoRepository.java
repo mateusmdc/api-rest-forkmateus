@@ -50,4 +50,18 @@ public interface GestorEspacoRepository extends JpaRepository<GestorEspaco, Stri
           AND g.estaAtivo = true
         """)
     Optional<GestorEspaco> findByUsuarioGestorIdAndEspacoIdAndEstaAtivo(String usuarioId, String espacoId);
+
+    /**
+     * Busca os IDs dos espaços que o usuário gerencia ativamente.
+     * Útil para filtrar reservas que o gestor pode visualizar.
+     * 
+     * @param usuarioId ID do usuário gestor
+     * @return Lista com os IDs dos espaços gerenciados
+     */
+    @Query("""
+        SELECT g.espaco.id FROM GestorEspaco g
+        WHERE g.usuarioGestor.id = :usuarioId
+          AND g.estaAtivo = true
+    """)
+    List<String> findEspacosIdsGerenciadosByUsuarioId(String usuarioId);
 }
