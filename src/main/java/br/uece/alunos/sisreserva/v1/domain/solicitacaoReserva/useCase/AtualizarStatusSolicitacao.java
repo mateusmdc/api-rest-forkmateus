@@ -60,6 +60,9 @@ public class AtualizarStatusSolicitacao {
         // Validar o novo status
         validator.validarStatusPermitido(data.status());
 
+        // Validar permissão do usuário para atualizar o status
+        validator.validarPermissaoParaAtualizarStatus(solicitacao, data.status());
+
         // Validar a transição de status
         validator.validarTransicaoStatus(solicitacao, data.status());
 
