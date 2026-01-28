@@ -4,7 +4,8 @@ public enum StatusSolicitacao {
     PENDENTE(0),
     APROVADO(1),
     RECUSADO(2),
-    PENDENTE_AJUSTE(3);
+    PENDENTE_AJUSTE(3),
+    CANCELADO(4);
 
     private final int codigo;
 

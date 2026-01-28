@@ -177,6 +177,9 @@ public class ReservaEmailService {
             case PENDENTE_AJUSTE:
                 corpo.append("Sua solicitação de reserva está PENDENTE DE AJUSTE.\n\n");
                 break;
+            case CANCELADO:
+                corpo.append("Sua solicitação de reserva foi CANCELADA.\n\n");
+                break;
             default:
                 corpo.append("O status da sua solicitação de reserva foi atualizado.\n\n");
         }
@@ -211,6 +214,8 @@ public class ReservaEmailService {
             corpo.append("Caso tenha dúvidas, entre em contato com os gestores do espaço.\n\n");
         } else if (solicitacao.getStatus() == StatusSolicitacao.PENDENTE_AJUSTE) {
             corpo.append("Por favor, entre em contato com os gestores para maiores informações.\n\n");
+        } else if (solicitacao.getStatus() == StatusSolicitacao.CANCELADO) {
+            corpo.append("A solicitação foi cancelada. Você pode criar uma nova solicitação a qualquer momento.\n\n");
         }
         
         corpo.append("Atenciosamente,\n");
@@ -329,6 +334,7 @@ public class ReservaEmailService {
             case APROVADO -> "Aprovado";
             case RECUSADO -> "Recusado";
             case PENDENTE_AJUSTE -> "Pendente de Ajuste";
+            case CANCELADO -> "Cancelado";
         };
     }
 }
