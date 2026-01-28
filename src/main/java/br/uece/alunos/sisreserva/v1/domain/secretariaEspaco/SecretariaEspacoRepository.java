@@ -100,4 +100,18 @@ public interface SecretariaEspacoRepository extends JpaRepository<SecretariaEspa
           AND s.estaAtivo = true
         """)
     Optional<SecretariaEspaco> findByUsuarioSecretariaIdAndEspacoIdAndEstaAtivo(String usuarioId, String espacoId);
+
+    /**
+     * Busca os IDs dos espaços que o usuário faz parte da secretaria ativa.
+     * Útil para filtrar reservas que a secretaria pode visualizar.
+     * 
+     * @param usuarioId ID do usuário da secretaria
+     * @return Lista com os IDs dos espaços onde o usuário está na secretaria
+     */
+    @Query("""
+        SELECT s.espaco.id FROM SecretariaEspaco s
+        WHERE s.usuarioSecretaria.id = :usuarioId
+          AND s.estaAtivo = true
+    """)
+    List<String> findEspacosIdsSecretariadosByUsuarioId(String usuarioId);
 }

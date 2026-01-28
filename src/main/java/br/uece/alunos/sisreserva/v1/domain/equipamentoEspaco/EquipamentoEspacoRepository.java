@@ -41,4 +41,18 @@ public interface EquipamentoEspacoRepository extends JpaRepository<EquipamentoEs
      */
     @Query("SELECT ee FROM EquipamentoEspaco ee WHERE ee.equipamento.id = :equipamentoId AND ee.dataRemocao IS NULL")
     List<EquipamentoEspaco> findByEquipamentoIdAndDataRemocaoIsNull(String equipamentoId);
+
+    /**
+     * Busca os IDs dos equipamentos ativos vinculados a uma lista de espaços.
+     * Útil para filtrar reservas de equipamentos que gestores/secretarias podem visualizar.
+     * 
+     * @param espacosIds Lista de IDs dos espaços
+     * @return Lista com os IDs dos equipamentos vinculados aos espaços
+     */
+    @Query("""
+        SELECT ee.equipamento.id FROM EquipamentoEspaco ee
+        WHERE ee.espaco.id IN :espacosIds
+          AND ee.dataRemocao IS NULL
+    """)
+    List<String> findEquipamentosIdsVinculadosAosEspacos(List<String> espacosIds);
 }
