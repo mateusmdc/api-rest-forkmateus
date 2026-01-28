@@ -338,4 +338,45 @@ public class SolicitacaoReservaValidator {
         log.info("[AUDIT] PERMISSAO_VALIDADA - Usuário ID: {} autorizado para {} no espaço ID: {} (Gestor: {}, Secretaria: {})",
                 usuarioId, operacao, espacoId, isGestor, isSecretaria);
     }
+
+    /**
+     * Valida se o usuário já possui uma solicitação de reserva ativa para o mesmo espaço ou equipamento no período.
+     * 
+     * <p>Evita que um usuário crie múltiplas solicitações de reserva para o mesmo recurso (espaço ou equipamento)
+     * no mesmo intervalo de horários. Considera conflito quando já existe uma solicitação com status PENDENTE 
+     * ou APROVADO que sobrepõe o período informado para o mesmo espaço ou equipamento.</p>
+     * 
+     * <p>Permite que o usuário crie solicitações simultâneas para diferentes espaços/equipamentos.</p>
+     * 
+     * @param usuarioId ID do usuário solicitante
+     * @param espacoId ID do espaço (null se for reserva de equipamento)
+     * @param equipamentoId ID do equipamento (null se for reserva de espaço)
+     * @param dataInicio data e hora de início da nova reserva
+     * @param dataFim data e hora de fim da nova reserva
+     * @throws ValidationException se o usuário já possui solicitação ativa para o mesmo recurso no período
+     */
+    public void validarSolicitacaoDuplicada(String usuarioId, String espacoId, String equipamentoId, 
+                                            LocalDateTime dataInicio, LocalDateTime dataFim) {
+        boolean existeSolicitacaoDuplicada = repository.existsByUsuarioIdAndPeriodoConflitante(
+                usuarioId, espacoId, equipamentoId, dataInicio, dataFim);
+        
+        if (existeSolicitacaoDuplicada) {
+            var usuario = usuarioAutenticadoService.getUsuarioAutenticado();
+            String recurso = espacoId != null ? "espaço ID: " + espacoId : "equipamento ID: " + equipamentoId;
+            
+            log.warn("[VALIDATION] Usuário '{}' (ID: {}) tentou criar solicitação duplicada para {} no período {} a {}",
+                    usuario != null ? usuario.getEmail() : "desconhecido", 
+                    usuarioId, recurso, dataInicio, dataFim);
+            
+            throw new ValidationException(
+                "Você já possui uma solicitação de reserva ativa para este " + 
+                (espacoId != null ? "espaço" : "equipamento") + " no período informado. " +
+                "Não é permitido criar múltiplas solicitações para o mesmo recurso no mesmo horário."
+            );
+        }
+        
+        String recurso = espacoId != null ? "espaço ID: " + espacoId : "equipamento ID: " + equipamentoId;
+        log.debug("[VALIDATION] Nenhuma solicitação duplicada encontrada para usuário ID: {} e {} no período {} a {}",
+                usuarioId, recurso, dataInicio, dataFim);
+    }
 }

@@ -53,6 +53,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         SELECT sr FROM SolicitacaoReserva sr
         LEFT JOIN FETCH sr.usuarioSolicitante
         LEFT JOIN FETCH sr.espaco
+        LEFT JOIN FETCH sr.equipamento
         LEFT JOIN FETCH sr.projeto
         WHERE sr.id = :id
     """)
@@ -225,5 +226,74 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         @Param("dataInicio") LocalDateTime dataInicio, 
         @Param("dataFim") LocalDateTime dataFim, 
         @Param("equipamentoId") String equipamentoId
+    );
+
+    /**
+     * Verifica se o usuário já possui uma solicitação de reserva ativa (pendente ou aprovada)
+     * para o mesmo espaço ou equipamento no período informado. Considera conflitos quando há 
+     * sobreposição de horários para o mesmo recurso (espaço ou equipamento).
+     * 
+     * @param usuarioId ID do usuário solicitante
+     * @param espacoId ID do espaço (null se for reserva de equipamento)
+     * @param equipamentoId ID do equipamento (null se for reserva de espaço)
+     * @param dataInicio data e hora de início da nova reserva
+     * @param dataFim data e hora de fim da nova reserva
+     * @return true se já existe uma solicitação do usuário para o mesmo recurso no período, false caso contrário
+     */
+    @Query("""
+        SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+        FROM SolicitacaoReserva s
+        WHERE s.usuarioSolicitante.id = :usuarioId
+        AND (s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.PENDENTE
+             OR s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO)
+        AND (
+            (:espacoId IS NOT NULL AND s.espaco.id = :espacoId)
+            OR (:equipamentoId IS NOT NULL AND s.equipamento.id = :equipamentoId)
+        )
+        AND s.dataInicio < :dataFim
+        AND s.dataFim > :dataInicio
+    """)
+    boolean existsByUsuarioIdAndPeriodoConflitante(
+        @Param("usuarioId") String usuarioId,
+        @Param("espacoId") String espacoId,
+        @Param("equipamentoId") String equipamentoId,
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim
+    );
+
+    /**
+     * Busca todas as solicitações pendentes que conflitam com um intervalo de tempo específico
+     * para o mesmo espaço ou equipamento da solicitação aprovada.
+     * 
+     * <p>Este método é usado para recusar automaticamente solicitações conflitantes quando
+     * uma reserva é aprovada.</p>
+     * 
+     * @param solicitacaoAprovadaId ID da solicitação que foi aprovada (para excluí-la dos resultados)
+     * @param espacoId ID do espaço (null se for reserva de equipamento)
+     * @param equipamentoId ID do equipamento (null se for reserva de espaço)
+     * @param dataInicio data e hora de início da reserva aprovada
+     * @param dataFim data e hora de fim da reserva aprovada
+     * @return lista de solicitações pendentes que conflitam com o período
+     */
+    @Query("""
+        SELECT s FROM SolicitacaoReserva s
+        LEFT JOIN FETCH s.usuarioSolicitante
+        LEFT JOIN FETCH s.espaco
+        LEFT JOIN FETCH s.equipamento
+        WHERE s.id != :solicitacaoAprovadaId
+        AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.PENDENTE
+        AND (
+            (:espacoId IS NOT NULL AND s.espaco.id = :espacoId)
+            OR (:equipamentoId IS NOT NULL AND s.equipamento.id = :equipamentoId)
+        )
+        AND s.dataInicio < :dataFim
+        AND s.dataFim > :dataInicio
+    """)
+    List<SolicitacaoReserva> findSolicitacoesPendentesConflitantes(
+        @Param("solicitacaoAprovadaId") String solicitacaoAprovadaId,
+        @Param("espacoId") String espacoId,
+        @Param("equipamentoId") String equipamentoId,
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim
     );
 }
