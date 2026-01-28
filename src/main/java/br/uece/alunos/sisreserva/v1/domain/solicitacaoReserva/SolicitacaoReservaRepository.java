@@ -53,6 +53,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         SELECT sr FROM SolicitacaoReserva sr
         LEFT JOIN FETCH sr.usuarioSolicitante
         LEFT JOIN FETCH sr.espaco
+        LEFT JOIN FETCH sr.equipamento
         LEFT JOIN FETCH sr.projeto
         WHERE sr.id = :id
     """)
