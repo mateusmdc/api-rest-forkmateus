@@ -10,16 +10,35 @@ import java.util.List;
 
 /**
  * Classe que implementa Specifications para consulta dinâmica da entidade SolicitacaoReserva.
- * Pode ser usada para montar filtros complexos de forma reutilizável.
+ * Implementa filtros de permissão baseados no cargo do usuário autenticado.
+ * <p>
+ * Regras de visualização:
+ * <ul>
+ *   <li>Admin: vê todas as reservas</li>
+ *   <li>Gestor: vê as suas + dos espaços que gerencia + dos equipamentos desses espaços</li>
+ *   <li>Secretaria: vê as suas + dos espaços da secretaria + dos equipamentos desses espaços</li>
+ *   <li>Usuário interno/externo: vê apenas as suas</li>
+ * </ul>
  */
 public class SolicitacaoReservaSpecification {
 
     /**
      * Cria uma Specification baseada nos parâmetros passados.
-     * A ideia é receber um mapa de filtros (nome do campo -> valor)
-     * e construir uma query dinâmica.
-     * Permite filtrar por id, datas, espaço, equipamento, usuário solicitante, status e projeto.
-     * @return Specification<Projeto> que pode ser usada no repository para consultas dinâmicas
+     * Aplica filtros de dados E filtros de permissão baseados no cargo do usuário.
+     * 
+     * @param id Filtro por ID da solicitação
+     * @param dataInicio Filtro por data de início
+     * @param dataFim Filtro por data de fim
+     * @param espacoId Filtro por ID do espaço
+     * @param equipamentoId Filtro por ID do equipamento
+     * @param usuarioSolicitanteId Filtro por ID do usuário solicitante
+     * @param statusCodigo Filtro por código do status
+     * @param projetoId Filtro por ID do projeto
+     * @param isAdmin Se o usuário é administrador (vê todas)
+     * @param usuarioAutenticadoId ID do usuário autenticado (para filtrar as suas)
+     * @param espacosGerenciadosIds IDs dos espaços que o usuário gerencia ou está na secretaria
+     * @param equipamentosPermitidosIds IDs dos equipamentos vinculados aos espaços gerenciados
+     * @return Specification com os filtros aplicados
      */
     public static Specification<SolicitacaoReserva> byFilter(
         String id,
@@ -29,7 +48,11 @@ public class SolicitacaoReservaSpecification {
         String equipamentoId,
         String usuarioSolicitanteId,
         Integer statusCodigo,
-        String projetoId
+        String projetoId,
+        boolean isAdmin,
+        String usuarioAutenticadoId,
+        List<String> espacosGerenciadosIds,
+        List<String> equipamentosPermitidosIds
     ) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -58,6 +81,44 @@ public class SolicitacaoReservaSpecification {
             if (projetoId != null && !projetoId.isBlank()) {
                 predicates.add(cb.equal(root.get("projeto").get("id"), projetoId));
             }
+
+            // Aplicar filtro de permissões baseado no cargo do usuário
+            if (!isAdmin) {
+                // Usuário não é admin: aplicar restrições de visualização
+                List<Predicate> permissaoPredicates = new ArrayList<>();
+                
+                // 1. Pode ver suas próprias reservas
+                if (usuarioAutenticadoId != null) {
+                    permissaoPredicates.add(
+                        cb.equal(root.get("usuarioSolicitante").get("id"), usuarioAutenticadoId)
+                    );
+                }
+                
+                // 2. Se for gestor ou secretaria, pode ver reservas dos espaços que gerencia
+                if (espacosGerenciadosIds != null && !espacosGerenciadosIds.isEmpty()) {
+                    permissaoPredicates.add(
+                        root.get("espaco").get("id").in(espacosGerenciadosIds)
+                    );
+                }
+                
+                // 3. Se for gestor ou secretaria, pode ver reservas dos equipamentos vinculados aos espaços
+                if (equipamentosPermitidosIds != null && !equipamentosPermitidosIds.isEmpty()) {
+                    permissaoPredicates.add(
+                        root.get("equipamento").get("id").in(equipamentosPermitidosIds)
+                    );
+                }
+                
+                // Aplica OR: (minhas reservas) OU (reservas dos espaços que gerencio) OU (reservas dos equipamentos)
+                if (!permissaoPredicates.isEmpty()) {
+                    predicates.add(cb.or(permissaoPredicates.toArray(new Predicate[0])));
+                } else if (usuarioAutenticadoId != null) {
+                    // Se não tem espaços/equipamentos gerenciados e não é admin, só vê as suas
+                    predicates.add(
+                        cb.equal(root.get("usuarioSolicitante").get("id"), usuarioAutenticadoId)
+                    );
+                }
+            }
+            // Se isAdmin = true, não adiciona nenhum filtro de permissão (vê todas)
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };
