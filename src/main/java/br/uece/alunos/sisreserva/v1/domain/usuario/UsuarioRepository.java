@@ -21,6 +21,19 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String>, JpaSp
             """)
     boolean usuarioExistsByEmail(String email);
 
+    /**
+     * Verifica se já existe um usuário com o CPF informado.
+     * 
+     * @param documentoFiscal CPF do usuário (normalizado, apenas dígitos)
+     * @return true se já existe, false caso contrário
+     */
+    @Query("""
+            SELECT CASE WHEN COUNT(u) > 0 THEN true
+            ELSE false END
+            FROM Usuario u WHERE u.documentoFiscal = :documentoFiscal
+            """)
+    boolean usuarioExistsByDocumentoFiscal(String documentoFiscal);
+
     @Query("""
             SELECT u FROM Usuario u WHERE u.email = :email
             """)
