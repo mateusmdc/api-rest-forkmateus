@@ -7,6 +7,8 @@ import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.dto.usuarioCargo.CriarCargaUsuarioCargoDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
+import br.uece.alunos.sisreserva.v1.infra.utils.validators.DocumentoFiscalUtils;
+import br.uece.alunos.sisreserva.v1.infra.utils.validators.TelefoneUtils;
 import br.uece.alunos.sisreserva.v1.service.EntityHandlerService;
 import br.uece.alunos.sisreserva.v1.service.UsuarioCargoService;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/**
+ * Caso de uso responsável por criar um novo usuário no sistema.
+ * Realiza validações de e-mail, CPF e telefone, normaliza os dados e persiste no banco.
+ */
 @Component
 @AllArgsConstructor
 public class CriarUsuario {
@@ -23,13 +29,40 @@ public class CriarUsuario {
     private final UsuarioRepository repository;
     private final UsuarioValidator validator;
 
+    /**
+     * Cria um novo usuário no sistema.
+     * Valida e-mail, CPF e telefone, normaliza os dados e persiste no banco.
+     * 
+     * @param data Dados do usuário a ser criado
+     * @return DTO com os dados do usuário criado (com formatação)
+     * @throws ValidationException se alguma validação falhar
+     */
     public UsuarioRetornoDTO criar(UsuarioDTO data) {
         try {
+            // Validações de e-mail
             validator.validarEmailJaExistente(data.email());
+            
+            // Normaliza CPF (remove formatação)
+            String cpfNormalizado = DocumentoFiscalUtils.normalizarCPF(data.documentoFiscal());
+            
+            // Validações de CPF
+            validator.validarCPF(cpfNormalizado);
+            validator.validarCPFJaExistente(cpfNormalizado);
+            
+            // Normaliza telefone (remove formatação)
+            String telefoneNormalizado = TelefoneUtils.normalizarTelefone(data.telefone());
+            
+            // Validação de telefone
+            validator.validarTelefone(telefoneNormalizado);
 
             var instituicao = entityHandlerService.obterInstituicaoPorId(data.instituicaoId());
 
             var novoUsuario = new Usuario(data, instituicao);
+            
+            // Define os dados normalizados
+            novoUsuario.setDocumentoFiscal(cpfNormalizado);
+            novoUsuario.setTelefone(telefoneNormalizado);
+            
             String senhaProtegida = bCryptPasswordEncoder.encode(data.senha());
             novoUsuario.setSenha(senhaProtegida);
 
