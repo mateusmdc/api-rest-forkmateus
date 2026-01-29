@@ -26,6 +26,34 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.projeto.id = :projetoId")
     List<SolicitacaoReserva> findByProjetoId(String projetoId);
 
+    /**
+     * Busca os IDs dos projetos vinculados a reservas de espaços específicos.
+     * Útil para filtrar projetos que gestores/secretarias podem visualizar.
+     * 
+     * @param espacosIds Lista de IDs dos espaços
+     * @return Lista com os IDs dos projetos vinculados a reservas desses espaços
+     */
+    @Query("""
+        SELECT DISTINCT sr.projeto.id FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id IN :espacosIds
+          AND sr.projeto IS NOT NULL
+    """)
+    List<String> findProjetosIdsVinculadosAosEspacos(List<String> espacosIds);
+
+    /**
+     * Busca os IDs dos projetos vinculados a reservas de equipamentos específicos.
+     * Útil para filtrar projetos que gestores/secretarias podem visualizar.
+     * 
+     * @param equipamentosIds Lista de IDs dos equipamentos
+     * @return Lista com os IDs dos projetos vinculados a reservas desses equipamentos
+     */
+    @Query("""
+        SELECT DISTINCT sr.projeto.id FROM SolicitacaoReserva sr
+        WHERE sr.equipamento.id IN :equipamentosIds
+          AND sr.projeto IS NOT NULL
+    """)
+    List<String> findProjetosIdsVinculadosAosEquipamentos(List<String> equipamentosIds);
+
     @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.dataInicio >= :startDate AND sr.dataFim <= :endDate")
     List<SolicitacaoReserva> findByPeriodo(LocalDateTime startDate, LocalDateTime endDate);
 
