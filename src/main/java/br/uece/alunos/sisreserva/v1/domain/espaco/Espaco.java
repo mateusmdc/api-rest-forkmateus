@@ -78,6 +78,14 @@ public class Espaco {
     @Column(name = "multiusuario", nullable = false)
     private Boolean multiusuario = false;
 
+    /**
+     * Indica se o espaço está disponível para reserva.
+     * Default: true (disponível)
+     */
+    @NotNull
+    @Column(name = "reservavel", nullable = false)
+    private Boolean reservavel = true;
+
     @ManyToMany(mappedBy = "espacos", fetch = FetchType.LAZY)
     private List<ComplexoEspacos> complexos = new ArrayList<>();
 
@@ -108,6 +116,9 @@ public class Espaco {
         }
         if (data.multiusuario() != null) {
             this.multiusuario = data.multiusuario();
+        }
+        if (data.reservavel() != null) {
+            this.reservavel = data.reservavel();
         }
     }
 

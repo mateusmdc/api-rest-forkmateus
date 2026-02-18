@@ -17,6 +17,7 @@ import java.util.List;
  * @param tipoAtividadeIds lista de identificadores dos tipos de atividade (mínimo 1)
  * @param precisaProjeto indica se o espaço precisa de projeto vinculado
  * @param multiusuario indica se o espaço pode ser usado por diferentes tipos de usuários (default: false)
+ * @param reservavel indica se o espaço está disponível para reserva (default: true)
  */
 public record EspacoDTO(
         @NotEmpty(message = "O nome não pode ser vazio")
@@ -33,5 +34,6 @@ public record EspacoDTO(
         List<String> tipoAtividadeIds,
         @NotNull(message = "O campo precisaProjeto é obrigatório")
         Boolean precisaProjeto,
-        Boolean multiusuario // Opcional - default: false
+        Boolean multiusuario, // Opcional - default: false
+        Boolean reservavel // Opcional - default: true
 ) {}

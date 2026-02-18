@@ -32,9 +32,10 @@ public class ObterEquipamentos {
      * @param tombamento Filtro por tombamento
      * @param status Filtro por status
      * @param tipoEquipamento Filtro por ID do tipo de equipamento
+     * @param reservavel Filtro por equipamentos disponíveis para reserva
      * @return Página com os equipamentos encontrados
      */
-    public Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento) {
+    public Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento, Boolean reservavel) {
         // Verifica se o usuário autenticado é externo e deve ter restrições
         boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveAplicarRestricoesMultiusuario();
 
@@ -53,6 +54,7 @@ public class ObterEquipamentos {
                 status,
                 tipoEquipamento,
                 null,  // multiusuario - não passado explicitamente pelo usuário
+                reservavel,  // reservavel - passa o parâmetro recebido
                 restringirApenasMultiusuario  // Restrição para usuários externos
         );
 

@@ -38,6 +38,7 @@ public class ObterEspaco {
      * @param tipoAtividade Filtro por ID do tipo de atividade
      * @param nome Filtro por nome do espaço (busca normalizada)
      * @param multiusuario Filtro explícito por espaços multiusuário
+     * @param reservavel Filtro por espaços disponíveis para reserva
      * @return Página com os espaços encontrados
      */
     public Page<EspacoRetornoDTO> obterEspacos(Pageable pageable,
@@ -47,7 +48,8 @@ public class ObterEspaco {
                                                String tipoEspaco,
                                                String tipoAtividade,
                                                String nome,
-                                               Boolean multiusuario) {
+                                               Boolean multiusuario,
+                                               Boolean reservavel) {
 
         Map<String, Object> filtros = new HashMap<>();
         if (id != null) filtros.put("id", id);
@@ -56,6 +58,7 @@ public class ObterEspaco {
         if (tipoEspaco != null) filtros.put("tipoEspacoId", tipoEspaco);
         if (tipoAtividade != null) filtros.put("tipoAtividadeId", tipoAtividade);
         if (multiusuario != null) filtros.put("multiusuario", multiusuario);
+        if (reservavel != null) filtros.put("reservavel", reservavel);
 
         // Verifica se o usuário autenticado é externo e deve ter restrições
         boolean restringirApenasMultiusuario = usuarioAutenticadoService.deveAplicarRestricoesMultiusuario();
@@ -76,6 +79,7 @@ public class ObterEspaco {
                 (String) filtros.get("tipoEspacoId"),
                 (String) filtros.get("tipoAtividadeId"),
                 (Boolean) filtros.get("multiusuario"),
+                (Boolean) filtros.get("reservavel"),
                 restringirApenasMultiusuario  // Novo parâmetro para restrição de usuários externos
         );
 

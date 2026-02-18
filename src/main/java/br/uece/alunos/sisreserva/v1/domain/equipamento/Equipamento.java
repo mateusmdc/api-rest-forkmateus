@@ -48,6 +48,14 @@ public class Equipamento {
     @Column(name = "multiusuario", nullable = false)
     private Boolean multiusuario = false;
 
+    /**
+     * Indica se o equipamento está disponível para reserva.
+     * Default: true (disponível)
+     */
+    @NotNull
+    @Column(name = "reservavel", nullable = false)
+    private Boolean reservavel = true;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -60,6 +68,7 @@ public class Equipamento {
         this.status = data.statusEquipamento();
         this.tipoEquipamento =  tipoEquipamento;
         this.multiusuario = data.multiusuario() != null ? data.multiusuario() : false;
+        this.reservavel = data.reservavel() != null ? data.reservavel() : true;
     }
 
     @PrePersist
@@ -77,6 +86,9 @@ public class Equipamento {
         }
         if (data.multiusuario() != null) {
             this.multiusuario = data.multiusuario();
+        }
+        if (data.reservavel() != null) {
+            this.reservavel = data.reservavel();
         }
     }
 
