@@ -48,8 +48,8 @@ public class EspacoServiceImpl implements EspacoService {
 
     @Override
     public Page<EspacoRetornoDTO> obterEspacos(Pageable pageable, String id, String departamento, String localizacao,
-                                               String tipoEspaco, String tipoAtividade, String nome, Boolean multiusuario) {
-        return obterEspaco.obterEspacos(pageable, id, departamento, localizacao, tipoEspaco, tipoAtividade, nome, multiusuario);
+                                               String tipoEspaco, String tipoAtividade, String nome, Boolean multiusuario, Boolean reservavel) {
+        return obterEspaco.obterEspacos(pageable, id, departamento, localizacao, tipoEspaco, tipoAtividade, nome, multiusuario, reservavel);
     }
 
     @Override

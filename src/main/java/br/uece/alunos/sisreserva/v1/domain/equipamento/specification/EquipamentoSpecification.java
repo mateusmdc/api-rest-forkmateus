@@ -13,13 +13,14 @@ public class EquipamentoSpecification {
 
     /**
      * Cria uma Specification para filtrar equipamentos baseado em múltiplos critérios.
-     * Suporta filtro de multiusuário e restrição para usuários externos.
+     * Suporta filtro de multiusuário, reservável e restrição para usuários externos.
      * 
      * @param id identificador do equipamento
      * @param tombamento número de tombamento do equipamento
      * @param status status do equipamento
      * @param tipoEquipamento identificador do tipo de equipamento
      * @param multiusuario flag de multiusuário
+     * @param reservavel flag para filtrar equipamentos disponíveis para reserva
      * @param restringirApenasMultiusuario flag para restringir apenas equipamentos multiusuário (para usuários externos)
      * @return Specification<Equipamento> que pode ser usada no repository para consultas dinâmicas
      */
@@ -29,6 +30,7 @@ public class EquipamentoSpecification {
             String status,
             String tipoEquipamento,
             Boolean multiusuario,
+            Boolean reservavel,
             Boolean restringirApenasMultiusuario
     ) {
         return (root, query, cb) -> {
@@ -57,6 +59,10 @@ public class EquipamentoSpecification {
 
             if (multiusuario != null) {
                 predicates.add(cb.equal(root.get("multiusuario"), multiusuario));
+            }
+            
+            if (reservavel != null) {
+                predicates.add(cb.equal(root.get("reservavel"), reservavel));
             }
             
             // Restrição para usuários externos: apenas equipamentos multiusuário

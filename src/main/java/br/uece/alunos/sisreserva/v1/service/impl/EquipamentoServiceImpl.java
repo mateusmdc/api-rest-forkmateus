@@ -30,7 +30,7 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     }
 
     @Override
-    public Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento) {
-        return obterEquipamentos.obter(pageable, id, tombamento, status, tipoEquipamento);
+    public Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento, Boolean reservavel) {
+        return obterEquipamentos.obter(pageable, id, tombamento, status, tipoEquipamento, reservavel);
     }
 }

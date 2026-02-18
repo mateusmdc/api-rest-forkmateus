@@ -24,6 +24,7 @@ public class EspacoSpecification {
      * @param tipoEspacoId identificador do tipo de espaço
      * @param tipoAtividadeId identificador do tipo de atividade (verifica se está na lista)
      * @param multiusuario flag de multiusuário
+     * @param reservavel flag para filtrar espaços disponíveis para reserva
      * @param restringirApenasMultiusuario flag para restringir apenas espaços multiusuário (para usuários externos)
      * @return Specification<Espaco> que pode ser usada no repository para consultas dinâmicas
      */
@@ -34,6 +35,7 @@ public class EspacoSpecification {
             String tipoEspacoId,
             String tipoAtividadeId,
             Boolean multiusuario,
+            Boolean reservavel,
             Boolean restringirApenasMultiusuario
     ) {
         return (root, query, cb) -> {
@@ -58,6 +60,9 @@ public class EspacoSpecification {
             }
             if (multiusuario != null) {
                 predicates.add(cb.equal(root.get("multiusuario"), multiusuario));
+            }
+            if (reservavel != null) {
+                predicates.add(cb.equal(root.get("reservavel"), reservavel));
             }
             
             // Restrição para usuários externos: apenas espaços multiusuário
