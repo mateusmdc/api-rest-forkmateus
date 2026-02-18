@@ -11,6 +11,7 @@ import java.util.List;
  * @param observacao observações sobre o espaço
  * @param precisaProjeto indica se o espaço precisa de projeto vinculado
  * @param multiusuario indica se o espaço pode ser usado por diferentes tipos de usuários
+ * @param reservavel indica se o espaço está disponível para reserva
  * @param tipoAtividadeIds lista de IDs dos tipos de atividade (opcional)
  */
 public record EspacoAtualizarDTO(
@@ -19,6 +20,7 @@ public record EspacoAtualizarDTO(
         String observacao, 
         Boolean precisaProjeto,
         Boolean multiusuario,
+        Boolean reservavel,
         List<String> tipoAtividadeIds
 ) {
 }

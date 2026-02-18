@@ -90,6 +90,7 @@ public class CriarEspaco {
         espaco.getTiposAtividade().addAll(tiposAtividade);
         espaco.setPrecisaProjeto(dto.precisaProjeto());
         espaco.setMultiusuario(dto.multiusuario() != null ? dto.multiusuario() : false);
+        espaco.setReservavel(dto.reservavel() != null ? dto.reservavel() : true);
         return espaco;
     }
 }

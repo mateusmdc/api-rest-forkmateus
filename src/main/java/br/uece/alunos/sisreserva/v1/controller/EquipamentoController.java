@@ -30,12 +30,13 @@ public class EquipamentoController {
             @RequestParam(required = false) String id,
             @RequestParam(required = false) String tombamento,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String tipoEquipamento
+            @RequestParam(required = false) String tipoEquipamento,
+            @RequestParam(required = false) Boolean reservavel
     ) {
 
         if (sortField.equals("tipoEquipamento")) sortField = "tipoEquipamento.id";
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
-        var equipamentos = service.obter(pageable, id, tombamento, status, tipoEquipamento);
+        var equipamentos = service.obter(pageable, id, tombamento, status, tipoEquipamento, reservavel);
         return ResponseEntity.ok(ApiResponseDTO.success(equipamentos));
     }
 

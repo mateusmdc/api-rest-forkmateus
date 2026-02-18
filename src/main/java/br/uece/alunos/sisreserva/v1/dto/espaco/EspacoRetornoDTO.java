@@ -21,6 +21,7 @@ import java.util.List;
  * @param tiposAtividade lista de tipos de atividade do espaço
  * @param precisaProjeto indica se o espaço precisa de projeto
  * @param multiusuario indica se o espaço é multiusuário
+ * @param reservavel indica se o espaço está disponível para reserva
  */
 public record EspacoRetornoDTO(
         String id,
@@ -32,7 +33,8 @@ public record EspacoRetornoDTO(
         TipoEspacoRetornoDTO tipoEspaco,
         List<TipoAtividadeRetornoDTO> tiposAtividade,
         Boolean precisaProjeto,
-        Boolean multiusuario
+        Boolean multiusuario,
+        Boolean reservavel
 ) {
     /**
      * Construtor que converte uma entidade Espaco para o DTO de retorno.
@@ -54,7 +56,8 @@ public record EspacoRetornoDTO(
                         .toList()
                     : List.of(),
                 espaco.getPrecisaProjeto(),
-                espaco.getMultiusuario()
+                espaco.getMultiusuario(),
+                espaco.getReservavel()
         );
     }
 }

@@ -9,5 +9,5 @@ import org.springframework.data.domain.Pageable;
 public interface EquipamentoService {
     EquipamentoRetornoDTO atualizar(String id, EquipamentoAtualizarDTO data);
     EquipamentoRetornoDTO criar(EquipamentoDTO data);
-    Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento);
+    Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento, Boolean reservavel);
 }
