@@ -15,7 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -98,5 +100,33 @@ public class EquipamentoController {
             @RequestParam(required = false) List<String> equipamentoIds) {
         var estatisticas = service.obterEstatisticas(mes, ano, equipamentoIds);
         return ResponseEntity.ok(ApiResponseDTO.success(estatisticas));
+    }
+
+    /**
+     * Gera PDF com estatísticas de uso dos equipamentos.
+     * 
+     * <p>Retorna um arquivo PDF contendo as mesmas informações do endpoint de estatísticas,
+     * formatado para impressão ou download.</p>
+     * 
+     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
+     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param equipamentoIds lista de IDs de equipamentos para filtrar (opcional, padrão = todos os equipamentos)
+     * @return arquivo PDF com as estatísticas
+     */
+    @GetMapping("/estatisticas/pdf")
+    @Operation(summary = "Gerar PDF com estatísticas de uso dos equipamentos",
+               description = "Gera um documento PDF contendo as estatísticas detalhadas de uso dos equipamentos.")
+    public ResponseEntity<byte[]> gerarPDFEstatisticas(
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) List<String> equipamentoIds) throws java.io.IOException {
+        byte[] pdfBytes = service.gerarPDFEstatisticas(mes, ano, equipamentoIds);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "estatisticas-equipamentos.pdf");
+        headers.setContentLength(pdfBytes.length);
+        
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }

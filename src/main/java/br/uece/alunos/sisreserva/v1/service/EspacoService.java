@@ -35,6 +35,17 @@ public interface EspacoService {
     // Método para obter estatísticas de uso dos espaços
     EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds);
     
+    /**
+     * Gera PDF com estatísticas de uso dos espaços.
+     * 
+     * @param mes mês para filtrar reservas (opcional, padrão = mês atual)
+     * @param ano ano para filtrar reservas (opcional, padrão = ano atual)
+     * @param espacoIds lista de IDs de espaços para filtrar (opcional, padrão = todos os espaços)
+     * @return array de bytes contendo o PDF gerado
+     * @throws java.io.IOException se houver erro na geração do PDF
+     */
+    byte[] gerarPDFEstatisticas(Integer mes, Integer ano, List<String> espacoIds) throws java.io.IOException;
+    
     // Método para deletar espaço (apenas administradores)
     void deletar(String id);
 }
