@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.AtualizarEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.CriarEquipamento;
+import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.DeletarEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.ObterEquipamentos;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class EquipamentoServiceImpl implements EquipamentoService {
     private final AtualizarEquipamento atualizarEquipamento;
     private final CriarEquipamento criarEquipamento;
+    private final DeletarEquipamento deletarEquipamento;
     private final ObterEquipamentos obterEquipamentos;
 
     @Override
@@ -27,6 +29,11 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Override
     public EquipamentoRetornoDTO criar(EquipamentoDTO data) {
         return criarEquipamento.criar(data);
+    }
+
+    @Override
+    public void deletar(String id) {
+        deletarEquipamento.deletar(id);
     }
 
     @Override

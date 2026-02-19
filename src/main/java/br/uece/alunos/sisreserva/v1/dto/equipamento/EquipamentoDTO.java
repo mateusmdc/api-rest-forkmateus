@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
  * @param tipoEquipamentoId identificador do tipo de equipamento (obrigatório)
  * @param multiusuario indica se o equipamento pode ser usado por múltiplos usuários (default: false)
  * @param reservavel indica se o equipamento está disponível para reserva (default: true)
+ * @param espacoId identificador do espaço ao qual o equipamento será vinculado (opcional)
  */
 public record EquipamentoDTO(
         String tombamento,
@@ -22,5 +23,6 @@ public record EquipamentoDTO(
         @NotBlank(message = "O ID do tipo de equipamento é obrigatório")
         String tipoEquipamentoId,
         Boolean multiusuario,
-        Boolean reservavel
+        Boolean reservavel,
+        String espacoId
 ) {}

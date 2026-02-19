@@ -1,16 +1,19 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
+import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +23,13 @@ import org.springframework.web.bind.annotation.*;
 public class EquipamentoController {
     @Autowired
     private EquipamentoService service;
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<EquipamentoRetornoDTO>> criar(@RequestBody @Valid EquipamentoDTO data) {
+        var equipamentoCriado = service.criar(data);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(equipamentoCriado));
+    }
 
     @GetMapping
     public ResponseEntity<ApiResponseDTO<Page<EquipamentoRetornoDTO>>> obter(
@@ -47,5 +57,12 @@ public class EquipamentoController {
             @RequestBody EquipamentoAtualizarDTO data) {
         var atualizado = service.atualizar(id, data);
         return ResponseEntity.ok(ApiResponseDTO.success(atualizado));
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<Void>> deletar(@PathVariable String id) {
+        service.deletar(id);
+        return ResponseEntity.ok(ApiResponseDTO.success(null));
     }
 }
