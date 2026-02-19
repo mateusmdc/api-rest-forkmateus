@@ -4,15 +4,23 @@ import br.uece.alunos.sisreserva.v1.domain.equipamento.EquipamentoRepository;
 import br.uece.alunos.sisreserva.v1.domain.tipoEquipamento.TipoEquipamento;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
+import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+/**
+ * Componente responsável pelas validações de negócio relacionadas ao Equipamento.
+ * Centraliza as regras de validação para garantir consistência e segurança dos dados.
+ */
 @Component
 public class EquipamentoValidator {
 
     @Autowired
     private EquipamentoRepository repository;
+
+    @Autowired
+    private UsuarioAutenticadoService usuarioAutenticadoService;
 
     public void validarDadosObrigatorios(EquipamentoDTO data, TipoEquipamento tipoEquipamento) {
         if (tipoEquipamento.getIsDetalhamentoObrigatorio()) {
@@ -30,6 +38,34 @@ public class EquipamentoValidator {
 
         if (repository.existsByTombamento(tombamento.trim())) {
             throw new ValidationException("Já existe um equipamento com o tombamento informado.");
+        }
+    }
+
+    /**
+     * Valida se o usuário autenticado possui permissão para criar equipamento.
+     * Apenas administradores podem realizar esta operação.
+     * 
+     * @throws ValidationException se o usuário não for administrador
+     */
+    public void validarPermissaoParaCriar() {
+        if (!usuarioAutenticadoService.isAdmin()) {
+            throw new ValidationException(
+                "Apenas administradores podem criar equipamentos."
+            );
+        }
+    }
+
+    /**
+     * Valida se o usuário autenticado possui permissão para deletar equipamento.
+     * Apenas administradores podem realizar esta operação.
+     * 
+     * @throws ValidationException se o usuário não for administrador
+     */
+    public void validarPermissaoParaDeletar() {
+        if (!usuarioAutenticadoService.isAdmin()) {
+            throw new ValidationException(
+                "Apenas administradores podem deletar equipamentos."
+            );
         }
     }
 
