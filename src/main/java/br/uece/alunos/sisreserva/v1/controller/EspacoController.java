@@ -100,6 +100,13 @@ public class EspacoController {
         return ResponseEntity.ok(ApiResponseDTO.success(complexos));
     }
 
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<Void>> deletar(@PathVariable String id) {
+        espacoService.deletar(id);
+        return ResponseEntity.ok(ApiResponseDTO.success(null));
+    }
+
     /**
      * Obtém estatísticas de uso dos espaços.
      * 

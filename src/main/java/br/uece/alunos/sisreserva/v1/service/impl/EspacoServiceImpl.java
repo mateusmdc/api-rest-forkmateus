@@ -3,6 +3,7 @@ package br.uece.alunos.sisreserva.v1.service.impl;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.AtribuirEspacoAComplexos;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.AtualizarEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.CriarEspaco;
+import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.DeletarEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.DesatribuirEspacoDeComplexos;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ListarComplexosDoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterEspaco;
@@ -29,6 +30,7 @@ import java.util.List;
 public class EspacoServiceImpl implements EspacoService {
     private final AtualizarEspaco atualizarEspaco;
     private final CriarEspaco criarEspaco;
+    private final DeletarEspaco deletarEspaco;
     private final ObterEspaco obterEspaco;
     private final ObterHorariosOcupadosEspaco obterHorariosOcupadosEspaco;
     private final AtribuirEspacoAComplexos atribuirEspacoAComplexos;
@@ -75,5 +77,10 @@ public class EspacoServiceImpl implements EspacoService {
     @Override
     public EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds) {
         return obterEstatisticasEspacos.obterEstatisticas(mes, ano, espacoIds);
+    }
+
+    @Override
+    public void deletar(String id) {
+        deletarEspaco.deletar(id);
     }
 }

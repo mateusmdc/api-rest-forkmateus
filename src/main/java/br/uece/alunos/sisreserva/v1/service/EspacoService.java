@@ -34,4 +34,7 @@ public interface EspacoService {
     
     // Método para obter estatísticas de uso dos espaços
     EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds);
+    
+    // Método para deletar espaço (apenas administradores)
+    void deletar(String id);
 }
