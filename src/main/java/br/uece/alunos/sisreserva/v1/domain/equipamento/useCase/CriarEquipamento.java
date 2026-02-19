@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * Caso de uso respons\u00e1vel pela cria\u00e7\u00e3o de equipamento.
- * Realiza valida\u00e7\u00f5es de permiss\u00e3o e dados, e opcionalmente vincula o equipamento a um espa\u00e7o.
+ * Caso de uso responsável pela criação de equipamento.
+ * Realiza validações de permissão e dados, e opcionalmente vincula o equipamento a um espaço.
  */
 @Component
 public class CriarEquipamento {
@@ -39,13 +39,13 @@ public class CriarEquipamento {
     /**
      * Cria um novo equipamento no sistema.
      * Apenas administradores podem criar equipamentos.
-     * Opcionalmente cria um v\u00ednculo com um espa\u00e7o se espacoId for fornecido.
+     * Opcionalmente cria um vínculo com um espaço se espacoId for fornecido.
      * 
      * @param data dados do equipamento a ser criado
      * @return DTO com os dados do equipamento criado
      */
     public EquipamentoRetornoDTO criar(EquipamentoDTO data) {
-        // Valida permiss\u00e3o de administrador
+        // Valida permissão de administrador
         equipamentoValidator.validarPermissaoParaCriar();
 
         TipoEquipamento tipoEquipamento = entityHandlerService.obterTipoEquipamentoPorId(data.tipoEquipamentoId());
@@ -57,7 +57,7 @@ public class CriarEquipamento {
         Equipamento novoEquipamento = new Equipamento(data, tipoEquipamento);
         var equipamentoNoBanco = repository.save(novoEquipamento);
 
-        // Se um espa\u00e7o foi informado, cria o v\u00ednculo
+        // Se um espaço foi informado, cria o vínculo
         if (data.espacoId() != null && !data.espacoId().trim().isEmpty()) {
             espacoValidator.validarEspacoId(data.espacoId());
             Espaco espaco = entityHandlerService.obterEspacoPorId(data.espacoId());
