@@ -25,6 +25,7 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     private final DeletarEquipamento deletarEquipamento;
     private final ObterEquipamentos obterEquipamentos;
     private final ObterEstatisticasEquipamentos obterEstatisticasEquipamentos;
+    private final br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.GerarPDFEstatisticasEquipamentos gerarPDFEstatisticasEquipamentos;
 
     @Override
     public EquipamentoRetornoDTO atualizar(String id, EquipamentoAtualizarDTO data) {
@@ -49,5 +50,10 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Override
     public EstatisticasGeralEquipamentoDTO obterEstatisticas(Integer mes, Integer ano, List<String> equipamentoIds) {
         return obterEstatisticasEquipamentos.obterEstatisticas(mes, ano, equipamentoIds);
+    }
+
+    @Override
+    public byte[] gerarPDFEstatisticas(Integer mes, Integer ano, List<String> equipamentoIds) throws java.io.IOException {
+        return gerarPDFEstatisticasEquipamentos.gerarPDF(mes, ano, equipamentoIds);
     }
 }

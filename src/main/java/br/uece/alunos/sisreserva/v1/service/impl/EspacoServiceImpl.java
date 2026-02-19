@@ -37,6 +37,7 @@ public class EspacoServiceImpl implements EspacoService {
     private final DesatribuirEspacoDeComplexos desatribuirEspacoDeComplexos;
     private final ListarComplexosDoEspaco listarComplexosDoEspaco;
     private final ObterEstatisticasEspacos obterEstatisticasEspacos;
+    private final br.uece.alunos.sisreserva.v1.domain.espaco.useCase.GerarPDFEstatisticasEspacos gerarPDFEstatisticasEspacos;
 
     @Override
     public EspacoRetornoDTO atualizar(String id, EspacoAtualizarDTO data) {
@@ -77,6 +78,11 @@ public class EspacoServiceImpl implements EspacoService {
     @Override
     public EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds) {
         return obterEstatisticasEspacos.obterEstatisticas(mes, ano, espacoIds);
+    }
+
+    @Override
+    public byte[] gerarPDFEstatisticas(Integer mes, Integer ano, List<String> espacoIds) throws java.io.IOException {
+        return gerarPDFEstatisticasEspacos.gerarPDF(mes, ano, espacoIds);
     }
 
     @Override
