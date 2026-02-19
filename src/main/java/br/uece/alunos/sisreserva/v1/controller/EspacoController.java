@@ -10,6 +10,7 @@ import br.uece.alunos.sisreserva.v1.dto.espaco.EstatisticasGeralDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EspacoService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -126,12 +129,43 @@ public class EspacoController {
      * @return estatísticas agrupadas por espaço
      */
     @GetMapping("/estatisticas")
+    @Operation(summary = "Obter estatísticas de uso dos espaços",
+               description = "Retorna estatísticas detalhadas sobre o uso dos espaços, incluindo reservas do mês, " +
+                           "mês com mais reservas e usuários que mais reservaram. Pode ser filtrado por mês, ano e espaços específicos.")
     public ResponseEntity<ApiResponseDTO<EstatisticasGeralDTO>> obterEstatisticas(
             @RequestParam(required = false) Integer mes,
             @RequestParam(required = false) Integer ano,
             @RequestParam(required = false) List<String> espacoIds) {
         var estatisticas = espacoService.obterEstatisticas(mes, ano, espacoIds);
         return ResponseEntity.ok(ApiResponseDTO.success(estatisticas));
+    }
+
+    /**
+     * Gera PDF com estatísticas de uso dos espaços.
+     * 
+     * <p>Retorna um arquivo PDF contendo as mesmas informações do endpoint de estatísticas,
+     * formatado para impressão ou download.</p>
+     * 
+     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
+     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param espacoIds lista de IDs de espaços para filtrar (opcional, padrão = todos os espaços)
+     * @return arquivo PDF com as estatísticas
+     */
+    @GetMapping("/estatisticas/pdf")
+    @Operation(summary = "Gerar PDF com estatísticas de uso dos espaços",
+               description = "Gera um documento PDF contendo as estatísticas detalhadas de uso dos espaços.")
+    public ResponseEntity<byte[]> gerarPDFEstatisticas(
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) List<String> espacoIds) throws java.io.IOException {
+        byte[] pdfBytes = espacoService.gerarPDFEstatisticas(mes, ano, espacoIds);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "estatisticas-espacos.pdf");
+        headers.setContentLength(pdfBytes.length);
+        
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }
 
