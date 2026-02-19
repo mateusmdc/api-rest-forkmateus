@@ -3,8 +3,10 @@ package br.uece.alunos.sisreserva.v1.controller;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoRetornoDTO;
+import br.uece.alunos.sisreserva.v1.dto.equipamento.EstatisticasGeralEquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -16,6 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/equipamento")
@@ -64,5 +68,35 @@ public class EquipamentoController {
     public ResponseEntity<ApiResponseDTO<Void>> deletar(@PathVariable String id) {
         service.deletar(id);
         return ResponseEntity.ok(ApiResponseDTO.success(null));
+    }
+
+    /**
+     * Obtém estatísticas de uso dos equipamentos.
+     * 
+     * <p>Retorna estatísticas detalhadas sobre o uso dos equipamentos, incluindo:</p>
+     * <ul>
+     *   <li>Reservas feitas no mês (filtrado ou mês atual)</li>
+     *   <li>Mês com mais reservas</li>
+     *   <li>Usuários que mais reservaram</li>
+     * </ul>
+     * 
+     * <p>As estatísticas são agrupadas por equipamento e podem ser filtradas
+     * para equipamentos específicos através do parâmetro equipamentoIds.</p>
+     * 
+     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
+     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param equipamentoIds lista de IDs de equipamentos para filtrar (opcional, padrão = todos os equipamentos)
+     * @return estatísticas agrupadas por equipamento
+     */
+    @GetMapping("/estatisticas")
+    @Operation(summary = "Obter estatísticas de uso dos equipamentos",
+               description = "Retorna estatísticas detalhadas sobre o uso dos equipamentos, incluindo reservas do mês, " +
+                           "mês com mais reservas e usuários que mais reservaram. Pode ser filtrado por mês, ano e equipamentos específicos.")
+    public ResponseEntity<ApiResponseDTO<EstatisticasGeralEquipamentoDTO>> obterEstatisticas(
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer ano,
+            @RequestParam(required = false) List<String> equipamentoIds) {
+        var estatisticas = service.obterEstatisticas(mes, ano, equipamentoIds);
+        return ResponseEntity.ok(ApiResponseDTO.success(estatisticas));
     }
 }
