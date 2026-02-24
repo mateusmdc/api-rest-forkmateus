@@ -19,6 +19,7 @@ RUN adduser --system --uid 1001 javauser
 
 COPY --from=builder /app/target/sisreserva-0.0.1-SNAPSHOT.jar app.jar
 
+RUN mkdir -p /app/logs && chown -R javauser:javauser /app/logs
 RUN chown javauser:javauser app.jar
 
 USER javauser

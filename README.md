@@ -2,14 +2,12 @@
 
 Para rodar a aplicação utilizando Docker, é **OBRIGATÓRIO** configurar as variáveis de ambiente antes de iniciar os containers.
 
-> ⚠️ **IMPORTANTE**: O arquivo `.env` é obrigatório. Se as variáveis não forem definidas, o Docker Compose falhará com mensagens de erro indicando quais variáveis estão faltando.
+> ⚠️ **IMPORTANTE**: O arquivo `.env.docker` é obrigatório. Se as variáveis não forem definidas, o Docker Compose falhará com mensagens de erro indicando quais variáveis estão faltando.
 
-### 1. Configuração (`.env`) - OBRIGATÓRIA
+### 1. Configuração (`.env.docker`) - OBRIGATÓRIA
 
-Crie um arquivo chamado `.env` na raiz do projeto (no mesmo nível do `docker-compose.yml`). Copie e cole o conteúdo abaixo:
+Crie um arquivo chamado `.env.docker` na raiz do projeto (no mesmo nível do `docker-compose.yml`). Copie e cole o conteúdo abaixo:
 (caso precise, já existe um arquivo de exemplo dentro projeto chamado '.env.example', na pasta raíz do projeto)
-
-> 🔒 **SEGURANÇA**: Nunca commite o arquivo `.env` no repositório Git. Ele contém informações sensíveis.
 
 ```properties
 # Banco de Dados
@@ -40,7 +38,7 @@ POSTGRES_DB=sisreserva
 
 ### 2. Execução
 
-Após criar e configurar o arquivo `.env` com todos os valores necessários, execute o comando abaixo para compilar a aplicação e subir os containers (API e Banco de Dados):
+Após criar e configurar o arquivo `.env.docker` com todos os valores necessários, execute o comando abaixo para compilar a aplicação e subir os containers (API e Banco de Dados):
 
 ```bash
 docker-compose up --build

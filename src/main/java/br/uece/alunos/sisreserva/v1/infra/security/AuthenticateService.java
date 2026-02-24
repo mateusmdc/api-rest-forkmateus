@@ -16,7 +16,7 @@ public class AuthenticateService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDetails userDetails = usuarioRepository.findByEmail(username);
         if (userDetails == null) {
-            //userDetails = usuarioRepository.findByMatricula(matricula); mas campo matricula vai ser unico?
+            throw new UsernameNotFoundException("Usuário não encontrado: " + username);
         }
         return userDetails;
     }

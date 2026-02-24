@@ -4,7 +4,8 @@ services:
     image: postgres:15-alpine
     container_name: sisreserva-db
     restart: always
-    # Here we reference variables defined in the .env file
+    ports:
+      - "5433:5432"
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME}
@@ -27,10 +28,9 @@ services:
       - "${SERVER_PORT:?ERROR: SERVER_PORT não definida no arquivo .env}:${SERVER_PORT}"
 
     env_file:
-      - .env
+      - .env.docker
 
     environment:
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:? SPRING_DATASOURCE_URL não definida no arquivo .env}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:? SPRING_DATASOURCE_USERNAME não definida no arquivo .env}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:? SPRING_DATASOURCE_PASSWORD não definida no arquivo .env}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:? CORS_ALLOWED_ORIGINS não definida no arquivo .env}

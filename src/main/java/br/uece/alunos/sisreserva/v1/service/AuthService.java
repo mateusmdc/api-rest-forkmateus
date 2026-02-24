@@ -16,6 +16,7 @@ public interface AuthService {
     MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data);
     AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request);
     UsuarioRetornoDTO obterPorTokenJwt(String tokenJWT);
+    UsuarioRetornoDTO obterPorId(String id);
     Page<UsuarioRetornoDTO> obter(Pageable pageable,
                                   String id,
                                   String matricula,
