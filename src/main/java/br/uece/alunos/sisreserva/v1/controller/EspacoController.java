@@ -69,6 +69,53 @@ public class EspacoController {
         return ResponseEntity.ok(ApiResponseDTO.success(espacosPaginados));
     }
 
+    /**
+     * Obtém espaços reserváveis com filtros e paginação.
+     * 
+     * <p>Este endpoint retorna apenas espaços com o campo 'reservavel' definido como true.</p>
+     * 
+     * <p>Aplica automaticamente restrições de visualização baseadas no cargo do usuário autenticado:</p>
+     * <ul>
+     *   <li><strong>Usuários externos (USUARIO_EXTERNO)</strong>: Visualizam apenas espaços reserváveis 
+     *       que também possuem o campo 'multiusuario' como true.</li>
+     *   <li><strong>Usuários internos e administradores</strong>: Visualizam todos os espaços reserváveis, 
+     *       independentemente do campo 'multiusuario'.</li>
+     * </ul>
+     * 
+     * @param page Número da página (padrão: 0)
+     * @param size Tamanho da página (padrão: 100)
+     * @param sortField Campo para ordenação (padrão: nome)
+     * @param sortOrder Direção da ordenação - asc ou desc (padrão: asc)
+     * @param id Filtro por ID do espaço (opcional)
+     * @param departamento Filtro por ID do departamento (opcional)
+     * @param localizacao Filtro por ID da localização (opcional)
+     * @param tipoEspaco Filtro por ID do tipo de espaço (opcional)
+     * @param tipoAtividade Filtro por ID do tipo de atividade (opcional)
+     * @param nome Filtro por nome do espaço (opcional)
+     * @param multiusuario Filtro explícito por espaços multiusuário (opcional)
+     * @return Página com os espaços reserváveis encontrados
+     */
+    @GetMapping("/reservaveis")
+    @Operation(summary = "Listar espaços reserváveis", 
+               description = "Retorna apenas espaços com reservavel=true. Usuários externos veem apenas espaços multiusuário.")
+    public ResponseEntity<ApiResponseDTO<Page<EspacoRetornoDTO>>> obterEspacosReservaveis(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size,
+            @RequestParam(defaultValue = "nome") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String departamento,
+            @RequestParam(required = false) String localizacao,
+            @RequestParam(required = false) String tipoEspaco,
+            @RequestParam(required = false) String tipoAtividade,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Boolean multiusuario) {
+
+        var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
+        var espacosReservaveis = espacoService.obterEspacosReservaveis(pageable, id, departamento, localizacao, tipoEspaco, tipoAtividade, nome, multiusuario);
+        return ResponseEntity.ok(ApiResponseDTO.success(espacosReservaveis));
+    }
+
     @GetMapping("/{id}/horarios-ocupados")
     public ResponseEntity<ApiResponseDTO<HorariosOcupadosPorMesDTO>> obterHorariosOcupadosDoEspaco(
         @PathVariable String id,
