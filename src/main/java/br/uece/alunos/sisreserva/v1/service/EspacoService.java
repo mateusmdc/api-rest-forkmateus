@@ -32,19 +32,24 @@ public interface EspacoService {
     EspacoRetornoDTO desatribuirComplexos(String id, List<String> complexoIds);
     List<ComplexoEspacosRetornoDTO> listarComplexos(String id);
     
-    // Método para obter estatísticas de uso dos espaços
-    EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds);
+    // Método para obter estatísticas de uso dos espaços em um período
+    EstatisticasGeralDTO obterEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> espacoIds, String departamentoId, String localizacaoId, String tipoEspacoId);
     
     /**
      * Gera PDF com estatísticas de uso dos espaços.
      * 
-     * @param mes mês para filtrar reservas (opcional, padrão = mês atual)
-     * @param ano ano para filtrar reservas (opcional, padrão = ano atual)
+     * @param mesInicial mês inicial para filtrar reservas (opcional, padrão = mês atual)
+     * @param anoInicial ano inicial para filtrar reservas (opcional, padrão = ano atual)
+     * @param mesFinal mês final para filtrar reservas (opcional, padrão = mês atual)
+     * @param anoFinal ano final para filtrar reservas (opcional, padrão = ano atual)
      * @param espacoIds lista de IDs de espaços para filtrar (opcional, padrão = todos os espaços)
+     * @param departamentoId ID do departamento para filtrar espaços (opcional)
+     * @param localizacaoId ID da localização para filtrar espaços (opcional)
+     * @param tipoEspacoId ID do tipo de espaço para filtrar (opcional)
      * @return array de bytes contendo o PDF gerado
      * @throws java.io.IOException se houver erro na geração do PDF
      */
-    byte[] gerarPDFEstatisticas(Integer mes, Integer ano, List<String> espacoIds) throws java.io.IOException;
+    byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> espacoIds, String departamentoId, String localizacaoId, String tipoEspacoId) throws java.io.IOException;
     
     // Método para deletar espaço (apenas administradores)
     void deletar(String id);

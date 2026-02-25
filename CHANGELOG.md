@@ -4,6 +4,206 @@ Gerado automaticamente em  a partir do histórico de commits Git.
 
 ## 🏷 Unreleased
 
+- feat(docker): adicionar configuração de ambiente e ajustes para execução com Docker _(rifa-456, 2026-02-24 02:21:05)_
+- feat(auth): adicionar cache de usuário autenticado e gerenciamento avançado de cookies JWT _(rifa-456, 2026-02-23 23:56:44)_
+- feat(pdf): adicionar geração de relatórios PDF para estatísticas de espaços e equipamentos _(Mateus Matos, 2026-02-19 02:59:49)_
+- feat(equipamento): adicionar endpoint de estatísticas de uso _(Mateus Matos, 2026-02-19 02:25:21)_
+- feat: adicionar relacionamento Espaço x EquipamentoGenerico com quantidade _(Mateus Matos, 2026-02-19 01:18:41)_
+- Correção de caracteres especiais _(Mateus Matos, 2026-02-19 00:30:34)_
+- feat: adicionar operações CREATE e DELETE para Equipamento e Espaço com restrição admin _(Mateus Matos, 2026-02-19 00:29:54)_
+- feat: adiciona campo &#x27;reservavel&#x27; nas entidades Espaco e Equipamento _(Mateus Matos, 2026-02-18 20:49:33)_
+- feat: adiciona validações de CPF, email e telefone no cadastro de usuário _(Mateus Matos, 2026-01-29 21:06:29)_
+- feat: Implementar filtro de permissões na listagem de projetos _(Mateus Matos, 2026-01-29 01:51:36)_
+- feat: Implementar filtro de permissões na listagem de solicitações de reserva _(Mateus Matos, 2026-01-28 21:13:26)_
+- feat: Restringir vinculação de gestores e secretarias de espaço a administradores _(Mateus Matos, 2026-01-28 20:17:26)_
+- fix: Corrigir suporte a equipamentos em notificações por email _(Mateus Matos, 2026-01-28 20:00:35)_
+- feat: Notificar gestores/secretários quando usuário cancelar solicitação _(Mateus Matos, 2026-01-28 19:34:37)_
+- feat: Permitir múltiplas solicitações de reserva para recursos diferentes _(Mateus Matos, 2026-01-28 19:18:41)_
+- feat: Implementar controle de permissões para atualização de status de reservas _(Mateus Matos, 2026-01-28 18:52:42)_
+- feat: Adicionar novo status CANCELADO para solicitações de reserva _(Mateus Matos, 2026-01-28 18:14:10)_
+- feat: Implementar recusa automática de solicitações conflitantes ao aprovar reserva _(Mateus Matos, 2026-01-28 18:03:37)_
+- feat: Adicionar validação para evitar solicitações duplicadas de reserva _(Mateus Matos, 2026-01-27 21:06:31)_
+- feat: implementar GestorComplexoEspacos com validações de permissão _(Mateus Matos, 2026-01-22 02:25:32)_
+- feat: adicionar suporte para reserva de equipamentos e vinculação de equipamentos existentes _(Mateus Matos, 2026-01-21 19:15:17)_
+- feat: criar entidade EquipamentoGenerico com CRUD completo _(Mateus Matos, 2026-01-12 04:10:53)_
+- feat: adicionar coluna multiusuario na entidade Equipamento com filtro para USUARIO_EXTERNO _(Mateus Matos, 2026-01-12 02:06:56)_
+- fix: corrigido JavaDoc _(Mateus Matos, 2026-01-06 19:47:43)_
+- fix: corrigido JavaDoc _(Mateus Matos, 2026-01-06 19:45:21)_
+- feat: adiciona validação de parâmetros mês e ano nas estatísticas _(Mateus Matos, 2026-01-06 19:44:51)_
+- (fix) usuarios: corrigido checagem do campo &#x27;matricula&#x27; _(Mateus Matos, 2026-01-06 19:32:24)_
+- perf: otimiza cálculo de estatísticas com queries agregadas _(Mateus Matos, 2026-01-06 19:30:41)_
+- fix: altera tipo do campo matricula de Integer para String e torna opcional _(Mateus Matos, 2025-12-11 20:52:07)_
+- feat: adiciona endpoint de estatísticas de uso dos espaços _(Mateus Matos, 2025-12-11 20:18:50)_
+- Adicionado permissão de acesso liberado sem autenticação para a rota &#x27;/instituicao _(Mateus Matos, 2025-11-27 03:11:59)_
+- Adicionado import de arquivo .env em application.properties _(Mateus Matos, 2025-11-27 03:11:06)_
+- segurança: chave OpenAI não utilizada dos arquivos de exemplo _(Mateus Matos, 2025-11-20 21:26:26)_
+- docs: atualiza documentação Docker com informações sobre variáveis obrigatórias _(Mateus Matos, 2025-11-20 20:46:54)_
+- docker: adiciona validação de variáveis de ambiente obrigatórias _(Mateus Matos, 2025-11-20 20:46:38)_
+- config: atualiza .gitignore para permitir rastreamento de application.properties _(Mateus Matos, 2025-11-20 20:46:24)_
+- segurança: remove secrets hardcoded e adiciona application.properties com variáveis de ambiente _(Mateus Matos, 2025-11-20 20:35:56)_
+- chore: adicionar diretório de logs ao gitignore _(Mateus Matos, 2025-11-20 19:10:38)_
+- feat: adicionar logs de auditoria para validação de reservas de usuários externos _(Mateus Matos, 2025-11-20 19:10:26)_
+- feat: adicionar logs de auditoria para listagem de espaços por usuários externos _(Mateus Matos, 2025-11-20 19:10:14)_
+- feat: integra validação de usuário externo ao criar reserva _(Mateus Matos, 2025-11-20 18:51:33)_
+- feat: adiciona validação de permissão para usuários externos em reservas _(Mateus Matos, 2025-11-20 18:51:14)_
+- feat: implementa restrição de listagem de espaços para usuários externos _(Mateus Matos, 2025-11-20 18:50:50)_
+- feat: adiciona filtro de espaços multiusuário na specification _(Mateus Matos, 2025-11-20 18:50:23)_
+- feat: adiciona serviço para verificar usuário autenticado _(Mateus Matos, 2025-11-20 18:49:57)_
+- feat: adiciona controller REST para SecretariaEspaco _(Mateus Matos, 2025-11-20 03:33:55)_
+- feat: adiciona camada de serviço para SecretariaEspaco _(Mateus Matos, 2025-11-20 03:33:38)_
+- feat: implementa casos de uso para SecretariaEspaco _(Mateus Matos, 2025-11-20 03:33:18)_
+- feat: adiciona validações para SecretariaEspaco _(Mateus Matos, 2025-11-20 03:32:39)_
+- feat: adiciona DTOs para SecretariaEspaco _(Mateus Matos, 2025-11-20 03:32:16)_
+- feat: adiciona entidade SecretariaEspaco e repository _(Mateus Matos, 2025-11-20 03:31:47)_
+- feat: adiciona migration para tabela secretaria_espaco _(Mateus Matos, 2025-11-20 03:31:08)_
+- readme: atualizado README com instruções de como executar o projeto da api. _(Mateus Matos, 2025-11-20 02:26:01)_
+- docker: atualizado arquivo docker-compose para buscar valores a partir das variáveis de ambiente em .env _(Mateus Matos, 2025-11-20 02:24:13)_
+- config: criado arquivo exemplo de variáveis de ambiente _(Mateus Matos, 2025-11-20 02:23:43)_
+- migration/data: corrigido inserção de dados em tabelas _(Mateus Matos, 2025-11-20 02:23:13)_
+- Adicionado arquivo .dockerignore _(Mateus Matos, 2025-11-16 20:30:35)_
+- Adicionado arquivos docker _(Mateus Matos, 2025-11-16 20:24:43)_
+- migration: corrigido valor utilizado no campo senha ao criar usuário admin _(Mateus Matos, 2025-11-12 20:55:22)_
+- migration: Alterado cargos existentes no sistema _(Mateus Matos, 2025-11-12 18:52:59)_
+- data: adicionar novos cargos USUARIO_EXTERNO_VISITANTE e SECRETARIA _(Mateus Matos, 2025-11-11 04:20:57)_
+- feat: implementar notificações por email para solicitações de reserva _(Mateus Matos, 2025-11-11 03:41:53)_
+- refactor: migrar relacionamento Espaco-TipoAtividade para ManyToMany _(Mateus Matos, 2025-10-28 21:18:36)_
+- fix: corrigir atribuição/desatribuição de complexos ao espaço modificando lado proprietário da relação _(Mateus Matos, 2025-10-26 20:15:06)_
+- feat: adicionar endpoints para listar espaços de um complexo e complexos de um espaço _(Mateus Matos, 2025-10-26 19:55:57)_
+- feat: implementar endpoints para atribuir/desatribuir espaços a complexos e vice-versa _(Mateus Matos, 2025-10-26 19:50:03)_
+- feat: implementa CRUD completo para ComplexoEspacos com relacionamento ManyToMany _(Mateus Matos, 2025-10-24 23:08:05)_
+- feat: implementa CRUD completo para TipoEspaco _(Mateus Matos, 2025-10-24 22:39:31)_
+- feat: adiciona filtro multiusuario na busca de espaços _(Mateus Matos, 2025-10-24 22:21:18)_
+- feat: adiciona campo multiusuario à entidade Espaco _(Mateus Matos, 2025-10-24 20:42:49)_
+- fix: adicionar validacoes de datas para criacao de reservas _(Mateus Matos, 2025-10-24 20:10:10)_
+- feat: implementar funcionalidade de reservas recorrentes _(Mateus Matos, 2025-10-24 19:53:54)_
+- feat: adicionar endpoint GET /espaco/{id}/horarios-ocupados _(Mateus Matos, 2025-10-17 19:02:59)_
+- Atualizado README _(Mateus Matos, 2025-09-21 09:52:03)_
+- feat: atualizado endpoint &#x27;horarios-ocupados&#x27; para aceitar parametro &#x27;espacoId&#x27; na url como filtro. _(Mateus Matos, 2025-09-21 09:37:11)_
+- feat: atualizado useCase, service e service implementation de retornar horários ocupados para aceitar filtro por espaço. _(Mateus Matos, 2025-09-21 09:36:10)_
+- feat: criado query para retorno de horários ocupados de um espaço específico. _(Mateus Matos, 2025-09-21 09:34:43)_
+- fix: corrigido import de DTO de instituição no controller de Projeto. _(Mateus Matos, 2025-09-21 09:30:13)_
+- feat: criado endpoint no controller de solicitação de reserva para listar horarios ocupados no mês. _(Mateus Matos, 2025-09-21 09:29:10)_
+- feat: criado service e implementation de service de obtenção de horarios ocupados. _(Mateus Matos, 2025-09-21 09:28:37)_
+- feat: criado useCase para obtenção de horarios ocupados. _(Mateus Matos, 2025-09-21 09:28:05)_
+- feat: criado query para retornar reservas aprovadas em um período. _(Mateus Matos, 2025-09-21 09:26:52)_
+- feat: criado DTO&#x27;s para retornos de horários ocupados para solicitações de reservas, utilizado aninhamento de DTO&#x27;s. _(Mateus Matos, 2025-09-21 09:20:56)_
+- fix: atualizado validator de conflitos de reserva. _(Mateus Matos, 2025-09-21 08:56:41)_
+- feat: criado endpoint &#x27;put&#x27; de atualização de status de solicitação de status de reserva no controller &#x27;SolicitacaoReserva&#x27;. _(Mateus Matos, 2025-09-21 08:56:04)_
+- feat: criado useCase para atualização de status de solicitação de reserva, junto com service e service implementation de atualizar status de solicitação. _(Mateus Matos, 2025-09-21 08:54:54)_
+- feat: criado validador de status de solicitação, para que apenas valores possíveis sejam passados (regras de negócio aplicadas podem ser alteradas futuramente). _(Mateus Matos, 2025-09-21 08:50:01)_
+- feat: criado DTO para atualização de status de reserva. _(Mateus Matos, 2025-09-21 08:49:06)_
+- fix: removido campo &#x27;status&#x27; de DTO de criação de solicitação de reserva, para que seja possível criar solicitação sem precisar enviar campo &#x27;status&#x27;. _(Mateus Matos, 2025-09-21 08:48:29)_
+- fix: atualizado query que valida criação de solicitações de reserva, para impedir criação de solicitação caso uma reserva ja tenha sido aprovada na mesma data e hora. _(Mateus Matos, 2025-09-21 08:46:47)_
+- feat: criado controller com rotas de leitura e criação para solicitação de reserva. _(Mateus Matos, 2025-07-24 18:28:57)_
+- feat: implementado service e service implementation para solicitação de reserva. _(Mateus Matos, 2025-07-24 18:28:34)_
+- feat: implementado specification para solicitação de reserva. _(Mateus Matos, 2025-07-24 18:28:15)_
+- feat: criado use cases de leitura, listagem por id e criação para solicitação reserva. _(Mateus Matos, 2025-07-24 18:27:48)_
+- feat: implementado validação para solicitação de reserva. _(Mateus Matos, 2025-07-24 18:25:16)_
+- feat: adicionado ao repository de solicitação de reservas verificação de conflito de reservas. _(Mateus Matos, 2025-07-24 18:22:37)_
+- feat: criado DTOs para solicitaçao de reserva, &#x27;SolicitacaoRservaDTO&#x27; e &#x27;SolicitacaoReservaRetornoDTO&#x27;. _(Mateus Matos, 2025-07-24 18:21:27)_
+- refactor: service centralizado de normalizer de string _(Andre Lucio Rocha, 2025-07-24 18:14:25)_
+- feat: adicionado entidade Projeto em &#x27;EntityHandler&#x27; e implementação de &#x27;obterProjetoPorId&#x27; em &#x27;EntityHandlerServiceImpl&#x27;. _(Mateus Matos, 2025-07-24 18:11:00)_
+- feat: obter espaço filtrando por nome _(Andre Lucio Rocha, 2025-07-24 18:05:24)_
+- feat: cors da aplicação _(Andre Lucio Rocha, 2025-07-24 18:02:32)_
+- feat: inativar equipamento espaco em bulk _(Andre Lucio Rocha, 2025-07-24 13:44:00)_
+- feat: valida se o refresh token foi invalidado antes de gerar um novo access token _(Andre Lucio Rocha, 2025-07-23 11:29:08)_
+- feat: logout invalidando refresh token _(Andre Lucio Rocha, 2025-07-23 11:19:59)_
+- feat: registro de auditoria com o refresh token gerado pela aplicação _(Andre Lucio Rocha, 2025-07-23 11:07:40)_
+- fix: corrigido nome do diretório de casos de uso de projeto para &#x27;useCase&#x27;. _(Mateus Matos, 2025-07-23 04:08:43)_
+- fix: corrigido nome da tag das rotas de projeto _(Mateus Matos, 2025-07-23 04:07:23)_
+- feat: utilizando spec para filtrar usuarios em uma rota exclusiva _(Andre Lucio Rocha, 2025-07-22 16:19:24)_
+- refactor: usando lombok p injetar dependencias de usuario _(Andre Lucio Rocha, 2025-07-22 15:59:47)_
+- feat: atualizando tipo de equipamento _(Andre Lucio Rocha, 2025-07-22 15:51:37)_
+- feat: logout apagando o cookie http only _(Andre Lucio Rocha, 2025-07-22 15:34:20)_
+- feat: atualizar comite _(Andre Lucio Rocha, 2025-07-22 15:28:44)_
+- feat: inativar equipamento espaço com safe delete _(Andre Lucio Rocha, 2025-07-22 13:20:08)_
+- feat: atualizar equipamento, validando se usuário é gestor ou não _(Andre Lucio Rocha, 2025-07-22 12:55:18)_
+- feat: atualizar espaço _(Andre Lucio Rocha, 2025-07-22 12:04:13)_
+- refactor: refatorando dto de retorno de login _(Andre Lucio Rocha, 2025-07-21 21:44:35)_
+- feat: obtendo refresh do cookie da requisição _(Andre Lucio Rocha, 2025-07-21 21:38:58)_
+- feat: atualizar token _(Andre Lucio Rocha, 2025-07-21 21:26:20)_
+- feat: atualizando usuário de um comitê _(Andre Lucio Rocha, 2025-07-21 18:28:21)_
+- feat: desvinculando usuário a um comitê _(Andre Lucio Rocha, 2025-07-21 18:09:53)_
+- feat: alocar usuário para comitê _(Andre Lucio Rocha, 2025-07-21 17:57:25)_
+- refactor: refatorando campos de todos os dto, com validadores do lombok _(Andre Lucio Rocha, 2025-07-21 17:24:08)_
+- feat: obter comite-usuario paginado, com filtragem e ordenação _(Andre Lucio Rocha, 2025-07-21 17:15:07)_
+- feat: criar comite _(Andre Lucio Rocha, 2025-07-21 16:48:10)_
+- feat: obter comites paginado, com filtragem e ordenação _(Andre Lucio Rocha, 2025-07-21 16:25:41)_
+- feat: criar equipamento espaço recebe lista de equipamentos _(Andre Lucio Rocha, 2025-07-19 19:17:28)_
+- feat: criar equipamento, alocando ao espaço devido _(Andre Lucio Rocha, 2025-07-19 18:56:18)_
+- refactor: aplicando SRP em criar tipo equipamento, com validator _(Andre Lucio Rocha, 2025-07-19 17:07:58)_
+- feat: criar equipamento _(Andre Lucio Rocha, 2025-07-19 17:05:59)_
+- feat: criar tipo equipamento _(Andre Lucio Rocha, 2025-07-19 14:32:50)_
+- refactor: retornando os dto de cada entidade, ao inves da string dos campos relacionados _(Andre Lucio Rocha, 2025-07-18 19:25:28)_
+- feat: novos campos para tipo equipamento e equipamento _(Andre Lucio Rocha, 2025-07-18 19:03:21)_
+- feat: removendo not null de tombamento _(Andre Lucio Rocha, 2025-07-18 18:50:34)_
+- feat: obter equipamentos espaço paginado _(Andre Lucio Rocha, 2025-07-18 13:12:24)_
+- feat: obter tipos de equipamento paginado _(Andre Lucio Rocha, 2025-07-18 12:45:23)_
+- feat: obter equipamentos paginado _(Andre Lucio Rocha, 2025-07-17 15:02:45)_
+- feat: obter tipos de atividade paginado _(Andre Lucio Rocha, 2025-07-16 20:36:41)_
+- feat: obter tipos de espaço paginado _(Andre Lucio Rocha, 2025-07-16 20:31:03)_
+- feat: obter localizações paginado _(Andre Lucio Rocha, 2025-07-16 20:23:11)_
+- feat: obter departamentos paginado _(Andre Lucio Rocha, 2025-07-16 18:42:09)_
+- feat: obter cargos paginado _(Andre Lucio Rocha, 2025-07-16 16:09:02)_
+- feat: obter instituições paginado _(Andre Lucio Rocha, 2025-07-16 15:58:46)_
+- feat: controller de projeto para mapeação das rotas HTTP (por enquanto leitura e criação). _(Mateus Matos, 2025-07-16 05:10:55)_
+- feat: criação de useCases de projeto: ObterProjeto, ObterEntProjetoPorId e CriarProjeto. _(Mateus Matos, 2025-07-16 05:09:34)_
+- feat: implementação de ProjetoService e ProjetoServiceImpl. _(Mateus Matos, 2025-07-16 05:08:47)_
+- feat: specification de projeto. _(Mateus Matos, 2025-07-16 05:08:02)_
+- feat: validator para projeto para ser usado na criação de projeto. _(Mateus Matos, 2025-07-16 05:07:26)_
+- feat: query de verificação de projeto já existente no repository de projetos. _(Mateus Matos, 2025-07-16 05:05:46)_
+- feat: DTO de retorno e criação para rota de projeto _(Mateus Matos, 2025-07-16 05:04:42)_
+- feat: readme do projeto _(Andre Lucio Rocha, 2025-07-10 16:41:11)_
+- feat: inativação de gestor e refatoração da paginação para levar em conta os gestores ativos do sistema _(Andre Lucio Rocha, 2025-07-10 16:30:28)_
+- feat: campo de esta ativo para gestor espaço, permitindo safe delete e reativação _(Andre Lucio Rocha, 2025-07-10 16:04:08)_
+- feat: protegendo rota de cadastro de gestor de espaço _(Andre Lucio Rocha, 2025-07-10 15:33:44)_
+- feat: obter gestor espaço paginado, com filtros e ordenação _(Andre Lucio Rocha, 2025-07-10 15:32:39)_
+- refactor: criação de validator para domain de usuario _(Andre Lucio Rocha, 2025-07-10 15:14:10)_
+- feat: cadastro de gestor espaço _(Andre Lucio Rocha, 2025-07-10 15:05:56)_
+- feat: obter espaços _(Andre Lucio Rocha, 2025-07-07 15:48:43)_
+- refactor: refatorando tipagem da rota de criação de espaço _(Andre Lucio Rocha, 2025-07-07 15:17:26)_
+- feat: cadastro de espaço com validator _(Andre Lucio Rocha, 2025-07-07 15:16:29)_
+- refactor: utilizando lombok pros construtores dos services _(Andre Lucio Rocha, 2025-07-07 14:53:23)_
+- feat: obter entidade tipo de atividade _(Andre Lucio Rocha, 2025-07-07 14:49:17)_
+- feat: obter entidade tipo de espaço _(Andre Lucio Rocha, 2025-07-07 14:46:52)_
+- feat: obter entidade localizacao _(Andre Lucio Rocha, 2025-07-07 14:42:14)_
+- feat: obter entidade departamento _(Andre Lucio Rocha, 2025-07-07 14:40:10)_
+- refactor: tratando o id extraido do claim do token jwt no token service _(Andre Lucio Rocha, 2025-07-06 17:05:06)_
+- feat: rota para cadastro de espaço, protegida p admin _(Andre Lucio Rocha, 2025-07-04 17:05:17)_
+- feat: add documento fiscal para usuario _(Andre Lucio Rocha, 2025-07-04 12:57:11)_
+- feat: mapeando e repository de solicitacao de reserva _(Andre Lucio Rocha, 2025-07-03 19:38:04)_
+- feat: mapeando e repository de projeto _(Andre Lucio Rocha, 2025-07-03 19:33:44)_
+- feat: mapeando e repository de comiteusuario _(Andre Lucio Rocha, 2025-07-03 19:31:07)_
+- feat: mapeando comite e repository _(Andre Lucio Rocha, 2025-07-03 19:26:07)_
+- refactor: tirando coluna de update em gestor espaço, já que nao vai atualizar nada _(Andre Lucio Rocha, 2025-07-03 19:17:08)_
+- feat: migration e populate de solicitacao reserva _(Andre Lucio Rocha, 2025-07-03 19:08:00)_
+- feat: migration e populate de projeto _(Andre Lucio Rocha, 2025-07-03 18:56:50)_
+- feat: novos atributos para comite usuario, istitular e portaria _(Andre Lucio Rocha, 2025-07-03 18:46:03)_
+- feat: migration e populate de comite e comite_usuario _(Andre Lucio Rocha, 2025-07-03 18:16:15)_
+- feat: mapeando equipamento espaço _(Andre Lucio Rocha, 2025-07-03 17:37:28)_
+- feat: mapeando gestor espaçõ _(Andre Lucio Rocha, 2025-07-03 17:30:25)_
+- feat: mapeando espaco _(Andre Lucio Rocha, 2025-07-03 17:25:58)_
+- feat: mapeando equipamento _(Andre Lucio Rocha, 2025-07-03 16:46:00)_
+- feat: mapeando persistencia tipo equipamento _(Andre Lucio Rocha, 2025-07-03 11:44:29)_
+- feat: mapeando persistencia localização _(Andre Lucio Rocha, 2025-07-03 11:27:27)_
+- feat: mapeando persistência p tipo de espaço _(Andre Lucio Rocha, 2025-07-03 11:23:44)_
+- feat: mapeando persistência p tipo de atividade _(Andre Lucio Rocha, 2025-07-03 11:20:55)_
+- feat: padrão de api response para o controller _(Andre Lucio Rocha, 2025-07-02 18:47:11)_
+- refactor: mapeando novamente os atributos de usuario cargo e usuario curso _(Andre Lucio Rocha, 2025-07-02 18:39:51)_
+- feat: dto padrão p response das exceptions lançadas _(Andre Lucio Rocha, 2025-07-02 18:32:13)_
+- hotfix: debugando relação entre espaço e tipo atividade _(Andre Lucio Rocha, 2025-07-02 16:20:27)_
+- feat: migration e populate de equipamento espaço _(Andre Lucio Rocha, 2025-07-02 16:10:18)_
+- feat: migration e populate de espaco e gestor espaço _(Andre Lucio Rocha, 2025-07-02 15:35:10)_
+- feat: migration e populate de equipamento e tipo equipamento _(Andre Lucio Rocha, 2025-07-02 15:21:13)_
+- feat: populate tipo atividade, tipo espaço e localização _(Andre Lucio Rocha, 2025-07-02 15:05:39)_
+- feat: migration de tipoatividade, tipoespaco e localizacao _(Andre Lucio Rocha, 2025-07-02 14:52:38)_
+- feat: body claro p email de esqueci minha senha _(Andre Lucio Rocha, 2025-06-26 19:34:59)_
+- feat: atualizando os cargos do usuário _(Andre Lucio Rocha, 2025-06-26 19:27:57)_
+- feat: apagar usuario cargo _(Andre Lucio Rocha, 2025-06-26 18:15:25)_
+- feat: criar usuario cargo _(Andre Lucio Rocha, 2025-06-26 18:06:25)_
+- feat: obter cargos por id de usuario _(Andre Lucio Rocha, 2025-06-26 17:32:34)_
+- feat: obter usuários por cargo id _(Andre Lucio Rocha, 2025-06-26 12:48:25)_
+- feat: changelog de commits _(Andre Lucio Rocha, 2025-06-26 12:13:09)_
 - feat: padrões de rotas seguindo api restful _(Andre Lucio Rocha, 2025-06-26 11:26:35)_
 - feat: obter todos usuarios paginados _(Andre Lucio Rocha, 2025-06-25 19:30:49)_
 - feat: trocar senha _(Andre Lucio Rocha, 2025-06-25 19:14:16)_

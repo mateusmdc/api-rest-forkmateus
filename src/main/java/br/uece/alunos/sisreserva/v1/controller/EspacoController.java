@@ -111,54 +111,76 @@ public class EspacoController {
     }
 
     /**
-     * Obtém estatísticas de uso dos espaços.
+     * Obtém estatísticas de uso dos espaços em um período.
      * 
      * <p>Retorna estatísticas detalhadas sobre o uso dos espaços, incluindo:</p>
      * <ul>
-     *   <li>Reservas feitas no mês (filtrado ou mês atual)</li>
-     *   <li>Mês com mais reservas</li>
-     *   <li>Usuários que mais reservaram</li>
+     *   <li>Estatísticas por mês do período</li>
+     *   <li>Mês com mais reservas (do período ou do ano se período for 1 mês)</li>
+     *   <li>Usuários que mais reservaram no período</li>
+     *   <li>Todos os usuários que reservaram no período</li>
+     *   <li>Totais do período (reservas solicitadas e aprovadas)</li>
      * </ul>
      * 
      * <p>As estatísticas são agrupadas por espaço e podem ser filtradas
-     * para espaços específicos através do parâmetro espacoIds.</p>
+     * por espaços específicos, departamento, localização ou tipo de espaço.</p>
      * 
-     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
-     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param mesInicial mês inicial para filtrar reservas (1-12), padrão = mês atual
+     * @param anoInicial ano inicial para filtrar reservas, padrão = ano atual
+     * @param mesFinal mês final para filtrar reservas (1-12), padrão = mês atual
+     * @param anoFinal ano final para filtrar reservas, padrão = ano atual
      * @param espacoIds lista de IDs de espaços para filtrar (opcional, padrão = todos os espaços)
+     * @param departamentoId ID do departamento para filtrar espaços (opcional)
+     * @param localizacaoId ID da localização para filtrar espaços (opcional)
+     * @param tipoEspacoId ID do tipo de espaço para filtrar espaços (opcional)
      * @return estatísticas agrupadas por espaço
      */
     @GetMapping("/estatisticas")
     @Operation(summary = "Obter estatísticas de uso dos espaços",
-               description = "Retorna estatísticas detalhadas sobre o uso dos espaços, incluindo reservas do mês, " +
-                           "mês com mais reservas e usuários que mais reservaram. Pode ser filtrado por mês, ano e espaços específicos.")
+               description = "Retorna estatísticas detalhadas sobre o uso dos espaços em um período, incluindo estatísticas por mês, " +
+                           "mês com mais reservas e usuários que mais reservaram. Pode ser filtrado por período e espaços específicos.")
     public ResponseEntity<ApiResponseDTO<EstatisticasGeralDTO>> obterEstatisticas(
-            @RequestParam(required = false) Integer mes,
-            @RequestParam(required = false) Integer ano,
-            @RequestParam(required = false) List<String> espacoIds) {
-        var estatisticas = espacoService.obterEstatisticas(mes, ano, espacoIds);
+            @RequestParam(required = false) Integer mesInicial,
+            @RequestParam(required = false) Integer anoInicial,
+            @RequestParam(required = false) Integer mesFinal,
+            @RequestParam(required = false) Integer anoFinal,
+            @RequestParam(required = false) List<String> espacoIds,
+            @RequestParam(required = false) String departamentoId,
+            @RequestParam(required = false) String localizacaoId,
+            @RequestParam(required = false) String tipoEspacoId) {
+        var estatisticas = espacoService.obterEstatisticas(mesInicial, anoInicial, mesFinal, anoFinal, espacoIds, departamentoId, localizacaoId, tipoEspacoId);
         return ResponseEntity.ok(ApiResponseDTO.success(estatisticas));
     }
 
     /**
-     * Gera PDF com estatísticas de uso dos espaços.
+     * Gera PDF com estatísticas de uso dos espaços em um período.
      * 
      * <p>Retorna um arquivo PDF contendo as mesmas informações do endpoint de estatísticas,
      * formatado para impressão ou download.</p>
      * 
-     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
-     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param mesInicial mês inicial para filtrar reservas (1-12), padrão = mês atual
+     * @param anoInicial ano inicial para filtrar reservas, padrão = ano atual
+     * @param mesFinal mês final para filtrar reservas (1-12), padrão = mês atual
+     * @param anoFinal ano final para filtrar reservas, padrão = ano atual
      * @param espacoIds lista de IDs de espaços para filtrar (opcional, padrão = todos os espaços)
+     * @param departamentoId ID do departamento para filtrar espaços (opcional)
+     * @param localizacaoId ID da localização para filtrar espaços (opcional)
+     * @param tipoEspacoId ID do tipo de espaço para filtrar espaços (opcional)
      * @return arquivo PDF com as estatísticas
      */
     @GetMapping("/estatisticas/pdf")
     @Operation(summary = "Gerar PDF com estatísticas de uso dos espaços",
-               description = "Gera um documento PDF contendo as estatísticas detalhadas de uso dos espaços.")
+               description = "Gera um documento PDF contendo as estatísticas detalhadas de uso dos espaços em um período.")
     public ResponseEntity<byte[]> gerarPDFEstatisticas(
-            @RequestParam(required = false) Integer mes,
-            @RequestParam(required = false) Integer ano,
-            @RequestParam(required = false) List<String> espacoIds) throws java.io.IOException {
-        byte[] pdfBytes = espacoService.gerarPDFEstatisticas(mes, ano, espacoIds);
+            @RequestParam(required = false) Integer mesInicial,
+            @RequestParam(required = false) Integer anoInicial,
+            @RequestParam(required = false) Integer mesFinal,
+            @RequestParam(required = false) Integer anoFinal,
+            @RequestParam(required = false) List<String> espacoIds,
+            @RequestParam(required = false) String departamentoId,
+            @RequestParam(required = false) String localizacaoId,
+            @RequestParam(required = false) String tipoEspacoId) throws java.io.IOException {
+        byte[] pdfBytes = espacoService.gerarPDFEstatisticas(mesInicial, anoInicial, mesFinal, anoFinal, espacoIds, departamentoId, localizacaoId, tipoEspacoId);
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

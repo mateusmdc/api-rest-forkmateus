@@ -16,23 +16,33 @@ public interface EquipamentoService {
     Page<EquipamentoRetornoDTO> obter(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento, Boolean reservavel);
     
     /**
-     * Obtém estatísticas de uso dos equipamentos.
+     * Obtém estatísticas de uso dos equipamentos em um período.
      * 
-     * @param mes mês para filtrar reservas (opcional, padrão = mês atual)
-     * @param ano ano para filtrar reservas (opcional, padrão = ano atual)
+     * @param mesInicial mês inicial para filtrar reservas (opcional, padrão = mês atual)
+     * @param anoInicial ano inicial para filtrar reservas (opcional, padrão = ano atual)
+     * @param mesFinal mês final para filtrar reservas (opcional, padrão = mês atual)
+     * @param anoFinal ano final para filtrar reservas (opcional, padrão = ano atual)
      * @param equipamentoIds lista de IDs de equipamentos para filtrar (opcional, padrão = todos os equipamentos)
+     * @param tipoEquipamentoId ID do tipo de equipamento para filtrar (opcional)
+     * @param multiusuario filtrar por equipamentos multiusuário (opcional)
+     * @param espacoId ID do espaço vinculado para filtrar equipamentos (opcional)
      * @return estatísticas agrupadas por equipamento
      */
-    EstatisticasGeralEquipamentoDTO obterEstatisticas(Integer mes, Integer ano, List<String> equipamentoIds);
+    EstatisticasGeralEquipamentoDTO obterEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId);
     
     /**
      * Gera PDF com estatísticas de uso dos equipamentos.
      * 
-     * @param mes mês para filtrar reservas (opcional, padrão = mês atual)
-     * @param ano ano para filtrar reservas (opcional, padrão = ano atual)
+     * @param mesInicial mês inicial para filtrar reservas (opcional, padrão = mês atual)
+     * @param anoInicial ano inicial para filtrar reservas (opcional, padrão = ano atual)
+     * @param mesFinal mês final para filtrar reservas (opcional, padrão = mês atual)
+     * @param anoFinal ano final para filtrar reservas (opcional, padrão = ano atual)
      * @param equipamentoIds lista de IDs de equipamentos para filtrar (opcional, padrão = todos os equipamentos)
+     * @param tipoEquipamentoId ID do tipo de equipamento para filtrar (opcional)
+     * @param multiusuario filtrar por equipamentos multiusuário (opcional)
+     * @param espacoId ID do espaço vinculado para filtrar equipamentos (opcional)
      * @return array de bytes contendo o PDF gerado
      * @throws java.io.IOException se houver erro na geração do PDF
      */
-    byte[] gerarPDFEstatisticas(Integer mes, Integer ano, List<String> equipamentoIds) throws java.io.IOException;
+    byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId) throws java.io.IOException;
 }

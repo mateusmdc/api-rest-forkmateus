@@ -76,13 +76,13 @@ public class EspacoServiceImpl implements EspacoService {
     }
 
     @Override
-    public EstatisticasGeralDTO obterEstatisticas(Integer mes, Integer ano, List<String> espacoIds) {
-        return obterEstatisticasEspacos.obterEstatisticas(mes, ano, espacoIds);
+    public EstatisticasGeralDTO obterEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> espacoIds, String departamentoId, String localizacaoId, String tipoEspacoId) {
+        return obterEstatisticasEspacos.obterEstatisticas(mesInicial, anoInicial, mesFinal, anoFinal, espacoIds, departamentoId, localizacaoId, tipoEspacoId);
     }
 
     @Override
-    public byte[] gerarPDFEstatisticas(Integer mes, Integer ano, List<String> espacoIds) throws java.io.IOException {
-        return gerarPDFEstatisticasEspacos.gerarPDF(mes, ano, espacoIds);
+    public byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> espacoIds, String departamentoId, String localizacaoId, String tipoEspacoId) throws java.io.IOException {
+        return gerarPDFEstatisticasEspacos.gerarPDF(mesInicial, anoInicial, mesFinal, anoFinal, espacoIds, departamentoId, localizacaoId, tipoEspacoId);
     }
 
     @Override
