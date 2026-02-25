@@ -198,7 +198,8 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         FROM SolicitacaoReserva sr
         WHERE sr.espaco.id = :espacoId
         GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
-        ORDER BY COUNT(sr) DESC
+        HAVING SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) > 0
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
     """)
     List<ReservasPorUsuarioProjection> contarReservasPorEspacoAgrupadoPorUsuario(@Param("espacoId") String espacoId);
 
@@ -387,7 +388,311 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         FROM SolicitacaoReserva sr
         WHERE sr.equipamento.id = :equipamentoId
         GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
-        ORDER BY COUNT(sr) DESC
+        HAVING SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) > 0
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
     """)
     List<ReservasPorUsuarioProjection> contarReservasPorEquipamentoAgrupadoPorUsuario(@Param("equipamentoId") String equipamentoId);
+
+    // ==================== QUERIES PARA ESTATÍSTICAS POR PERÍODO ====================
+
+    /**
+     * Agrupa e conta reservas de um espaço por mês em um período específico.
+     * 
+     * @param espacoId ID do espaço
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return lista de projeções com totais agrupados por mês, ordenada cronologicamente
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+        ORDER BY YEAR(sr.dataInicio), MONTH(sr.dataInicio)
+    """)
+    List<ReservasPorMesProjection> contarReservasPorEspacoNoPeriodo(
+        @Param("espacoId") String espacoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Agrupa e conta reservas de um equipamento por mês em um período específico.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return lista de projeções com totais agrupados por mês, ordenada cronologicamente
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.equipamento.id = :equipamentoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+        ORDER BY YEAR(sr.dataInicio), MONTH(sr.dataInicio)
+    """)
+    List<ReservasPorMesProjection> contarReservasPorEquipamentoNoPeriodo(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Agrupa e conta reservas de um espaço por usuário em um período específico.
+     * 
+     * @param espacoId ID do espaço
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return lista de projeções com totais agrupados por usuário, ordenada por quantidade decrescente
+     */
+    @Query("""
+        SELECT 
+            sr.usuarioSolicitante.id as usuarioId,
+            sr.usuarioSolicitante.nome as usuarioNome,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
+        HAVING SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) > 0
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
+    """)
+    List<ReservasPorUsuarioProjection> contarReservasPorEspacoEUsuarioNoPeriodo(
+        @Param("espacoId") String espacoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Agrupa e conta reservas de um equipamento por usuário em um período específico.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return lista de projeções com totais agrupados por usuário, ordenada por quantidade decrescente
+     */
+    @Query("""
+        SELECT 
+            sr.usuarioSolicitante.id as usuarioId,
+            sr.usuarioSolicitante.nome as usuarioNome,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.equipamento.id = :equipamentoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
+        HAVING SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) > 0
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
+    """)
+    List<ReservasPorUsuarioProjection> contarReservasPorEquipamentoEUsuarioNoPeriodo(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Agrupa e conta TODAS as reservas (incluindo não aprovadas) de um espaço por usuário em um período específico.
+     * Diferente de contarReservasPorEspacoEUsuarioNoPeriodo, esta query não filtra usuários sem reservas aprovadas.
+     * 
+     * @param espacoId ID do espaço
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return lista de projeções com totais agrupados por usuário, ordenada por total de solicitações
+     */
+    @Query("""
+        SELECT 
+            sr.usuarioSolicitante.id as usuarioId,
+            sr.usuarioSolicitante.nome as usuarioNome,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
+        ORDER BY COUNT(sr) DESC
+    """)
+    List<ReservasPorUsuarioProjection> contarTodosUsuariosPorEspacoNoPeriodo(
+        @Param("espacoId") String espacoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Agrupa e conta TODAS as reservas (incluindo não aprovadas) de um equipamento por usuário em um período específico.
+     * Diferente de contarReservasPorEquipamentoEUsuarioNoPeriodo, esta query não filtra usuários sem reservas aprovadas.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return lista de projeções com totais agrupados por usuário, ordenada por total de solicitações
+     */
+    @Query("""
+        SELECT 
+            sr.usuarioSolicitante.id as usuarioId,
+            sr.usuarioSolicitante.nome as usuarioNome,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.equipamento.id = :equipamentoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
+        ORDER BY COUNT(sr) DESC
+    """)
+    List<ReservasPorUsuarioProjection> contarTodosUsuariosPorEquipamentoNoPeriodo(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Busca o mês com mais reservas de um espaço em um período específico.
+     * 
+     * @param espacoId ID do espaço
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return projeção com o mês que tem mais reservas no período
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
+    """)
+    List<ReservasPorMesProjection> contarMesComMaisReservasPorEspacoNoPeriodo(
+        @Param("espacoId") String espacoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Busca o mês com mais reservas de um equipamento em um período específico.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @param mesInicial mês inicial (1-12)
+     * @param anoInicial ano inicial
+     * @param mesFinal mês final (1-12)
+     * @param anoFinal ano final
+     * @return projeção com o mês que tem mais reservas no período
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.equipamento.id = :equipamentoId
+          AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
+          AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
+    """)
+    List<ReservasPorMesProjection> contarMesComMaisReservasPorEquipamentoNoPeriodo(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("mesInicial") int mesInicial,
+        @Param("anoInicial") int anoInicial,
+        @Param("mesFinal") int mesFinal,
+        @Param("anoFinal") int anoFinal
+    );
+
+    /**
+     * Busca o mês com mais reservas de um espaço em um ano específico.
+     * 
+     * @param espacoId ID do espaço
+     * @param ano ano
+     * @return projeção com o mês que tem mais reservas no ano
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.espaco.id = :espacoId
+          AND YEAR(sr.dataInicio) = :ano
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
+    """)
+    List<ReservasPorMesProjection> contarMesComMaisReservasPorEspacoNoAno(
+        @Param("espacoId") String espacoId,
+        @Param("ano") int ano
+    );
+
+    /**
+     * Busca o mês com mais reservas de um equipamento em um ano específico.
+     * 
+     * @param equipamentoId ID do equipamento
+     * @param ano ano
+     * @return projeção com o mês que tem mais reservas no ano
+     */
+    @Query("""
+        SELECT 
+            CAST(MONTH(sr.dataInicio) AS int) as mes,
+            CAST(YEAR(sr.dataInicio) AS int) as ano,
+            COUNT(sr) as totalReservas,
+            SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
+        FROM SolicitacaoReserva sr
+        WHERE sr.equipamento.id = :equipamentoId
+          AND YEAR(sr.dataInicio) = :ano
+        GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
+        ORDER BY SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) DESC
+    """)
+    List<ReservasPorMesProjection> contarMesComMaisReservasPorEquipamentoNoAno(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("ano") int ano
+    );
 }
+

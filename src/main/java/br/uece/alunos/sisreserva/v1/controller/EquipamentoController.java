@@ -73,54 +73,76 @@ public class EquipamentoController {
     }
 
     /**
-     * Obtém estatísticas de uso dos equipamentos.
+     * Obtém estatísticas de uso dos equipamentos em um período.
      * 
      * <p>Retorna estatísticas detalhadas sobre o uso dos equipamentos, incluindo:</p>
      * <ul>
-     *   <li>Reservas feitas no mês (filtrado ou mês atual)</li>
-     *   <li>Mês com mais reservas</li>
-     *   <li>Usuários que mais reservaram</li>
+     *   <li>Estatísticas por mês do período</li>
+     *   <li>Mês com mais reservas (do período ou do ano se período for 1 mês)</li>
+     *   <li>Usuários que mais reservaram no período</li>
+     *   <li>Todos os usuários que reservaram no período</li>
+     *   <li>Totais do período (reservas solicitadas e aprovadas)</li>
      * </ul>
      * 
      * <p>As estatísticas são agrupadas por equipamento e podem ser filtradas
-     * para equipamentos específicos através do parâmetro equipamentoIds.</p>
+     * por equipamentos específicos, tipo de equipamento, multiusuário ou espaço vinculado.</p>
      * 
-     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
-     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param mesInicial mês inicial para filtrar reservas (1-12), padrão = mês atual
+     * @param anoInicial ano inicial para filtrar reservas, padrão = ano atual
+     * @param mesFinal mês final para filtrar reservas (1-12), padrão = mês atual
+     * @param anoFinal ano final para filtrar reservas, padrão = ano atual
      * @param equipamentoIds lista de IDs de equipamentos para filtrar (opcional, padrão = todos os equipamentos)
+     * @param tipoEquipamentoId ID do tipo de equipamento para filtrar (opcional)
+     * @param multiusuario filtrar por equipamentos multiusuário (opcional)
+     * @param espacoId ID do espaço vinculado para filtrar equipamentos (opcional)
      * @return estatísticas agrupadas por equipamento
      */
     @GetMapping("/estatisticas")
     @Operation(summary = "Obter estatísticas de uso dos equipamentos",
-               description = "Retorna estatísticas detalhadas sobre o uso dos equipamentos, incluindo reservas do mês, " +
-                           "mês com mais reservas e usuários que mais reservaram. Pode ser filtrado por mês, ano e equipamentos específicos.")
+               description = "Retorna estatísticas detalhadas sobre o uso dos equipamentos em um período, incluindo estatísticas por mês, " +
+                           "mês com mais reservas e usuários que mais reservaram. Pode ser filtrado por período e equipamentos específicos.")
     public ResponseEntity<ApiResponseDTO<EstatisticasGeralEquipamentoDTO>> obterEstatisticas(
-            @RequestParam(required = false) Integer mes,
-            @RequestParam(required = false) Integer ano,
-            @RequestParam(required = false) List<String> equipamentoIds) {
-        var estatisticas = service.obterEstatisticas(mes, ano, equipamentoIds);
+            @RequestParam(required = false) Integer mesInicial,
+            @RequestParam(required = false) Integer anoInicial,
+            @RequestParam(required = false) Integer mesFinal,
+            @RequestParam(required = false) Integer anoFinal,
+            @RequestParam(required = false) List<String> equipamentoIds,
+            @RequestParam(required = false) String tipoEquipamentoId,
+            @RequestParam(required = false) Boolean multiusuario,
+            @RequestParam(required = false) String espacoId) {
+        var estatisticas = service.obterEstatisticas(mesInicial, anoInicial, mesFinal, anoFinal, equipamentoIds, tipoEquipamentoId, multiusuario, espacoId);
         return ResponseEntity.ok(ApiResponseDTO.success(estatisticas));
     }
 
     /**
-     * Gera PDF com estatísticas de uso dos equipamentos.
+     * Gera PDF com estatísticas de uso dos equipamentos em um período.
      * 
      * <p>Retorna um arquivo PDF contendo as mesmas informações do endpoint de estatísticas,
      * formatado para impressão ou download.</p>
      * 
-     * @param mes mês para filtrar reservas (1-12), padrão = mês atual
-     * @param ano ano para filtrar reservas, padrão = ano atual
+     * @param mesInicial mês inicial para filtrar reservas (1-12), padrão = mês atual
+     * @param anoInicial ano inicial para filtrar reservas, padrão = ano atual
+     * @param mesFinal mês final para filtrar reservas (1-12), padrão = mês atual
+     * @param anoFinal ano final para filtrar reservas, padrão = ano atual
      * @param equipamentoIds lista de IDs de equipamentos para filtrar (opcional, padrão = todos os equipamentos)
+     * @param tipoEquipamentoId ID do tipo de equipamento para filtrar (opcional)
+     * @param multiusuario filtrar por equipamentos multiusuário (opcional)
+     * @param espacoId ID do espaço vinculado para filtrar equipamentos (opcional)
      * @return arquivo PDF com as estatísticas
      */
     @GetMapping("/estatisticas/pdf")
     @Operation(summary = "Gerar PDF com estatísticas de uso dos equipamentos",
-               description = "Gera um documento PDF contendo as estatísticas detalhadas de uso dos equipamentos.")
+               description = "Gera um documento PDF contendo as estatísticas detalhadas de uso dos equipamentos em um período.")
     public ResponseEntity<byte[]> gerarPDFEstatisticas(
-            @RequestParam(required = false) Integer mes,
-            @RequestParam(required = false) Integer ano,
-            @RequestParam(required = false) List<String> equipamentoIds) throws java.io.IOException {
-        byte[] pdfBytes = service.gerarPDFEstatisticas(mes, ano, equipamentoIds);
+            @RequestParam(required = false) Integer mesInicial,
+            @RequestParam(required = false) Integer anoInicial,
+            @RequestParam(required = false) Integer mesFinal,
+            @RequestParam(required = false) Integer anoFinal,
+            @RequestParam(required = false) List<String> equipamentoIds,
+            @RequestParam(required = false) String tipoEquipamentoId,
+            @RequestParam(required = false) Boolean multiusuario,
+            @RequestParam(required = false) String espacoId) throws java.io.IOException {
+        byte[] pdfBytes = service.gerarPDFEstatisticas(mesInicial, anoInicial, mesFinal, anoFinal, equipamentoIds, tipoEquipamentoId, multiusuario, espacoId);
         
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);

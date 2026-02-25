@@ -48,12 +48,12 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     }
 
     @Override
-    public EstatisticasGeralEquipamentoDTO obterEstatisticas(Integer mes, Integer ano, List<String> equipamentoIds) {
-        return obterEstatisticasEquipamentos.obterEstatisticas(mes, ano, equipamentoIds);
+    public EstatisticasGeralEquipamentoDTO obterEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId) {
+        return obterEstatisticasEquipamentos.obterEstatisticas(mesInicial, anoInicial, mesFinal, anoFinal, equipamentoIds, tipoEquipamentoId, multiusuario, espacoId);
     }
 
     @Override
-    public byte[] gerarPDFEstatisticas(Integer mes, Integer ano, List<String> equipamentoIds) throws java.io.IOException {
-        return gerarPDFEstatisticasEquipamentos.gerarPDF(mes, ano, equipamentoIds);
+    public byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId) throws java.io.IOException {
+        return gerarPDFEstatisticasEquipamentos.gerarPDF(mesInicial, anoInicial, mesFinal, anoFinal, equipamentoIds, tipoEquipamentoId, multiusuario, espacoId);
     }
 }
