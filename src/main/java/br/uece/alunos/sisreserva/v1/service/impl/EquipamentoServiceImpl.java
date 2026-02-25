@@ -26,6 +26,7 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     private final ObterEquipamentos obterEquipamentos;
     private final ObterEstatisticasEquipamentos obterEstatisticasEquipamentos;
     private final br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.GerarPDFEstatisticasEquipamentos gerarPDFEstatisticasEquipamentos;
+    private final br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.ObterEquipamentosReservaveis obterEquipamentosReservaveis;
 
     @Override
     public EquipamentoRetornoDTO atualizar(String id, EquipamentoAtualizarDTO data) {
@@ -55,5 +56,10 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Override
     public byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId) throws java.io.IOException {
         return gerarPDFEstatisticasEquipamentos.gerarPDF(mesInicial, anoInicial, mesFinal, anoFinal, equipamentoIds, tipoEquipamentoId, multiusuario, espacoId);
+    }
+
+    @Override
+    public Page<EquipamentoRetornoDTO> obterEquipamentosReservaveis(Pageable pageable, String id, String tombamento, String status, String tipoEquipamento, Boolean multiusuario) {
+        return obterEquipamentosReservaveis.obterEquipamentosReservaveis(pageable, id, tombamento, status, tipoEquipamento, multiusuario);
     }
 }

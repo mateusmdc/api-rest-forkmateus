@@ -56,6 +56,50 @@ public class EquipamentoController {
         return ResponseEntity.ok(ApiResponseDTO.success(equipamentos));
     }
 
+    /**
+     * Obtém equipamentos reserváveis com filtros e paginação.
+     * 
+     * <p>Este endpoint retorna apenas equipamentos com o campo 'reservavel' definido como true.</p>
+     * 
+     * <p>Aplica automaticamente restrições de visualização baseadas no cargo do usuário autenticado:</p>
+     * <ul>
+     *   <li><strong>Usuários externos (USUARIO_EXTERNO)</strong>: Visualizam apenas equipamentos reserváveis 
+     *       que também possuem o campo 'multiusuario' como true.</li>
+     *   <li><strong>Usuários internos e administradores</strong>: Visualizam todos os equipamentos reserváveis, 
+     *       independentemente do campo 'multiusuario'.</li>
+     * </ul>
+     * 
+     * @param page Número da página (padrão: 0)
+     * @param size Tamanho da página (padrão: 100)
+     * @param sortField Campo para ordenação (padrão: tombamento)
+     * @param sortOrder Direção da ordenação - asc ou desc (padrão: asc)
+     * @param id Filtro por ID do equipamento (opcional)
+     * @param tombamento Filtro por tombamento do equipamento (opcional)
+     * @param status Filtro por status do equipamento (opcional)
+     * @param tipoEquipamento Filtro por ID do tipo de equipamento (opcional)
+     * @param multiusuario Filtro explícito por equipamentos multiusuário (opcional)
+     * @return Página com os equipamentos reserváveis encontrados
+     */
+    @GetMapping("/reservaveis")
+    @Operation(summary = "Listar equipamentos reserváveis", 
+               description = "Retorna apenas equipamentos com reservavel=true. Usuários externos veem apenas equipamentos multiusuário.")
+    public ResponseEntity<ApiResponseDTO<Page<EquipamentoRetornoDTO>>> obterEquipamentosReservaveis(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size,
+            @RequestParam(defaultValue = "tombamento") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String tombamento,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String tipoEquipamento,
+            @RequestParam(required = false) Boolean multiusuario
+    ) {
+        if (sortField.equals("tipoEquipamento")) sortField = "tipoEquipamento.id";
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
+        var equipamentosReservaveis = service.obterEquipamentosReservaveis(pageable, id, tombamento, status, tipoEquipamento, multiusuario);
+        return ResponseEntity.ok(ApiResponseDTO.success(equipamentosReservaveis));
+    }
+
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<ApiResponseDTO<EquipamentoRetornoDTO>> atualizar(

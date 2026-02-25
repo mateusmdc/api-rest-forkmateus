@@ -38,6 +38,7 @@ public class EspacoServiceImpl implements EspacoService {
     private final ListarComplexosDoEspaco listarComplexosDoEspaco;
     private final ObterEstatisticasEspacos obterEstatisticasEspacos;
     private final br.uece.alunos.sisreserva.v1.domain.espaco.useCase.GerarPDFEstatisticasEspacos gerarPDFEstatisticasEspacos;
+    private final br.uece.alunos.sisreserva.v1.domain.espaco.useCase.ObterEspacosReservaveis obterEspacosReservaveis;
 
     @Override
     public EspacoRetornoDTO atualizar(String id, EspacoAtualizarDTO data) {
@@ -83,6 +84,11 @@ public class EspacoServiceImpl implements EspacoService {
     @Override
     public byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> espacoIds, String departamentoId, String localizacaoId, String tipoEspacoId) throws java.io.IOException {
         return gerarPDFEstatisticasEspacos.gerarPDF(mesInicial, anoInicial, mesFinal, anoFinal, espacoIds, departamentoId, localizacaoId, tipoEspacoId);
+    }
+
+    @Override
+    public Page<EspacoRetornoDTO> obterEspacosReservaveis(Pageable pageable, String id, String departamento, String localizacao, String tipoEspaco, String tipoAtividade, String nome, Boolean multiusuario) {
+        return obterEspacosReservaveis.obterEspacosReservaveis(pageable, id, departamento, localizacao, tipoEspaco, tipoAtividade, nome, multiusuario);
     }
 
     @Override
