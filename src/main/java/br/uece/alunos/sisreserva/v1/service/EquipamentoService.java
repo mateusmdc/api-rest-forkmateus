@@ -45,4 +45,24 @@ public interface EquipamentoService {
      * @throws java.io.IOException se houver erro na geração do PDF
      */
     byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId) throws java.io.IOException;
+    
+    /**
+     * Obtém equipamentos reserváveis com filtros e paginação.
+     * Retorna apenas equipamentos com o campo 'reservavel' definido como true.
+     * Para usuários externos, também aplica restrição de 'multiusuario' = true.
+     * 
+     * @param pageable Informações de paginação e ordenação
+     * @param id Filtro por ID do equipamento (opcional)
+     * @param tombamento Filtro por tombamento do equipamento (opcional)
+     * @param status Filtro por status do equipamento (opcional)
+     * @param tipoEquipamento Filtro por ID do tipo de equipamento (opcional)
+     * @param multiusuario Filtro explícito por equipamentos multiusuário (opcional)
+     * @return Página com os equipamentos reserváveis encontrados
+     */
+    Page<EquipamentoRetornoDTO> obterEquipamentosReservaveis(Pageable pageable,
+                                                             String id,
+                                                             String tombamento,
+                                                             String status,
+                                                             String tipoEquipamento,
+                                                             Boolean multiusuario);
 }

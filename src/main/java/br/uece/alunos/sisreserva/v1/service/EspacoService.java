@@ -51,6 +51,30 @@ public interface EspacoService {
      */
     byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> espacoIds, String departamentoId, String localizacaoId, String tipoEspacoId) throws java.io.IOException;
     
+    /**
+     * Obtém espaços reserváveis com filtros e paginação.
+     * Retorna apenas espaços com o campo 'reservavel' definido como true.
+     * Para usuários externos, também aplica restrição de 'multiusuario' = true.
+     * 
+     * @param pageable Informações de paginação e ordenação
+     * @param id Filtro por ID do espaço (opcional)
+     * @param departamento Filtro por ID do departamento (opcional)
+     * @param localizacao Filtro por ID da localização (opcional)
+     * @param tipoEspaco Filtro por ID do tipo de espaço (opcional)
+     * @param tipoAtividade Filtro por ID do tipo de atividade (opcional)
+     * @param nome Filtro por nome do espaço (opcional)
+     * @param multiusuario Filtro explícito por espaços multiusuário (opcional)
+     * @return Página com os espaços reserváveis encontrados
+     */
+    Page<EspacoRetornoDTO> obterEspacosReservaveis(Pageable pageable,
+                                                   String id,
+                                                   String departamento,
+                                                   String localizacao,
+                                                   String tipoEspaco,
+                                                   String tipoAtividade,
+                                                   String nome,
+                                                   Boolean multiusuario);
+    
     // Método para deletar espaço (apenas administradores)
     void deletar(String id);
 }
