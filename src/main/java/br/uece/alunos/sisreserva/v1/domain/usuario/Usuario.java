@@ -120,9 +120,21 @@ public class Usuario implements UserDetails {
         return authorities;
     }
 
-    public void atualizarUsuario(AtualizarUsuarioDTO data, Instituicao instituicao) {
+    /**
+     * Atualiza os dados do usuário com base no DTO fornecido.
+     * Todos os campos são opcionais - apenas campos não nulos e não vazios serão atualizados.
+     *
+     * @param data DTO contendo os dados a serem atualizados
+     * @param instituicao Nova instituição do usuário (se fornecida)
+     * @param senhaEncriptada Senha já criptografada (se fornecida)
+     */
+    public void atualizarUsuario(AtualizarUsuarioDTO data, Instituicao instituicao, String senhaEncriptada) {
         if (data.nome() != null && !data.nome().isBlank()) {
             this.nome = data.nome();
+        }
+
+        if (senhaEncriptada != null && !senhaEncriptada.isBlank()) {
+            this.senha = senhaEncriptada;
         }
 
         if (data.fotoPerfil() != null && !data.fotoPerfil().isBlank()) {
