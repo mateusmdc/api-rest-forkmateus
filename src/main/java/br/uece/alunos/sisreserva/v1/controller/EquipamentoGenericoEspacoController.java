@@ -20,20 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Controller REST para gerenciamento do relacionamento entre equipamentos genéricos e espaços.
- * Disponibiliza endpoints para vincular, desvincular e consultar equipamentos em espaços.
- * 
- * <p>Permissões necessárias para operações de vínculo:</p>
- * <ul>
- *   <li>Administrador do sistema</li>
- *   <li>Gestor ativo do espaço</li>
- *   <li>Secretaria ativa do espaço</li>
- * </ul>
- * 
- * @author Sistema de Reservas - UECE
- * @version 1.0
- */
 @RestController
 @RequestMapping("/equipamento-generico-espaco")
 @RequiredArgsConstructor
@@ -43,12 +29,6 @@ public class EquipamentoGenericoEspacoController {
 
     private final EquipamentoGenericoEspacoService service;
 
-    /**
-     * Vincula um equipamento genérico a um espaço com uma quantidade específica.
-     * 
-     * @param dto dados do vínculo (equipamento, espaço e quantidade)
-     * @return DTO com os dados do vínculo criado
-     */
     @PostMapping
     @Transactional
     @Operation(
@@ -68,13 +48,6 @@ public class EquipamentoGenericoEspacoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponseDTO.success(vinculo));
     }
 
-    /**
-     * Atualiza a quantidade de um equipamento genérico em um espaço.
-     * 
-     * @param vinculoId ID do vínculo equipamento-espaço
-     * @param dto dados com a nova quantidade
-     * @return DTO com os dados do vínculo atualizado
-     */
     @PutMapping("/{vinculoId}/quantidade")
     @Transactional
     @Operation(
@@ -95,12 +68,6 @@ public class EquipamentoGenericoEspacoController {
         return ResponseEntity.ok(ApiResponseDTO.success(vinculo));
     }
 
-    /**
-     * Remove o vínculo entre equipamento genérico e espaço.
-     * 
-     * @param vinculoId ID do vínculo equipamento-espaço
-     * @return resposta vazia com status 200
-     */
     @DeleteMapping("/{vinculoId}")
     @Transactional
     @Operation(
@@ -119,12 +86,6 @@ public class EquipamentoGenericoEspacoController {
         return ResponseEntity.ok(ApiResponseDTO.success(null));
     }
 
-    /**
-     * Obtém todos os equipamentos genéricos vinculados a um espaço.
-     * 
-     * @param espacoId ID do espaço
-     * @return lista de DTOs com os equipamentos e suas quantidades
-     */
     @GetMapping("/espaco/{espacoId}")
     @Operation(
         summary = "Listar equipamentos do espaço",
@@ -140,12 +101,6 @@ public class EquipamentoGenericoEspacoController {
         return ResponseEntity.ok(ApiResponseDTO.success(equipamentos));
     }
 
-    /**
-     * Obtém todos os espaços que possuem um equipamento genérico específico.
-     * 
-     * @param equipamentoGenericoId ID do equipamento genérico
-     * @return lista de DTOs com os espaços e quantidades
-     */
     @GetMapping("/equipamento/{equipamentoGenericoId}")
     @Operation(
         summary = "Listar espaços com o equipamento",
