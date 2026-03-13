@@ -1,5 +1,4 @@
 services:
-
   db:
     image: postgres:15-alpine
     container_name: sisreserva-db
@@ -12,24 +11,21 @@ services:
       - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pgeem-network
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
-
     container_name: sisreserva-api
     restart: on-failure
-
     depends_on:
       - db
-
     ports:
       - "${SERVER_PORT:?ERROR: SERVER_PORT não definida no arquivo .env}:${SERVER_PORT}"
-
     env_file:
       - .env.docker
-
     environment:
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:? SPRING_DATASOURCE_USERNAME não definida no arquivo .env}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:? SPRING_DATASOURCE_PASSWORD não definida no arquivo .env}
@@ -43,6 +39,12 @@ services:
       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:? SPRING_MAIL_PASSWORD não definida no arquivo .env}
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:? SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH não definida no arquivo .env}
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:? SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE não definida no arquivo .env}
+    networks:
+      - pgeem-network
 
 volumes:
   postgres_data:
+
+networks:
+  pgeem-network:
+    name: pgeem-network
