@@ -104,4 +104,13 @@ public class EquipamentoEspacoController {
     public List<EquipamentoEspacoRetornoDTO> inativarEmLote(@Valid @RequestBody InativarEquipamentoEspacoLoteDTO dto) {
         return service.inativarEmLote(dto.equipamentoEspacoIds(), dto.usuarioId());
     }
+
+    @PutMapping("/editar-vinculo")
+    @Transactional
+    @Operation(summary = "Altera o espaço de um equipamento, encerra o vínculo atual e cria um novo")
+    public ResponseEntity<ApiResponseDTO<EquipamentoEspacoRetornoDTO>> editarVinculo(
+            @RequestBody @Valid VincularEquipamentoEspacoDTO data) {
+        var resultado = service.editarVinculo(data);
+        return ResponseEntity.ok(ApiResponseDTO.success(resultado));
+    }
 }
