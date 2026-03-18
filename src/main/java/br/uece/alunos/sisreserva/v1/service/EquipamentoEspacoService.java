@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EquipamentoEspacoService {
+    EquipamentoEspacoRetornoDTO editarVinculo(VincularEquipamentoEspacoDTO data);
     List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data);
     EquipamentoEspacoRetornoDTO vincularEquipamentoExistente(VincularEquipamentoEspacoDTO data);
     EquipamentoEspacoRetornoDTO inativar(String equipamentoEspacoId, String usuarioId);

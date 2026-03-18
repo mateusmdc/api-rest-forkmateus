@@ -7,11 +7,13 @@ import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.VincularEqu
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.VincularEquipamentoEspacoDTO;
+import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoEspacoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     private final VincularEquipamentoEspaco vincularEquipamentoEspaco;
     private final InativarEquipamentoEspaco inativarEquipamentoEspaco;
     private final ObterEquipamentosEspaco obterEquipamentosEspaco;
+    private final EquipamentoEspacoRepository repository;
 
     @Override
     public List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
@@ -41,6 +44,7 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
         return inativarEquipamentoEspaco.inativar(equipamentoEspacoId, usuarioId);
     }
 
+
     @Override
     public List<EquipamentoEspacoRetornoDTO> inativarEmLote(List<String> equipamentoEspacoIds, String usuarioId) {
         List<EquipamentoEspacoRetornoDTO> inativados = new ArrayList<>();
@@ -56,5 +60,20 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     @Override
     public Page<EquipamentoEspacoRetornoDTO> obter(Pageable pageable, String id, String equipamentoId, String tipoEquipamentoId, String espacoId, LocalDateTime dataInicio, LocalDateTime dataFim, String tipoEquipamentoNome, String espacoNome) {
         return obterEquipamentosEspaco.obter(pageable, id, equipamentoId, tipoEquipamentoId, espacoId, dataInicio, dataFim, tipoEquipamentoNome, espacoNome);
+    }
+
+    @Override
+    @Transactional
+    public EquipamentoEspacoRetornoDTO editarVinculo(VincularEquipamentoEspacoDTO data) {
+        var vinculosAtivos = repository.findByEquipamentoIdAndDataRemocaoIsNull(data.equipamentoId());
+
+        if (vinculosAtivos != null && !vinculosAtivos.isEmpty()) {
+            String vinculoId = vinculosAtivos.get(0).getId();
+            inativarEquipamentoEspaco.inativar(vinculoId, data.usuarioId());
+        }
+
+        var novoVinculo = vincularEquipamentoEspaco.executar(data);
+
+        return new EquipamentoEspacoRetornoDTO(novoVinculo);
     }
 }
