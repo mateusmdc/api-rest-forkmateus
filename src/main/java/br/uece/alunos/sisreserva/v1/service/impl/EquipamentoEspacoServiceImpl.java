@@ -1,13 +1,13 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.CriarEquipamentoEspaco;
+import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.EditarVinculoEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.InativarEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.ObterEquipamentosEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.VincularEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.CriarEquipamentoEspacoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.VincularEquipamentoEspacoDTO;
-import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoEspacoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     private final VincularEquipamentoEspaco vincularEquipamentoEspaco;
     private final InativarEquipamentoEspaco inativarEquipamentoEspaco;
     private final ObterEquipamentosEspaco obterEquipamentosEspaco;
-    private final EquipamentoEspacoRepository repository;
+    private final EditarVinculoEquipamentoEspaco editarVinculoEquipamentoEspaco;
 
     @Override
     public List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
@@ -65,15 +65,6 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     @Override
     @Transactional
     public EquipamentoEspacoRetornoDTO editarVinculo(VincularEquipamentoEspacoDTO data) {
-        var vinculosAtivos = repository.findByEquipamentoIdAndDataRemocaoIsNull(data.equipamentoId());
-
-        if (vinculosAtivos != null && !vinculosAtivos.isEmpty()) {
-            String vinculoId = vinculosAtivos.get(0).getId();
-            inativarEquipamentoEspaco.inativar(vinculoId, data.usuarioId());
-        }
-
-        var novoVinculo = vincularEquipamentoEspaco.executar(data);
-
-        return new EquipamentoEspacoRetornoDTO(novoVinculo);
+        return editarVinculoEquipamentoEspaco.executar(data);
     }
 }
