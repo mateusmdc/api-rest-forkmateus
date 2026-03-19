@@ -1,12 +1,15 @@
 package br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase;
 
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository;
+import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.useCase.ValidadorGestorEspaco;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.EquipamentoEspacoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamentoEspaco.VincularEquipamentoEspacoDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 /**
  * Caso de uso para editar o vínculo de um equipamento, transferindo-o de um espaço para outro.
@@ -20,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class EditarVinculoEquipamentoEspaco {
 
     private final EquipamentoEspacoRepository repository;
-    private final InativarEquipamentoEspaco inativarEquipamentoEspaco;
+    private final ValidadorGestorEspaco validaSeGestorEspaco;
     private final VincularEquipamentoEspaco vincularEquipamentoEspaco;
 
     /**
@@ -34,8 +37,13 @@ public class EditarVinculoEquipamentoEspaco {
     public EquipamentoEspacoRetornoDTO executar(VincularEquipamentoEspacoDTO dto) {
         var vinculosAtivos = repository.findByEquipamentoIdAndDataRemocaoIsNull(dto.equipamentoId());
 
-        for (var vinculo : vinculosAtivos) {
-            inativarEquipamentoEspaco.inativar(vinculo.getId(), dto.usuarioId());
+        if (!vinculosAtivos.isEmpty()) {
+            var agora = LocalDateTime.now();
+            for (var vinculo : vinculosAtivos) {
+                validaSeGestorEspaco.validarGestorAtivo(dto.usuarioId(), vinculo.getEspaco().getId());
+                vinculo.setDataRemocao(agora);
+            }
+            repository.saveAll(vinculosAtivos);
         }
 
         var novoVinculo = vincularEquipamentoEspaco.executar(dto);
