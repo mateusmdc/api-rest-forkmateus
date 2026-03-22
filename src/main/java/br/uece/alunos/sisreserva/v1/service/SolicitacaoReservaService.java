@@ -1,6 +1,8 @@
 package br.uece.alunos.sisreserva.v1.service;
 
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.ExcecaoRecorrenciaDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.OcorrenciaReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.RecorrenciaInfoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
@@ -83,4 +85,13 @@ public interface SolicitacaoReservaService {
      * @return informações da recorrência incluindo todas as ocorrências
      */
     RecorrenciaInfoDTO obterRecorrenciaInfo(String reservaId);
+
+    /**
+     * Cria ou atualiza uma exceção em uma ocorrência específica de uma série recorrente.
+     *
+     * @param serieId ID da série recorrente
+     * @param dto     dados da exceção (data, novo status, horários opcionais, motivo)
+     * @return dados da ocorrência atualizada
+     */
+    OcorrenciaReservaDTO criarExcecaoOcorrencia(String serieId, ExcecaoRecorrenciaDTO dto);
 }

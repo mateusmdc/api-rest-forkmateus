@@ -5,15 +5,24 @@ import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRe
 import br.uece.alunos.sisreserva.v1.domain.espaco.EspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.GestorEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.secretariaEspaco.SecretariaEspacoRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrencia;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrenciaRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReservaRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.TipoRecorrencia;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.RecorrenciaProcessor;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Validador de regras de negócio para solicitações de reserva.
@@ -49,6 +58,9 @@ public class SolicitacaoReservaValidator {
     @Autowired
     private UsuarioAutenticadoService usuarioAutenticadoService;
 
+    @Autowired
+    private ExcecaoRecorrenciaRepository excecaoRecorrenciaRepository;
+
     /**
      * Valida se já existe uma solicitação de reserva aprovada para o mesmo espaço e período informado.
      * 
@@ -58,10 +70,53 @@ public class SolicitacaoReservaValidator {
      * @throws IllegalArgumentException se houver conflito de horários
      */
     public void validarConflitoReserva(String espacoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        // Verifica conflito com reservas simples/legadas (isSerie = false)
         boolean existeConflito = repository.existsByEspacoIdAndPeriodoConflitanteAprovado(espacoId, dataInicio, dataFim);
         if (existeConflito) {
             throw new IllegalArgumentException("Já existe uma solicitação de reserva aprovada para este espaço no período informado.");
         }
+        // Verifica conflito com séries recorrentes aprovadas (isSerie = true)
+        if (existeConflitoComSeriesEspaco(espacoId, dataInicio, dataFim)) {
+            throw new IllegalArgumentException("Já existe uma série de reservas aprovada para este espaço que conflita com o período informado.");
+        }
+    }
+
+    /**
+     * Verifica se alguma ocorrência de série recorrente do espaço conflita com o intervalo dado.
+     */
+    private boolean existeConflitoComSeriesEspaco(String espacoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        List<SolicitacaoReserva> series = repository.findSeriesAprovadosDoEspacoComPeriodoRelevante(
+                espacoId, dataInicio, dataFim);
+        if (series.isEmpty()) return false;
+
+        List<String> serieIds = series.stream().map(SolicitacaoReserva::getId).collect(Collectors.toList());
+        List<ExcecaoRecorrencia> excecoes = excecaoRecorrenciaRepository.findBySerieIds(serieIds);
+        Map<String, Map<LocalDate, StatusSolicitacao>> statusPorSerieEData = excecoes.stream()
+                .collect(Collectors.groupingBy(
+                        ExcecaoRecorrencia::getSolicitacaoReservaId,
+                        Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, ExcecaoRecorrencia::getStatus)
+                ));
+
+        for (SolicitacaoReserva serie : series) {
+            long duracaoMinutos = RecorrenciaProcessor.calcularDuracaoEmMinutos(
+                    serie.getDataInicio(), serie.getDataFim());
+            Map<LocalDate, StatusSolicitacao> statusDaSerie =
+                    statusPorSerieEData.getOrDefault(serie.getId(), Map.of());
+
+            List<LocalDateTime> ocorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
+                    serie.getDataInicio(), serie.getDataFimRecorrencia(), serie.getTipoRecorrencia());
+
+            for (LocalDateTime ocorrenciaInicio : ocorrencias) {
+                StatusSolicitacao status = statusDaSerie.getOrDefault(
+                        ocorrenciaInicio.toLocalDate(), StatusSolicitacao.APROVADO);
+                if (status != StatusSolicitacao.APROVADO) continue;
+
+                LocalDateTime ocorrenciaFim = ocorrenciaInicio.plusMinutes(duracaoMinutos);
+                boolean conflita = ocorrenciaInicio.isBefore(dataFim) && ocorrenciaFim.isAfter(dataInicio);
+                if (conflita) return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -249,9 +304,9 @@ public class SolicitacaoReservaValidator {
      * @throws ValidationException se houver conflito de horários
      */
     public void validarConflitoReservaEquipamento(String equipamentoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        // Verifica conflito com reservas simples/legadas (isSerie = false)
         boolean existeConflito = repository.existsByEquipamentoIdAndPeriodoConflitanteAprovado(
                 equipamentoId, dataInicio, dataFim);
-        
         if (existeConflito) {
             log.warn("[VALIDATION] Conflito de reserva para equipamento ID: {} no período {} a {}",
                     equipamentoId, dataInicio, dataFim);
@@ -259,6 +314,50 @@ public class SolicitacaoReservaValidator {
                 "Já existe uma solicitação de reserva aprovada para este equipamento no período informado"
             );
         }
+        // Verifica conflito com séries recorrentes aprovadas (isSerie = true)
+        if (existeConflitoComSeriesEquipamento(equipamentoId, dataInicio, dataFim)) {
+            throw new ValidationException(
+                "Já existe uma série de reservas aprovada para este equipamento que conflita com o período informado"
+            );
+        }
+    }
+
+    /**
+     * Verifica se alguma ocorrência de série recorrente do equipamento conflita com o intervalo dado.
+     */
+    private boolean existeConflitoComSeriesEquipamento(String equipamentoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        List<SolicitacaoReserva> series = repository.findSeriesAprovadosDoEquipamentoComPeriodoRelevante(
+                equipamentoId, dataInicio, dataFim);
+        if (series.isEmpty()) return false;
+
+        List<String> serieIds = series.stream().map(SolicitacaoReserva::getId).collect(Collectors.toList());
+        List<ExcecaoRecorrencia> excecoes = excecaoRecorrenciaRepository.findBySerieIds(serieIds);
+        Map<String, Map<LocalDate, StatusSolicitacao>> statusPorSerieEData = excecoes.stream()
+                .collect(Collectors.groupingBy(
+                        ExcecaoRecorrencia::getSolicitacaoReservaId,
+                        Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, ExcecaoRecorrencia::getStatus)
+                ));
+
+        for (SolicitacaoReserva serie : series) {
+            long duracaoMinutos = RecorrenciaProcessor.calcularDuracaoEmMinutos(
+                    serie.getDataInicio(), serie.getDataFim());
+            Map<LocalDate, StatusSolicitacao> statusDaSerie =
+                    statusPorSerieEData.getOrDefault(serie.getId(), Map.of());
+
+            List<LocalDateTime> ocorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
+                    serie.getDataInicio(), serie.getDataFimRecorrencia(), serie.getTipoRecorrencia());
+
+            for (LocalDateTime ocorrenciaInicio : ocorrencias) {
+                StatusSolicitacao status = statusDaSerie.getOrDefault(
+                        ocorrenciaInicio.toLocalDate(), StatusSolicitacao.APROVADO);
+                if (status != StatusSolicitacao.APROVADO) continue;
+
+                LocalDateTime ocorrenciaFim = ocorrenciaInicio.plusMinutes(duracaoMinutos);
+                boolean conflita = ocorrenciaInicio.isBefore(dataFim) && ocorrenciaFim.isAfter(dataInicio);
+                if (conflita) return true;
+            }
+        }
+        return false;
     }
 
     /**
