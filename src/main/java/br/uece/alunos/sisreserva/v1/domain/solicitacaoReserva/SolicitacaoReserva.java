@@ -84,8 +84,15 @@ public class SolicitacaoReserva {
     @Column(name = "data_fim_recorrencia")
     private LocalDateTime dataFimRecorrencia;
 
-    @Column(name = "reserva_pai_id", length = 36)
-    private String reservaPaiId;
+    /**
+     * Indica se este registro representa uma série recorrente (true)
+     * ou um registro individual (false).
+     *
+     * Quando {@code true}, apenas esta entrada armazena toda a série; as ocorrências
+     * individuais são computadas dinamicamente e as exceções ficam em {@code excecao_recorrencia}.
+     */
+    @Column(name = "is_serie", nullable = false)
+    private Boolean isSerie = false;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
