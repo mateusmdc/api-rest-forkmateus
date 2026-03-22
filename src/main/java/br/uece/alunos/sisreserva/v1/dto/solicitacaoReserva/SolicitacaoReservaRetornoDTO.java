@@ -19,7 +19,6 @@ public record SolicitacaoReservaRetornoDTO(
     String projetoId,
     Integer tipoRecorrencia,
     LocalDateTime dataFimRecorrencia,
-    String reservaPaiId,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
@@ -35,7 +34,6 @@ public record SolicitacaoReservaRetornoDTO(
             solicitacaoReserva.getProjeto() != null ? solicitacaoReserva.getProjeto().getId() : null,
             solicitacaoReserva.getTipoRecorrencia().getCodigo(),
             solicitacaoReserva.getDataFimRecorrencia(),
-            solicitacaoReserva.getReservaPaiId(),
             solicitacaoReserva.getCreatedAt(),
             solicitacaoReserva.getUpdatedAt()
         );

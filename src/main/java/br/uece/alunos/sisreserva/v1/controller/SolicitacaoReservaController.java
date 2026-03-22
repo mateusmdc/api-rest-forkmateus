@@ -1,6 +1,8 @@
 package br.uece.alunos.sisreserva.v1.controller;
 
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.ExcecaoRecorrenciaDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.OcorrenciaReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
@@ -93,5 +95,24 @@ public class SolicitacaoReservaController {
     public ResponseEntity<ApiResponseDTO<RecorrenciaInfoDTO>> obterRecorrenciaInfo(@PathVariable String id) {
         var recorrenciaInfo = solicitacaoReservaService.obterRecorrenciaInfo(id);
         return ResponseEntity.ok(ApiResponseDTO.success(recorrenciaInfo));
+    }
+
+    /**
+     * Cria ou atualiza uma exceção em uma ocorrência específica de uma série recorrente.
+     *
+     * Permite cancelar, reagendar ou confirmar uma ocorrência individual sem afetar
+     * as demais ocorrências da série.
+     *
+     * @param id  ID da série recorrente
+     * @param dto dados da exceção
+     * @return dados da ocorrência atualizada
+     */
+    @PostMapping("/{id}/ocorrencias/excecao")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<OcorrenciaReservaDTO>> criarExcecaoOcorrencia(
+            @PathVariable String id,
+            @RequestBody @Valid ExcecaoRecorrenciaDTO dto) {
+        var ocorrenciaAtualizada = solicitacaoReservaService.criarExcecaoOcorrencia(id, dto);
+        return ResponseEntity.ok(ApiResponseDTO.success(ocorrenciaAtualizada));
     }
 }
