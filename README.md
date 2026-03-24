@@ -1,3 +1,5 @@
+docker-compose --profile dev up -d
+
 ## 🐳 Docker
 
 Para rodar a aplicação utilizando Docker, é **OBRIGATÓRIO** configurar as variáveis de ambiente antes de iniciar os containers.

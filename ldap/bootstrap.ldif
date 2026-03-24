@@ -1,0 +1,16 @@
+dn: ou=users,dc=uece,dc=br
+objectClass: organizationalUnit
+ou: users
+
+dn: uid=usuario.interno,ou=users,dc=uece,dc=br
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+objectClass: shadowAccount
+cn: usuario.interno
+uid: usuario.interno
+uidNumber: 10001
+gidNumber: 10001
+homeDirectory: /home/usuario.interno
+userPassword: usuario
+loginShell: /bin/bash

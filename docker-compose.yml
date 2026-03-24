@@ -14,6 +14,40 @@ services:
     networks:
       - pgeem-network
 
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: sisreserva-ldap
+    profiles: ["dev"]
+    restart: always
+    ports:
+      - "389:389"
+      - "636:636"
+    environment:
+      LDAP_ORGANISATION: "UECE"
+      LDAP_DOMAIN: "uece.br"
+      LDAP_ADMIN_PASSWORD: "admin"
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+      - ./ldap/bootstrap.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/50-bootstrap.ldif
+    networks:
+      - pgeem-network
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    container_name: sisreserva-ldap-ui
+    profiles: ["dev"]
+    restart: always
+    ports:
+      - "6443:443"
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    depends_on:
+      - openldap
+    networks:
+      - pgeem-network
+
   api:
     build:
       context: .
@@ -22,6 +56,7 @@ services:
     restart: on-failure
     depends_on:
       - db
+      - openldap
     ports:
       - "${SERVER_PORT:?ERROR: SERVER_PORT não definida no arquivo .env}:${SERVER_PORT}"
     env_file:
@@ -39,11 +74,20 @@ services:
       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD:? SPRING_MAIL_PASSWORD não definida no arquivo .env}
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:? SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH não definida no arquivo .env}
       - SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:? SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE não definida no arquivo .env}
+      - LDAP_URL=${LDAP_URL}
+      - LDAP_BASE_DN=${LDAP_BASE_DN}
+      - LDAP_BIND_DN=${LDAP_BIND_DN}
+      - LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD}
+      - LDAP_USER_SEARCH_BASE=${LDAP_USER_SEARCH_BASE}
+      - LDAP_USER_SEARCH_FILTER=${LDAP_USER_SEARCH_FILTER}
+      - API_SECURITY_ONBOARDING_SECRET=${API_SECURITY_ONBOARDING_SECRET:? API_SECURITY_ONBOARDING_SECRET não definida no arquivo .env}
     networks:
       - pgeem-network
 
 volumes:
   postgres_data:
+  ldap_data:
+  ldap_config:
 
 networks:
   pgeem-network:
