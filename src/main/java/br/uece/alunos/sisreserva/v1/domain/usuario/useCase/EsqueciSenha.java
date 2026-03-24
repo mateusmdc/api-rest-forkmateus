@@ -32,16 +32,17 @@ public class EsqueciSenha {
 
         validator.validarEmailExistenteParaRecuperacao(email);
         var usuario = repository.findByEmailToHandle(email);
-
-        if (credencialLocalRepository.findByUsuarioId(usuario.getId()).isEmpty()) {
+        var credencialOptional = credencialLocalRepository.findByUsuarioId(usuario.getId());
+        if (credencialOptional.isEmpty()) {
             throw new ValidationException("Usuários institucionais não podem redefinir a senha por aqui. A senha é gerenciada pelo diretório institucional da UECE.");
         }
+        var credencial = credencialOptional.get();
 
         var token = mailToken.gerarTokenEmail();
         var emUmaHora = LocalDateTime.now().plusHours(1);
         var esqueciSenhaDTO = new UsuarioEsqueciSenhaDTO(token, emUmaHora);
 
-        usuario.esqueciSenha(esqueciSenhaDTO);
+        credencial.esqueciSenha(esqueciSenhaDTO);
 
         var subject = "Esqueci Minha Senha - Sis Reserva";
 

@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
 import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.LoginStatus;
 import br.uece.alunos.sisreserva.v1.domain.auditLogLogin.useCase.RegisterAuditLog;
+import br.uece.alunos.sisreserva.v1.domain.credencialLocal.CredencialLocalRepository;
 import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioLoginDTO;
 import br.uece.alunos.sisreserva.v1.service.RefreshTokenLogService;
@@ -28,6 +29,7 @@ public class RealizarLogin {
     private final RegisterAuditLog registerAuditLog;
     private final RefreshTokenLogService refreshTokenLogService;
     private final UsuarioValidator usuarioValidator;
+    private final CredencialLocalRepository credencialLocalRepository;
 
     @Transactional
     public AuthTokensDTO login(UsuarioLoginDTO data, HttpServletRequest request) {
@@ -40,7 +42,11 @@ public class RealizarLogin {
 
             Usuario usuarioAutenticado = (Usuario) authentication.getPrincipal();
 
-            usuarioAutenticado.resetAccessCount();
+            credencialLocalRepository.findByUsuarioId(usuarioAutenticado.getId())
+                    .ifPresent(credencial -> {
+                        credencial.resetAccessCount();
+                        credencialLocalRepository.save(credencial);
+                    });
 
             var accessToken = tokenService.generateAccessToken(usuarioAutenticado);
             var refreshToken = tokenService.generateRefreshToken(usuarioAutenticado);
@@ -48,7 +54,10 @@ public class RealizarLogin {
             var refreshClaims = tokenService.parseClaims(refreshToken);
             var refreshTokenId = refreshClaims.getClaim("refreshId").asString();
             var issuedAt = refreshClaims.getIssuedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            var expiresAt = refreshClaims.getExpiresAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            var expiresAtRaw = refreshClaims.getExpiresAt();
+            var expiresAt = expiresAtRaw != null
+                    ? expiresAtRaw.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                    : null;
 
             refreshTokenLogService.registrar(
                     usuarioAutenticado,

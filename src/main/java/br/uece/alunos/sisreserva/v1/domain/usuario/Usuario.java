@@ -57,21 +57,6 @@ public class Usuario implements UserDetails {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Instituicao instituicao;
 
-    @Column(name = "access_failed_count")
-    private int accessFailedCount = 0;
-
-    @Column(name = "lockout_enabled")
-    private boolean lockoutEnabled = false;
-
-    @Column(name = "lockout_end")
-    private LocalDateTime lockoutEnd;
-
-    @Column(name = "token_expiration")
-    private LocalDateTime tokenExpiration;
-
-    @Column(name = "token_mail")
-    private String tokenMail;
-
     @Column(name = "refresh_token_enabled")
     private boolean refreshTokenEnabled = false;
 
@@ -146,17 +131,6 @@ public class Usuario implements UserDetails {
         }
     }
 
-    public void resetAccessCount() {
-        this.accessFailedCount = 0;
-        this.setLockoutEnabled(false);
-        this.setLockoutEnd(null);
-    }
-
-    public void esqueciSenha(UsuarioEsqueciSenhaDTO data) {
-        this.tokenMail = data.tokenMail();
-        this.tokenExpiration = data.tokenExpiration();
-    }
-
     @Override
     public String getPassword() {
         return credencialLocal != null ? credencialLocal.getSenha() : null;
@@ -165,26 +139,6 @@ public class Usuario implements UserDetails {
     @Override
     public String getUsername() {
         return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !lockoutEnabled;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return !lockoutEnabled;
     }
 
     @PrePersist

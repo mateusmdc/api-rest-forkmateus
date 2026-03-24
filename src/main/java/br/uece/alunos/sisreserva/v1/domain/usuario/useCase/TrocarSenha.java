@@ -28,21 +28,22 @@ public class TrocarSenha {
 
             var usuario = repository.findByEmailToHandle(data.email());
 
-            var tokenMail = usuario.getTokenMail();
-            var tokenExpiration = usuario.getTokenExpiration();
+            var credencial = credencialLocalRepository.findByUsuarioId(usuario.getId())
+                    .orElseThrow(() -> new ValidationException("Credencial local não encontrada. Usuários institucionais não podem trocar a senha por este fluxo."));
+
+            var tokenMail = credencial.getTokenMail();
+            var tokenExpiration = credencial.getTokenExpiration();
             var agora = LocalDateTime.now();
 
             var tokenIsValid = tokenMail != null && tokenMail.equals(data.tokenMail())
                     && tokenExpiration != null && agora.isBefore(tokenExpiration);
 
             if (tokenIsValid) {
-                var credencial = credencialLocalRepository.findByUsuarioId(usuario.getId())
-                        .orElseThrow(() -> new ValidationException("Credencial local não encontrada. Usuários institucionais não podem trocar a senha por este fluxo."));
-
                 String encodedPassword = bCryptPasswordEncoder.encode(data.senha());
                 credencial.setSenha(encodedPassword);
-                usuario.setTokenMail(null);
-                usuario.setTokenExpiration(null);
+
+                credencial.setTokenMail(null);
+                credencial.setTokenExpiration(null);
 
                 return new MessageResponseDTO("Sucesso ao trocar a senha do Usuário.");
             } else {

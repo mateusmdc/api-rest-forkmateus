@@ -52,7 +52,6 @@ public class RealizarLoginLdap {
         }
 
         var usuario = credencialLdap.get().getUsuario();
-        usuario.resetAccessCount();
 
         usuarioCache.evict(usuario.getEmail());
 
