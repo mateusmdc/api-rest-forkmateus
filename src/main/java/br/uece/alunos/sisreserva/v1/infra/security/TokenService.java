@@ -142,4 +142,55 @@ public class TokenService {
         //se alterar aqui tem que levar em consideração o expiration date do cookie http em cookieManager
         return LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.of("-03:00"));
     }
+
+    @Value("${api.security.onboarding.secret}")
+    private String onboardingSecret;
+
+    public String generateOnboardingToken(String ldapUsername) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(onboardingSecret);
+            return JWT.create()
+                    .withIssuer("sisreserva-api")
+                    .withSubject("onboarding")
+                    .withClaim("ldapUsername", ldapUsername)
+                    .withIssuedAt(Instant.now())
+                    .withExpiresAt(onboardingTokenExpirationDate())
+                    .sign(algorithm);
+        } catch (JWTCreationException e) {
+            throw new RuntimeException("Erro ao gerar o token de onboarding.", e);
+        }
+    }
+
+    public boolean isOnboardingTokenValid(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(onboardingSecret);
+            JWT.require(algorithm)
+                    .withIssuer("sisreserva-api")
+                    .withSubject("onboarding")
+                    .build()
+                    .verify(token);
+            return true;
+        } catch (JWTVerificationException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public String getLdapUsernameFromOnboardingToken(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(onboardingSecret);
+            return JWT.require(algorithm)
+                    .withIssuer("sisreserva-api")
+                    .withSubject("onboarding")
+                    .build()
+                    .verify(token)
+                    .getClaim("ldapUsername")
+                    .asString();
+        } catch (JWTVerificationException e) {
+            throw new RuntimeException("Token de onboarding inválido ou expirado.");
+        }
+    }
+
+    private Instant onboardingTokenExpirationDate() {
+        return LocalDateTime.now().plusMinutes(15).toInstant(ZoneOffset.of("-03:00"));
+    }
 }
