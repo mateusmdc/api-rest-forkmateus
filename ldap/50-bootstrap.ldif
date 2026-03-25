@@ -3,11 +3,11 @@ objectClass: organizationalUnit
 ou: users
 
 dn: uid=usuario.interno,ou=users,dc=uece,dc=br
-objectClass: top
-objectClass: account
+objectClass: inetOrgPerson
 objectClass: posixAccount
 objectClass: shadowAccount
 cn: usuario.interno
+sn: interno
 uid: usuario.interno
 uidNumber: 696
 gidNumber: 696
