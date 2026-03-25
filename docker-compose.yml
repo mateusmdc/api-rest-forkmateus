@@ -15,9 +15,9 @@ services:
       - pgeem-network
 
   openldap:
-    image: osixia/openldap:1.5.0
+    image: osixia/openldap
     container_name: sisreserva-ldap
-    profiles: ["dev"]
+    profiles: [ "dev" ]
     restart: always
     ports:
       - "389:389"
@@ -26,6 +26,8 @@ services:
       LDAP_ORGANISATION: "UECE"
       LDAP_DOMAIN: "uece.br"
       LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_TLS: "false"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
     volumes:
       - ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap/slapd.d
@@ -39,7 +41,7 @@ services:
     profiles: ["dev"]
     restart: always
     ports:
-      - "6443:443"
+      - "6443:80"
     environment:
       PHPLDAPADMIN_LDAP_HOSTS: "openldap"
       PHPLDAPADMIN_HTTPS: "false"

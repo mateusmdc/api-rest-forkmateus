@@ -9,8 +9,8 @@ objectClass: posixAccount
 objectClass: shadowAccount
 cn: usuario.interno
 uid: usuario.interno
-uidNumber: 10001
-gidNumber: 10001
+uidNumber: 696
+gidNumber: 696
 homeDirectory: /home/usuario.interno
 userPassword: usuario
 loginShell: /bin/bash
