@@ -77,7 +77,7 @@ public class SolicitacaoReservaValidator {
         }
         // Verifica conflito com séries recorrentes aprovadas (isSerie = true)
         if (existeConflitoComSeriesEspaco(espacoId, dataInicio, dataFim)) {
-            throw new IllegalArgumentException("Já existe uma série de reservas aprovada para este espaço que conflita com o período informado.");
+            throw new IllegalArgumentException("Já existe uma solicitação de reserva aprovada para este espaço no período informado.");
         }
     }
 
@@ -91,28 +91,31 @@ public class SolicitacaoReservaValidator {
 
         List<String> serieIds = series.stream().map(SolicitacaoReserva::getId).collect(Collectors.toList());
         List<ExcecaoRecorrencia> excecoes = excecaoRecorrenciaRepository.findBySerieIds(serieIds);
-        Map<String, Map<LocalDate, StatusSolicitacao>> statusPorSerieEData = excecoes.stream()
+        Map<String, Map<LocalDate, ExcecaoRecorrencia>> excecoesPorSerieEData = excecoes.stream()
                 .collect(Collectors.groupingBy(
                         ExcecaoRecorrencia::getSolicitacaoReservaId,
-                        Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, ExcecaoRecorrencia::getStatus)
+                        Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, e -> e)
                 ));
 
         for (SolicitacaoReserva serie : series) {
             long duracaoMinutos = RecorrenciaProcessor.calcularDuracaoEmMinutos(
                     serie.getDataInicio(), serie.getDataFim());
-            Map<LocalDate, StatusSolicitacao> statusDaSerie =
-                    statusPorSerieEData.getOrDefault(serie.getId(), Map.of());
+            Map<LocalDate, ExcecaoRecorrencia> excecoesDaSerie =
+                    excecoesPorSerieEData.getOrDefault(serie.getId(), Map.of());
 
             List<LocalDateTime> ocorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
                     serie.getDataInicio(), serie.getDataFimRecorrencia(), serie.getTipoRecorrencia());
 
             for (LocalDateTime ocorrenciaInicio : ocorrencias) {
-                StatusSolicitacao status = statusDaSerie.getOrDefault(
-                        ocorrenciaInicio.toLocalDate(), StatusSolicitacao.APROVADO);
+                ExcecaoRecorrencia excecao = excecoesDaSerie.get(ocorrenciaInicio.toLocalDate());
+                StatusSolicitacao status = excecao != null ? excecao.getStatus() : StatusSolicitacao.APROVADO;
                 if (status != StatusSolicitacao.APROVADO) continue;
 
-                LocalDateTime ocorrenciaFim = ocorrenciaInicio.plusMinutes(duracaoMinutos);
-                boolean conflita = ocorrenciaInicio.isBefore(dataFim) && ocorrenciaFim.isAfter(dataInicio);
+                LocalDateTime inicioEfetivo = excecao != null && excecao.getDataInicioNova() != null
+                        ? excecao.getDataInicioNova() : ocorrenciaInicio;
+                LocalDateTime fimEfetivo = excecao != null && excecao.getDataFimNova() != null
+                        ? excecao.getDataFimNova() : inicioEfetivo.plusMinutes(duracaoMinutos);
+                boolean conflita = inicioEfetivo.isBefore(dataFim) && fimEfetivo.isAfter(dataInicio);
                 if (conflita) return true;
             }
         }
@@ -317,7 +320,7 @@ public class SolicitacaoReservaValidator {
         // Verifica conflito com séries recorrentes aprovadas (isSerie = true)
         if (existeConflitoComSeriesEquipamento(equipamentoId, dataInicio, dataFim)) {
             throw new ValidationException(
-                "Já existe uma série de reservas aprovada para este equipamento que conflita com o período informado"
+                "Já existe uma solicitação de reserva aprovada para este equipamento no período informado"
             );
         }
     }
@@ -332,28 +335,31 @@ public class SolicitacaoReservaValidator {
 
         List<String> serieIds = series.stream().map(SolicitacaoReserva::getId).collect(Collectors.toList());
         List<ExcecaoRecorrencia> excecoes = excecaoRecorrenciaRepository.findBySerieIds(serieIds);
-        Map<String, Map<LocalDate, StatusSolicitacao>> statusPorSerieEData = excecoes.stream()
+        Map<String, Map<LocalDate, ExcecaoRecorrencia>> excecoesPorSerieEData = excecoes.stream()
                 .collect(Collectors.groupingBy(
                         ExcecaoRecorrencia::getSolicitacaoReservaId,
-                        Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, ExcecaoRecorrencia::getStatus)
+                        Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, e -> e)
                 ));
 
         for (SolicitacaoReserva serie : series) {
             long duracaoMinutos = RecorrenciaProcessor.calcularDuracaoEmMinutos(
                     serie.getDataInicio(), serie.getDataFim());
-            Map<LocalDate, StatusSolicitacao> statusDaSerie =
-                    statusPorSerieEData.getOrDefault(serie.getId(), Map.of());
+            Map<LocalDate, ExcecaoRecorrencia> excecoesDaSerie =
+                    excecoesPorSerieEData.getOrDefault(serie.getId(), Map.of());
 
             List<LocalDateTime> ocorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
                     serie.getDataInicio(), serie.getDataFimRecorrencia(), serie.getTipoRecorrencia());
 
             for (LocalDateTime ocorrenciaInicio : ocorrencias) {
-                StatusSolicitacao status = statusDaSerie.getOrDefault(
-                        ocorrenciaInicio.toLocalDate(), StatusSolicitacao.APROVADO);
+                ExcecaoRecorrencia excecao = excecoesDaSerie.get(ocorrenciaInicio.toLocalDate());
+                StatusSolicitacao status = excecao != null ? excecao.getStatus() : StatusSolicitacao.APROVADO;
                 if (status != StatusSolicitacao.APROVADO) continue;
 
-                LocalDateTime ocorrenciaFim = ocorrenciaInicio.plusMinutes(duracaoMinutos);
-                boolean conflita = ocorrenciaInicio.isBefore(dataFim) && ocorrenciaFim.isAfter(dataInicio);
+                LocalDateTime inicioEfetivo = excecao != null && excecao.getDataInicioNova() != null
+                        ? excecao.getDataInicioNova() : ocorrenciaInicio;
+                LocalDateTime fimEfetivo = excecao != null && excecao.getDataFimNova() != null
+                        ? excecao.getDataFimNova() : inicioEfetivo.plusMinutes(duracaoMinutos);
+                boolean conflita = inicioEfetivo.isBefore(dataFim) && fimEfetivo.isAfter(dataInicio);
                 if (conflita) return true;
             }
         }

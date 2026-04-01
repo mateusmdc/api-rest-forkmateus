@@ -64,6 +64,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
         FROM SolicitacaoReserva s
         WHERE s.espaco.id = :espacoId
+        AND s.isSerie = false
         AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
         AND s.dataInicio < :dataFim
         AND s.dataFim > :dataInicio
@@ -185,6 +186,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
         FROM SolicitacaoReserva s
         WHERE s.equipamento.id = :equipamentoId
+        AND s.isSerie = false
         AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
         AND s.dataInicio < :dataFim
         AND s.dataFim > :dataInicio
@@ -778,6 +780,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     @Query("""
         SELECT sr FROM SolicitacaoReserva sr
         JOIN FETCH sr.usuarioSolicitante
+        JOIN FETCH sr.espaco
         LEFT JOIN FETCH sr.projeto
         WHERE sr.espaco.id = :espacoId
           AND sr.isSerie = true
@@ -812,6 +815,33 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     List<SolicitacaoReserva> findSeriesAprovadasNoPeriodo(
         @Param("periodoInicio") LocalDateTime periodoInicio,
         @Param("periodoFim") LocalDateTime periodoFim
+    );
+
+    /**
+     * Verifica conflito de horário para um espaço, excluindo uma reserva específica.
+     * Considera apenas reservas aprovadas. Usado para validar reagendamentos de ocorrências
+     * sem que a própria série seja apontada como conflitante.
+     *
+     * @param espacoId   ID do espaço
+     * @param dataInicio data/hora de início do novo horário
+     * @param dataFim    data/hora de fim do novo horário
+     * @param excludeId  ID da reserva a excluir da busca (a própria série)
+     * @return true se houver conflito com outra reserva aprovada, false caso contrário
+     */
+    @Query("""
+        SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+        FROM SolicitacaoReserva s
+        WHERE s.espaco.id = :espacoId
+          AND s.id <> :excludeId
+          AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.dataInicio < :dataFim
+          AND s.dataFim > :dataInicio
+    """)
+    boolean existsConflitoPorEspacoExcluindoId(
+        @Param("espacoId") String espacoId,
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim,
+        @Param("excludeId") String excludeId
     );
 }
 

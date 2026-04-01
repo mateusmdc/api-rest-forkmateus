@@ -101,13 +101,6 @@ public class ObterHorariosOcupados {
                 );
 
                 for (LocalDateTime dataOcorrencia : ocorrencias) {
-                    LocalDateTime dataFimOcorrencia = dataOcorrencia.plusMinutes(duracaoMinutos);
-
-                    // Verificar se esta ocorrência está dentro do mês
-                    boolean dentroDoMes = !dataOcorrencia.isAfter(fimMes)
-                            && !dataFimOcorrencia.isBefore(inicioMes);
-                    if (!dentroDoMes) continue;
-
                     // Aplicar exceção (se existir) para obter status e horários efetivos
                     ExcecaoRecorrencia excecao = excecoesDaSerie.get(dataOcorrencia.toLocalDate());
 
@@ -118,7 +111,12 @@ public class ObterHorariosOcupados {
                     LocalDateTime inicioEfetivo = excecao != null && excecao.getDataInicioNova() != null
                             ? excecao.getDataInicioNova() : dataOcorrencia;
                     LocalDateTime fimEfetivo = excecao != null && excecao.getDataFimNova() != null
-                            ? excecao.getDataFimNova() : dataFimOcorrencia;
+                            ? excecao.getDataFimNova() : inicioEfetivo.plusMinutes(duracaoMinutos);
+
+                    // Verificar se esta ocorrência está dentro do mês (usando horários efetivos)
+                    boolean dentroDoMes = !inicioEfetivo.isAfter(fimMes)
+                            && !fimEfetivo.isBefore(inicioMes);
+                    if (!dentroDoMes) continue;
 
                     horariosOcupados.add(new HorarioOcupadoDTO(
                             serie.getEspaco() != null ? serie.getEspaco().getId() : null,
