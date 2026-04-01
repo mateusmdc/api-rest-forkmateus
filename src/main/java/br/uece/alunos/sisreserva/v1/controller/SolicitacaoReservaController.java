@@ -84,12 +84,14 @@ public class SolicitacaoReservaController {
     }
 
     /**
-     * Obtém informações completas sobre uma reserva recorrente.
+     * Obtém informações completas sobre uma série recorrente.
      *
-     * <p>Retorna a reserva pai e todas as reservas filhas (ocorrências) geradas pela recorrência.</p>
+     * Retorna os dados da série (registro com {@code isSerie = true}) e todas as ocorrências
+     * calculadas dinamicamente a partir da regra de recorrência, com eventuais exceções já aplicadas
+     * (cancelamentos, reagendamentos ou confirmações individuais).
      *
-     * @param id identificador da reserva (pode ser reserva pai ou filha)
-     * @return informações completas da recorrência
+     * @param id identificador da série recorrente ({@code isSerie = true})
+     * @return informações completas da série e suas ocorrências calculadas
      */
     @GetMapping("/{id}/recorrencia")
     public ResponseEntity<ApiResponseDTO<RecorrenciaInfoDTO>> obterRecorrenciaInfo(@PathVariable String id) {
