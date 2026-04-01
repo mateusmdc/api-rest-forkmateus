@@ -121,7 +121,7 @@ public class ObterRecorrenciaInfo {
 
         LocalDateTime dataFimEfetiva = excecao != null && excecao.getDataFimNova() != null
                 ? excecao.getDataFimNova()
-                : dataOcorrencia.plusMinutes(duracaoMinutos);
+                : dataInicioEfetiva.plusMinutes(duracaoMinutos);
 
         Integer statusEfetivo = excecao != null
                 ? excecao.getStatus().getCodigo()

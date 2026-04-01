@@ -4,6 +4,8 @@ import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrencia
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrenciaRepository;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReservaRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.validation.AtualizarStatusValidator;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.ExcecaoRecorrenciaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.OcorrenciaReservaDTO;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
@@ -42,6 +44,9 @@ public class AtualizarOcorrenciaReserva {
     @Autowired
     private ExcecaoRecorrenciaRepository excecaoRepository;
 
+    @Autowired
+    private AtualizarStatusValidator validator;
+
     /**
      * Aplica uma exceção a uma ocorrência específica de uma série recorrente.
      *
@@ -60,14 +65,17 @@ public class AtualizarOcorrenciaReserva {
                     "Esta solicitação não é uma série recorrente. Use o endpoint de atualização de status para reservas avulsas.");
         }
 
-        // 2. Verificar se a data informada é uma ocorrência válida da série
+        // 2. Validar permissão do usuário autenticado
+        validator.validarPermissaoParaAtualizarStatus(serie, dto.novoStatus());
+
+        // 3. Verificar se a data informada é uma ocorrência válida da série
         LocalDate dataOcorrencia = dto.dataOcorrencia();
         if (!isOcorrenciaValida(serie, dataOcorrencia)) {
             throw new ValidationException(
                     "A data " + dataOcorrencia + " não corresponde a uma ocorrência válida desta série recorrente.");
         }
 
-        // 3. Criar ou atualizar a exceção
+        // 4. Criar ou atualizar a exceção
         ExcecaoRecorrencia excecao = excecaoRepository
                 .findBySerieIdAndData(serieId, dataOcorrencia)
                 .orElseGet(ExcecaoRecorrencia::new);
@@ -77,11 +85,45 @@ public class AtualizarOcorrenciaReserva {
         excecao.setStatus(dto.novoStatus());
         excecao.setMotivo(dto.motivo());
 
-        if (dto.dataInicioNova() != null) {
-            excecao.setDataInicioNova(dto.dataInicioNova());
+        LocalDateTime dataInicioNova = dto.dataInicioNova();
+        LocalDateTime dataFimNova = dto.dataFimNova();
+
+        // Validação de coerência dos novos horários, se ambos forem informados
+        if (dataInicioNova != null && dataFimNova != null) {
+            if (!dataFimNova.isAfter(dataInicioNova)) {
+                throw new ValidationException(
+                        "A data/hora de término da ocorrência deve ser posterior à data/hora de início.");
+            }
+
+            LocalDate dataInicioNovaDia = dataInicioNova.toLocalDate();
+            LocalDate dataFimNovaDia = dataFimNova.toLocalDate();
+            if (!dataInicioNovaDia.equals(dataOcorrencia) || !dataFimNovaDia.equals(dataOcorrencia)) {
+                throw new ValidationException(
+                        "Os horários informados para a ocorrência devem estar na mesma data da ocorrência (" + dataOcorrencia + ").");
+            }
         }
-        if (dto.dataFimNova() != null) {
-            excecao.setDataFimNova(dto.dataFimNova());
+
+        // Sempre aplicar os valores (inclusive null) para permitir remover overrides anteriores
+        excecao.setDataInicioNova(dataInicioNova);
+        excecao.setDataFimNova(dataFimNova);
+
+        // Validar conflito de horário quando os horários são alterados e o status é APROVADO
+        if (dto.novoStatus() == StatusSolicitacao.APROVADO
+                && (dataInicioNova != null || dataFimNova != null)
+                && serie.getEspaco() != null) {
+            long duracaoMinutosConf = RecorrenciaProcessor.calcularDuracaoEmMinutos(
+                    serie.getDataInicio(), serie.getDataFim());
+            LocalDateTime inicioVerif = dataInicioNova != null
+                    ? dataInicioNova
+                    : dataOcorrencia.atTime(serie.getDataInicio().toLocalTime());
+            LocalDateTime fimVerif = dataFimNova != null
+                    ? dataFimNova
+                    : inicioVerif.plusMinutes(duracaoMinutosConf);
+            if (reservaRepository.existsConflitoPorEspacoExcluindoId(
+                    serie.getEspaco().getId(), inicioVerif, fimVerif, serieId)) {
+                throw new ValidationException(
+                        "Existe conflito de horário com outra reserva aprovada neste espaço para o período informado.");
+            }
         }
 
         ExcecaoRecorrencia salva = excecaoRepository.save(excecao);
@@ -103,7 +145,7 @@ public class AtualizarOcorrenciaReserva {
                 dataOcorrencia,
                 inicioEfetivo,
                 fimEfetivo,
-                salva.getStatus().ordinal(),
+                salva.getStatus().getCodigo(),
                 true,
                 salva.getId(),
                 salva.getMotivo()
