@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -118,7 +117,7 @@ public class CriarSolicitacaoReserva {
             validator.validarConflitoReservaEquipamento(data.equipamentoId(), data.dataInicio(), data.dataFim());
         }
 
-        var solicitacao = obterSolicitacaoComEntidadesRelacionadas(data, TipoRecorrencia.NAO_REPETE, null);
+        var solicitacao = obterSolicitacaoComEntidadesRelacionadas(data, TipoRecorrencia.NAO_REPETE);
 
         var solicitacaoSalva = repository.save(solicitacao);
 
@@ -133,103 +132,84 @@ public class CriarSolicitacaoReserva {
     }
 
     /**
-     * Cria múltiplas reservas recorrentes baseado no tipo de recorrência.
-     * 
-     * <p>Gera todas as datas de ocorrência, valida cada uma para conflitos,
-     * e cria as reservas em batch. A primeira reserva é a "reserva pai" e as
-     * demais referenciam ela através do campo reservaPaiId.</p>
-     * 
-     * @param data dados da reserva
+     * Cria um único registro de série recorrente (novo modelo).
+     *
+     * Em vez de criar N registros (um por ocorrência), cria apenas um registro
+     * com {@code isSerie = true}. As ocorrências individuais são calculadas dinamicamente
+     * pelo sistema a partir das regras de recorrência. Exceções por ocorrência são
+     * gerenciadas na tabela {@code excecao_recorrencia}.
+     *
+     * Ainda valida conflitos para todas as ocorrências antes de salvar,
+     * garantindo que nenhuma data da série conflite com reservas já aprovadas.
+     *
+     * @param data            dados da reserva
      * @param tipoRecorrencia tipo de recorrência
-     * @return DTO com os dados da reserva pai criada
-     * @throws IllegalArgumentException se houver conflito em alguma das datas
+     * @return DTO da série criada
+     * @throws IllegalArgumentException se houver conflito em alguma das datas calculadas
      */
     private SolicitacaoReservaRetornoDTO criarReservasRecorrentes(
-            SolicitacaoReservaDTO data, 
+            SolicitacaoReservaDTO data,
             TipoRecorrencia tipoRecorrencia) {
-        
+
         // Determinar se é reserva de espaço ou equipamento
         boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
         String targetId = isReservaEspaco ? data.espacoId() : data.equipamentoId();
-        
-        // Gerar todas as datas de ocorrência
+
+        // Gerar todas as datas de ocorrência (necessário para validação de conflitos)
         List<LocalDateTime> datasOcorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
-            data.dataInicio(), 
-            data.dataFimRecorrencia(), 
-            tipoRecorrencia
+                data.dataInicio(),
+                data.dataFimRecorrencia(),
+                tipoRecorrencia
         );
-        
-        // Calcular duração da reserva
+
+        // Calcular duração padrão da reserva
         long duracaoMinutos = RecorrenciaProcessor.calcularDuracaoEmMinutos(
-            data.dataInicio(), 
-            data.dataFim()
+                data.dataInicio(),
+                data.dataFim()
         );
-        
-        // Validar conflitos para todas as ocorrências
+
+        // Validar conflitos para todas as ocorrências ANTES de criar qualquer registro
         validarTodasOcorrencias(datasOcorrencias, duracaoMinutos, targetId, isReservaEspaco, data.usuarioSolicitanteId());
-        
-        // Obter entidades relacionadas uma única vez
+
+        // Obter entidades relacionadas
         Espaco espaco = null;
         Equipamento equipamento = null;
-        
+
         if (isReservaEspaco) {
             espaco = entityHandlerService.obterEspacoPorId(data.espacoId());
         } else {
             equipamento = entityHandlerService.obterEquipamentoPorId(data.equipamentoId());
         }
-        
+
         Usuario usuario = entityHandlerService.obterUsuarioPorId(data.usuarioSolicitanteId());
         Projeto projeto = null;
         if (data.projetoId() != null && !data.projetoId().isBlank()) {
             projeto = entityHandlerService.obterProjetoPorId(data.projetoId());
         }
-        
-        // Criar reserva pai (primeira ocorrência)
-        SolicitacaoReserva reservaPai = criarReserva(
-            datasOcorrencias.get(0),
-            duracaoMinutos,
-            espaco,
-            equipamento,
-            usuario,
-            projeto,
-            tipoRecorrencia,
-            data.dataFimRecorrencia(),
-            null // Reserva pai não tem pai
+
+        // Criar o único registro da série (novo modelo: isSerie = true)
+        SolicitacaoReserva serie = criarReserva(
+                data.dataInicio(),
+                duracaoMinutos,
+                espaco,
+                equipamento,
+                usuario,
+                projeto,
+                tipoRecorrencia,
+                data.dataFimRecorrencia()
         );
-        
-        SolicitacaoReserva reservaPaiSalva = repository.save(reservaPai);
-        
-        // Recarregar com relações para enviar notificação (evitar LazyInitializationException)
-        var reservaPaiComRelacoes = repository.findByIdWithRelations(reservaPaiSalva.getId())
-                .orElse(reservaPaiSalva);
-        
-        // Enviar notificação para gestores do espaço sobre a reserva pai
-        reservaEmailService.notificarGestoresSobreNovaSolicitacao(reservaPaiComRelacoes);
-        
-        // Criar reservas filhas (demais ocorrências)
-        if (datasOcorrencias.size() > 1) {
-            List<SolicitacaoReserva> reservasFilhas = new ArrayList<>();
-            
-            for (int i = 1; i < datasOcorrencias.size(); i++) {
-                SolicitacaoReserva reservaFilha = criarReserva(
-                    datasOcorrencias.get(i),
-                    duracaoMinutos,
-                    espaco,
-                    equipamento,
-                    usuario,
-                    projeto,
-                    tipoRecorrencia,
-                    data.dataFimRecorrencia(),
-                    reservaPaiSalva.getId()
-                );
-                reservasFilhas.add(reservaFilha);
-            }
-            
-            // Salvar todas as reservas filhas em batch
-            repository.saveAll(reservasFilhas);
-        }
-        
-        return new SolicitacaoReservaRetornoDTO(reservaPaiSalva);
+        serie.setIsSerie(true); // Marca como série
+
+        SolicitacaoReserva serieSalva = repository.save(serie);
+
+        // Recarregar com relações para enviar notificação
+        var serieComRelacoes = repository.findByIdWithRelations(serieSalva.getId())
+                .orElse(serieSalva);
+
+        // Notificar gestores sobre a nova série recorrente
+        reservaEmailService.notificarGestoresSobreNovaSolicitacao(serieComRelacoes);
+
+        return new SolicitacaoReservaRetornoDTO(serieSalva);
     }
 
     /**
@@ -271,7 +251,7 @@ public class CriarSolicitacaoReserva {
 
     /**
      * Cria uma instância de SolicitacaoReserva com os dados fornecidos.
-     * 
+     *
      * @param dataInicio data e hora de início
      * @param duracaoMinutos duração em minutos
      * @param espaco espaço reservado (null se for reserva de equipamento)
@@ -280,7 +260,6 @@ public class CriarSolicitacaoReserva {
      * @param projeto projeto associado (opcional)
      * @param tipoRecorrencia tipo de recorrência
      * @param dataFimRecorrencia data fim de recorrência
-     * @param reservaPaiId ID da reserva pai (null se for a reserva pai)
      * @return instância de SolicitacaoReserva
      */
     private SolicitacaoReserva criarReserva(
@@ -291,8 +270,7 @@ public class CriarSolicitacaoReserva {
             Usuario usuario,
             Projeto projeto,
             TipoRecorrencia tipoRecorrencia,
-            LocalDateTime dataFimRecorrencia,
-            String reservaPaiId) {
+            LocalDateTime dataFimRecorrencia) {
         
         SolicitacaoReserva solicitacao = new SolicitacaoReserva();
         solicitacao.setDataInicio(dataInicio);
@@ -304,23 +282,20 @@ public class CriarSolicitacaoReserva {
         solicitacao.setProjeto(projeto);
         solicitacao.setTipoRecorrencia(tipoRecorrencia);
         solicitacao.setDataFimRecorrencia(dataFimRecorrencia);
-        solicitacao.setReservaPaiId(reservaPaiId);
-        
+
         return solicitacao;
     }
 
     /**
      * Obtém uma solicitação de reserva com todas as entidades relacionadas carregadas.
-     * 
+     *
      * @param data dados da solicitação
      * @param tipoRecorrencia tipo de recorrência
-     * @param reservaPaiId ID da reserva pai (opcional)
      * @return instância de SolicitacaoReserva
      */
     public SolicitacaoReserva obterSolicitacaoComEntidadesRelacionadas(
             SolicitacaoReservaDTO data,
-            TipoRecorrencia tipoRecorrencia,
-            String reservaPaiId) {
+            TipoRecorrencia tipoRecorrencia) {
         
         // Determinar se é reserva de espaço ou equipamento
         boolean isReservaEspaco = data.espacoId() != null && !data.espacoId().isBlank();
@@ -340,19 +315,18 @@ public class CriarSolicitacaoReserva {
             projeto = entityHandlerService.obterProjetoPorId(data.projetoId());
         }
 
-        return fromDTO(data, espaco, equipamento, usuario, projeto, tipoRecorrencia, reservaPaiId);
+        return fromDTO(data, espaco, equipamento, usuario, projeto, tipoRecorrencia);
     }
 
     /**
      * Converte um DTO em uma entidade SolicitacaoReserva.
-     * 
+     *
      * @param dto dados da solicitação
      * @param espaco espaço reservado (null se for reserva de equipamento)
      * @param equipamento equipamento reservado (null se for reserva de espaço)
      * @param usuario usuário solicitante
      * @param projeto projeto associado (opcional)
      * @param tipoRecorrencia tipo de recorrência
-     * @param reservaPaiId ID da reserva pai (opcional)
      * @return instância de SolicitacaoReserva
      */
     public static SolicitacaoReserva fromDTO(
@@ -361,8 +335,7 @@ public class CriarSolicitacaoReserva {
             Equipamento equipamento,
             Usuario usuario, 
             Projeto projeto,
-            TipoRecorrencia tipoRecorrencia,
-            String reservaPaiId) {
+            TipoRecorrencia tipoRecorrencia) {
         
         SolicitacaoReserva solicitacao = new SolicitacaoReserva();
         solicitacao.setDataInicio(dto.dataInicio());
@@ -374,8 +347,7 @@ public class CriarSolicitacaoReserva {
         solicitacao.setProjeto(projeto);
         solicitacao.setTipoRecorrencia(tipoRecorrencia);
         solicitacao.setDataFimRecorrencia(dto.dataFimRecorrencia());
-        solicitacao.setReservaPaiId(reservaPaiId);
-        
+
         return solicitacao;
     }
 }

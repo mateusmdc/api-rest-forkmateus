@@ -3,7 +3,12 @@ package br.uece.alunos.sisreserva.v1.domain.equipamento.useCase;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.Equipamento;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.EquipamentoRepository;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrencia;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrenciaRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReservaRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.RecorrenciaProcessor;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EstatisticasEquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EstatisticasGeralEquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.espaco.ReservasMesDTO;
@@ -15,6 +20,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.*;
@@ -37,6 +44,7 @@ public class ObterEstatisticasEquipamentos {
     private final EquipamentoRepository equipamentoRepository;
     private final SolicitacaoReservaRepository solicitacaoReservaRepository;
     private final EquipamentoEspacoRepository equipamentoEspacoRepository;
+    private final ExcecaoRecorrenciaRepository excecaoRecorrenciaRepository;
     
     /**
      * Obtém estatísticas de uso dos equipamentos em um período.
@@ -190,24 +198,28 @@ public class ObterEstatisticasEquipamentos {
             int mesFinal, 
             int anoFinal) {
         
-        // Calcula estatísticas por mês do período
-        List<ReservasMesDTO> estatisticasPorMes = calcularEstatisticasPorMes(
+        // Expande séries recorrentes do equipamento no período (isSerie = true) – executado uma única vez
+        ExpansaoSeriesStats seriesStats = expandirSeriesNoPeriodo(
             equipamento.getId(), mesInicial, anoInicial, mesFinal, anoFinal);
+        
+        // Calcula estatísticas por mês do período (SQL simples + séries expandidas)
+        List<ReservasMesDTO> estatisticasPorMes = calcularEstatisticasPorMes(
+            equipamento.getId(), mesInicial, anoInicial, mesFinal, anoFinal, seriesStats);
         
         // Calcula totais do período
         TotaisPeriodoDTO totaisPeriodo = calcularTotaisPeriodo(estatisticasPorMes);
         
-        // Calcula mês com mais reservas (do período ou do ano se período for 1 mês)
-        ReservasMesDTO mesComMaisReservas = calcularMesComMaisReservas(
-            equipamento.getId(), mesInicial, anoInicial, mesFinal, anoFinal);
+        // Calcula mês com mais reservas a partir das estatísticas já mescladas
+        boolean periodoUnicoMes = (mesInicial == mesFinal && anoInicial == anoFinal);
+        ReservasMesDTO mesComMaisReservas = calcularMesComMaisReservas(estatisticasPorMes, periodoUnicoMes);
         
         // Calcula todos os usuários que reservaram no período (incluindo não aprovadas)
         List<UsuarioEstatisticaDTO> todosUsuarios = calcularTodosUsuarios(
-            equipamento.getId(), mesInicial, anoInicial, mesFinal, anoFinal);
+            equipamento.getId(), mesInicial, anoInicial, mesFinal, anoFinal, seriesStats);
         
         // Calcula usuários que mais reservaram no período (top 10 com reservas aprovadas)
         List<UsuarioEstatisticaDTO> usuariosQueMaisReservaram = calcularUsuariosQueMaisReservaram(
-            equipamento.getId(), mesInicial, anoInicial, mesFinal, anoFinal);
+            equipamento.getId(), mesInicial, anoInicial, mesFinal, anoFinal, seriesStats);
         
         return new EstatisticasEquipamentoDTO(
             equipamento.getId(),
@@ -237,86 +249,30 @@ public class ObterEstatisticasEquipamentos {
             int mesInicial, 
             int anoInicial, 
             int mesFinal, 
-            int anoFinal) {
+            int anoFinal,
+            ExpansaoSeriesStats seriesStats) {
         
         List<ReservasPorMesProjection> reservasPorMes = solicitacaoReservaRepository
             .contarReservasPorEquipamentoNoPeriodo(equipamentoId, mesInicial, anoInicial, mesFinal, anoFinal);
         
-        if (reservasPorMes.isEmpty()) {
-            // Se não houver reservas, retorna lista com zeros para cada mês do período
-            return gerarMesesVazios(mesInicial, anoInicial, mesFinal, anoFinal);
-        }
-        
-        // Converte projeções para DTOs, preenchendo meses sem reservas com zeros
-        return preencherMesesComZeros(reservasPorMes, mesInicial, anoInicial, mesFinal, anoFinal);
-    }
-    
-    /**
-     * Gera lista de meses vazios (com zeros) para o período.
-     * 
-     * @param mesInicial mês inicial
-     * @param anoInicial ano inicial
-     * @param mesFinal mês final
-     * @param anoFinal ano final
-     * @return lista de meses com estatísticas zeradas
-     */
-    private List<ReservasMesDTO> gerarMesesVazios(int mesInicial, int anoInicial, int mesFinal, int anoFinal) {
-        List<ReservasMesDTO> meses = new ArrayList<>();
-        YearMonth periodo = YearMonth.of(anoInicial, mesInicial);
-        YearMonth periodoFinal = YearMonth.of(anoFinal, mesFinal);
-        
-        while (!periodo.isAfter(periodoFinal)) {
-            meses.add(new ReservasMesDTO(periodo.getMonthValue(), periodo.getYear(), 0L, 0L));
-            periodo = periodo.plusMonths(1);
-        }
-        
-        return meses;
-    }
-    
-    /**
-     * Preenche meses sem reservas com zeros, mantendo ordem cronológica.
-     * 
-     * @param reservasPorMes lista de projeções com dados
-     * @param mesInicial mês inicial
-     * @param anoInicial ano inicial
-     * @param mesFinal mês final
-     * @param anoFinal ano final
-     * @return lista completa de meses, com zeros onde não há dados
-     */
-    private List<ReservasMesDTO> preencherMesesComZeros(
-            List<ReservasPorMesProjection> reservasPorMes,
-            int mesInicial, 
-            int anoInicial, 
-            int mesFinal, 
-            int anoFinal) {
-        
-        // Converte projeções para mapa para acesso rápido
-        Map<String, ReservasPorMesProjection> mapaReservas = reservasPorMes.stream()
+        Map<String, long[]> sqlMap = reservasPorMes.stream()
             .collect(Collectors.toMap(
                 p -> p.getAno() + "-" + p.getMes(),
-                p -> p
+                p -> new long[]{p.getTotalReservas(), p.getReservasConfirmadas()}
             ));
         
-        // Gera lista completa de meses
         List<ReservasMesDTO> meses = new ArrayList<>();
         YearMonth periodo = YearMonth.of(anoInicial, mesInicial);
         YearMonth periodoFinal = YearMonth.of(anoFinal, mesFinal);
         
         while (!periodo.isAfter(periodoFinal)) {
             String chave = periodo.getYear() + "-" + periodo.getMonthValue();
-            ReservasPorMesProjection reservas = mapaReservas.get(chave);
-            
-            if (reservas != null) {
-                meses.add(new ReservasMesDTO(
-                    reservas.getMes(),
-                    reservas.getAno(),
-                    reservas.getTotalReservas(),
-                    reservas.getReservasConfirmadas()
-                ));
-            } else {
-                meses.add(new ReservasMesDTO(periodo.getMonthValue(), periodo.getYear(), 0L, 0L));
-            }
-            
+            long[] sql = sqlMap.getOrDefault(chave, new long[]{0, 0});
+            long[] series = seriesStats.statsPorMes().getOrDefault(periodo, new long[]{0, 0});
+            meses.add(new ReservasMesDTO(
+                periodo.getMonthValue(), periodo.getYear(),
+                sql[0] + series[0], sql[1] + series[1]
+            ));
             periodo = periodo.plusMonths(1);
         }
         
@@ -352,37 +308,17 @@ public class ObterEstatisticasEquipamentos {
      * @return estatísticas do mês com mais reservas confirmadas, ou null se período for de 1 mês
      */
     private ReservasMesDTO calcularMesComMaisReservas(
-            String equipamentoId, 
-            int mesInicial, 
-            int anoInicial, 
-            int mesFinal, 
-            int anoFinal) {
+            List<ReservasMesDTO> estatisticasPorMes,
+            boolean periodoUnicoMes) {
         
-        // Verifica se o período é de um único mês
-        boolean periodoUnicoMes = (mesInicial == mesFinal && anoInicial == anoFinal);
-        
-        // Se for período de 1 mês, não retorna esta seção
         if (periodoUnicoMes) {
             return null;
         }
         
-        // Busca mês com mais reservas confirmadas do período
-        List<ReservasPorMesProjection> resultado = solicitacaoReservaRepository
-            .contarMesComMaisReservasPorEquipamentoNoPeriodo(equipamentoId, mesInicial, anoInicial, mesFinal, anoFinal);
-        
-        if (resultado.isEmpty()) {
-            // Se não houver reservas, retorna null
-            return null;
-        }
-        
-        // Retorna o primeiro (que tem mais reservas confirmadas)
-        ReservasPorMesProjection mesComMais = resultado.get(0);
-        return new ReservasMesDTO(
-            mesComMais.getMes(),
-            mesComMais.getAno(),
-            mesComMais.getTotalReservas(),
-            mesComMais.getReservasConfirmadas()
-        );
+        return estatisticasPorMes.stream()
+            .filter(m -> m.reservasConfirmadas() > 0)
+            .max(Comparator.comparingLong(ReservasMesDTO::reservasConfirmadas))
+            .orElse(null);
     }
     
     /**
@@ -401,18 +337,28 @@ public class ObterEstatisticasEquipamentos {
             int mesInicial, 
             int anoInicial, 
             int mesFinal, 
-            int anoFinal) {
+            int anoFinal,
+            ExpansaoSeriesStats seriesStats) {
         
         List<ReservasPorUsuarioProjection> reservasPorUsuario = solicitacaoReservaRepository
             .contarTodosUsuariosPorEquipamentoNoPeriodo(equipamentoId, mesInicial, anoInicial, mesFinal, anoFinal);
         
-        return reservasPorUsuario.stream()
-            .map(projection -> new UsuarioEstatisticaDTO(
-                projection.getUsuarioId(),
-                projection.getUsuarioNome(),
-                projection.getTotalReservas(),
-                projection.getReservasConfirmadas()
-            ))
+        Map<String, long[]> userMap = new LinkedHashMap<>();
+        Map<String, String> nomeMap = new HashMap<>();
+        for (ReservasPorUsuarioProjection p : reservasPorUsuario) {
+            userMap.put(p.getUsuarioId(), new long[]{p.getTotalReservas(), p.getReservasConfirmadas()});
+            nomeMap.put(p.getUsuarioId(), p.getUsuarioNome());
+        }
+        for (Map.Entry<String, long[]> entry : seriesStats.statsPorUsuario().entrySet()) {
+            String userId = entry.getKey();
+            long[] sc = entry.getValue();
+            nomeMap.putIfAbsent(userId, seriesStats.nomePorUsuario().get(userId));
+            long[] ex = userMap.getOrDefault(userId, new long[]{0, 0});
+            userMap.put(userId, new long[]{ex[0] + sc[0], ex[1] + sc[1]});
+        }
+        return userMap.entrySet().stream()
+            .map(e -> new UsuarioEstatisticaDTO(e.getKey(), nomeMap.get(e.getKey()), e.getValue()[0], e.getValue()[1]))
+            .sorted(Comparator.comparingLong(UsuarioEstatisticaDTO::reservasSolicitadas).reversed())
             .collect(Collectors.toList());
     }
     
@@ -432,19 +378,99 @@ public class ObterEstatisticasEquipamentos {
             int mesInicial, 
             int anoInicial, 
             int mesFinal, 
-            int anoFinal) {
+            int anoFinal,
+            ExpansaoSeriesStats seriesStats) {
         
         List<ReservasPorUsuarioProjection> reservasPorUsuario = solicitacaoReservaRepository
             .contarReservasPorEquipamentoEUsuarioNoPeriodo(equipamentoId, mesInicial, anoInicial, mesFinal, anoFinal);
         
-        return reservasPorUsuario.stream()
+        Map<String, long[]> userMap = new LinkedHashMap<>();
+        Map<String, String> nomeMap = new HashMap<>();
+        for (ReservasPorUsuarioProjection p : reservasPorUsuario) {
+            userMap.put(p.getUsuarioId(), new long[]{p.getTotalReservas(), p.getReservasConfirmadas()});
+            nomeMap.put(p.getUsuarioId(), p.getUsuarioNome());
+        }
+        for (Map.Entry<String, long[]> entry : seriesStats.statsPorUsuario().entrySet()) {
+            String userId = entry.getKey();
+            long[] sc = entry.getValue();
+            if (sc[1] == 0) continue;
+            nomeMap.putIfAbsent(userId, seriesStats.nomePorUsuario().get(userId));
+            long[] ex = userMap.getOrDefault(userId, new long[]{0, 0});
+            userMap.put(userId, new long[]{ex[0] + sc[0], ex[1] + sc[1]});
+        }
+        return userMap.entrySet().stream()
+            .filter(e -> e.getValue()[1] > 0)
+            .map(e -> new UsuarioEstatisticaDTO(e.getKey(), nomeMap.get(e.getKey()), e.getValue()[0], e.getValue()[1]))
+            .sorted(Comparator.comparingLong(UsuarioEstatisticaDTO::reservasConfirmadas).reversed())
             .limit(10)
-            .map(projection -> new UsuarioEstatisticaDTO(
-                projection.getUsuarioId(),
-                projection.getUsuarioNome(),
-                projection.getTotalReservas(),
-                projection.getReservasConfirmadas()
-            ))
             .collect(Collectors.toList());
+    }
+
+    // ==================== SUPORTE A SÉRIES RECORRENTES (isSerie = true) ====================
+
+    /** Carrega contadores de séries recorrentes expandidas no período para mesclagem com SQL. */
+    private record ExpansaoSeriesStats(
+        Map<YearMonth, long[]> statsPorMes,
+        Map<String, long[]> statsPorUsuario,
+        Map<String, String> nomePorUsuario
+    ) {}
+
+    private ExpansaoSeriesStats expandirSeriesNoPeriodo(
+            String equipamentoId,
+            int mesInicial, int anoInicial, int mesFinal, int anoFinal) {
+
+        YearMonth monthStart = YearMonth.of(anoInicial, mesInicial);
+        YearMonth monthEnd   = YearMonth.of(anoFinal, mesFinal);
+        LocalDateTime periodoStart = monthStart.atDay(1).atStartOfDay();
+        LocalDateTime periodoEnd   = monthEnd.atEndOfMonth().atTime(23, 59, 59);
+
+        List<SolicitacaoReserva> series =
+            solicitacaoReservaRepository.findSeriesDoEquipamentoNoPeriodo(equipamentoId, periodoStart, periodoEnd);
+
+        if (series.isEmpty()) {
+            return new ExpansaoSeriesStats(Map.of(), Map.of(), Map.of());
+        }
+
+        List<String> serieIds = series.stream().map(SolicitacaoReserva::getId).collect(Collectors.toList());
+        List<ExcecaoRecorrencia> allExcecoes = excecaoRecorrenciaRepository.findBySerieIds(serieIds);
+        Map<String, Map<LocalDate, ExcecaoRecorrencia>> excecoesPorSerie = allExcecoes.stream()
+            .collect(Collectors.groupingBy(
+                ExcecaoRecorrencia::getSolicitacaoReservaId,
+                Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, e -> e)
+            ));
+
+        Map<YearMonth, long[]> statsPorMes    = new HashMap<>();
+        Map<String, long[]>   statsPorUsuario = new HashMap<>();
+        Map<String, String>   nomePorUsuario  = new HashMap<>();
+
+        for (SolicitacaoReserva serie : series) {
+            Map<LocalDate, ExcecaoRecorrencia> excDaSerie =
+                excecoesPorSerie.getOrDefault(serie.getId(), Map.of());
+            String usuarioId   = serie.getUsuarioSolicitante().getId();
+            String usuarioNome = serie.getUsuarioSolicitante().getNome();
+            nomePorUsuario.put(usuarioId, usuarioNome);
+
+            List<LocalDateTime> ocorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
+                serie.getDataInicio(), serie.getDataFimRecorrencia(), serie.getTipoRecorrencia());
+
+            for (LocalDateTime dataOcorrencia : ocorrencias) {
+                YearMonth mesOcorrencia = YearMonth.of(
+                    dataOcorrencia.getYear(), dataOcorrencia.getMonthValue());
+                if (mesOcorrencia.isBefore(monthStart) || mesOcorrencia.isAfter(monthEnd)) continue;
+
+                ExcecaoRecorrencia excecao = excDaSerie.get(dataOcorrencia.toLocalDate());
+                StatusSolicitacao statusEfetivo = excecao != null ? excecao.getStatus() : serie.getStatus();
+
+                long[] ms = statsPorMes.computeIfAbsent(mesOcorrencia, k -> new long[]{0, 0});
+                ms[0]++;
+                if (statusEfetivo == StatusSolicitacao.APROVADO) ms[1]++;
+
+                long[] us = statsPorUsuario.computeIfAbsent(usuarioId, k -> new long[]{0, 0});
+                us[0]++;
+                if (statusEfetivo == StatusSolicitacao.APROVADO) us[1]++;
+            }
+        }
+
+        return new ExpansaoSeriesStats(statsPorMes, statsPorUsuario, nomePorUsuario);
     }
 }

@@ -1,12 +1,15 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.AtualizarOcorrenciaReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.AtualizarStatusSolicitacao;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.CriarSolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterHorariosOcupados;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterRecorrenciaInfo;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase.ObterSolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.AtualizarStatusSolicitacaoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.ExcecaoRecorrenciaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.OcorrenciaReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.RecorrenciaInfoDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
@@ -29,6 +32,7 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
     private final AtualizarStatusSolicitacao atualizarStatusSolicitacao;
     private final ObterHorariosOcupados obterHorariosOcupados;
     private final ObterRecorrenciaInfo obterRecorrenciaInfo;
+    private final AtualizarOcorrenciaReserva atualizarOcorrenciaReserva;
 
     @Override
     public SolicitacaoReservaRetornoDTO criarSolicitacaoReserva(SolicitacaoReservaDTO data) {
@@ -67,5 +71,10 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
     @Override
     public RecorrenciaInfoDTO obterRecorrenciaInfo(String reservaId) {
         return obterRecorrenciaInfo.obterRecorrenciaInfo(reservaId);
+    }
+
+    @Override
+    public OcorrenciaReservaDTO criarExcecaoOcorrencia(String serieId, ExcecaoRecorrenciaDTO dto) {
+        return atualizarOcorrenciaReserva.executar(serieId, dto);
     }
 }

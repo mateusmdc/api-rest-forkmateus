@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.service.impl;
 
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.CriarEquipamentoEspaco;
+import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.EditarVinculoEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.InativarEquipamentoEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.ObterEquipamentosEspaco;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.useCase.VincularEquipamentoEspaco;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     private final VincularEquipamentoEspaco vincularEquipamentoEspaco;
     private final InativarEquipamentoEspaco inativarEquipamentoEspaco;
     private final ObterEquipamentosEspaco obterEquipamentosEspaco;
+    private final EditarVinculoEquipamentoEspaco editarVinculoEquipamentoEspaco;
 
     @Override
     public List<EquipamentoEspacoRetornoDTO> criarEquipamentoAlocandoAoEspaco(CriarEquipamentoEspacoDTO data) {
@@ -41,6 +44,7 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
         return inativarEquipamentoEspaco.inativar(equipamentoEspacoId, usuarioId);
     }
 
+
     @Override
     public List<EquipamentoEspacoRetornoDTO> inativarEmLote(List<String> equipamentoEspacoIds, String usuarioId) {
         List<EquipamentoEspacoRetornoDTO> inativados = new ArrayList<>();
@@ -56,5 +60,11 @@ public class EquipamentoEspacoServiceImpl implements EquipamentoEspacoService {
     @Override
     public Page<EquipamentoEspacoRetornoDTO> obter(Pageable pageable, String id, String equipamentoId, String tipoEquipamentoId, String espacoId, LocalDateTime dataInicio, LocalDateTime dataFim, String tipoEquipamentoNome, String espacoNome) {
         return obterEquipamentosEspaco.obter(pageable, id, equipamentoId, tipoEquipamentoId, espacoId, dataInicio, dataFim, tipoEquipamentoNome, espacoNome);
+    }
+
+    @Override
+    @Transactional
+    public EquipamentoEspacoRetornoDTO editarVinculo(VincularEquipamentoEspacoDTO data) {
+        return editarVinculoEquipamentoEspaco.executar(data);
     }
 }

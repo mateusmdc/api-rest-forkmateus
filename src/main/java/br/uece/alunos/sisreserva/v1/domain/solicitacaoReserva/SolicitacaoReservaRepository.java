@@ -64,6 +64,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
         FROM SolicitacaoReserva s
         WHERE s.espaco.id = :espacoId
+        AND s.isSerie = false
         AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
         AND s.dataInicio < :dataFim
         AND s.dataFim > :dataInicio
@@ -89,6 +90,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     @Query("""
         SELECT s FROM SolicitacaoReserva s
         WHERE s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.isSerie = false
           AND s.dataInicio >= :dataInicio
           AND s.dataInicio < :dataFim
         ORDER BY s.dataInicio ASC
@@ -98,43 +100,13 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     @Query("""
         SELECT s FROM SolicitacaoReserva s
         WHERE s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.isSerie = false
           AND s.dataInicio >= :dataInicio
           AND s.dataInicio < :dataFim
           AND s.espaco.id = :espacoId
         ORDER BY s.dataInicio ASC
     """)
     List<SolicitacaoReserva> findReservasAprovadasPorPeriodoEEspaco(LocalDateTime dataInicio, LocalDateTime dataFim, String espacoId);
-
-    /**
-     * Busca todas as reservas filhas de uma reserva pai.
-     * 
-     * @param reservaPaiId ID da reserva pai
-     * @return lista de reservas filhas
-     */
-    @Query("SELECT sr FROM SolicitacaoReserva sr WHERE sr.reservaPaiId = :reservaPaiId ORDER BY sr.dataInicio ASC")
-    List<SolicitacaoReserva> findByReservaPaiId(String reservaPaiId);
-
-    /**
-     * Busca todas as reservas (pai e filhas) de um grupo de recorrência.
-     * 
-     * @param reservaPaiId ID da reserva pai
-     * @return lista contendo a reserva pai e todas as filhas
-     */
-    @Query("""
-        SELECT sr FROM SolicitacaoReserva sr 
-        WHERE sr.id = :reservaPaiId OR sr.reservaPaiId = :reservaPaiId 
-        ORDER BY sr.dataInicio ASC
-    """)
-    List<SolicitacaoReserva> findReservasPaiEFilhas(String reservaPaiId);
-
-    /**
-     * Conta quantas reservas filhas existem para uma reserva pai.
-     * 
-     * @param reservaPaiId ID da reserva pai
-     * @return número de reservas filhas
-     */
-    @Query("SELECT COUNT(sr) FROM SolicitacaoReserva sr WHERE sr.reservaPaiId = :reservaPaiId")
-    Long countByReservaPaiId(String reservaPaiId);
 
     /**
      * Conta reservas de um espaço em um mês/ano específico (query agregada otimizada).
@@ -214,6 +186,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
         SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
         FROM SolicitacaoReserva s
         WHERE s.equipamento.id = :equipamentoId
+        AND s.isSerie = false
         AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
         AND s.dataInicio < :dataFim
         AND s.dataFim > :dataInicio
@@ -409,6 +382,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.espaco.id = :espacoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
@@ -440,6 +414,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.equipamento.id = :equipamentoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
@@ -471,6 +446,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.espaco.id = :espacoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
@@ -503,6 +479,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.equipamento.id = :equipamentoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
@@ -536,6 +513,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.espaco.id = :espacoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
@@ -568,6 +546,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.equipamento.id = :equipamentoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY sr.usuarioSolicitante.id, sr.usuarioSolicitante.nome
@@ -599,6 +578,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.espaco.id = :espacoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
@@ -630,6 +610,7 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
             SUM(CASE WHEN sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO THEN 1 ELSE 0 END) as reservasConfirmadas
         FROM SolicitacaoReserva sr
         WHERE sr.equipamento.id = :equipamentoId
+          AND sr.isSerie = false
           AND (YEAR(sr.dataInicio) > :anoInicial OR (YEAR(sr.dataInicio) = :anoInicial AND MONTH(sr.dataInicio) >= :mesInicial))
           AND (YEAR(sr.dataInicio) < :anoFinal OR (YEAR(sr.dataInicio) = :anoFinal AND MONTH(sr.dataInicio) <= :mesFinal))
         GROUP BY MONTH(sr.dataInicio), YEAR(sr.dataInicio)
@@ -689,6 +670,178 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     List<ReservasPorMesProjection> contarMesComMaisReservasPorEquipamentoNoAno(
         @Param("equipamentoId") String equipamentoId,
         @Param("ano") int ano
+    );
+
+    // ==================== QUERIES PARA SÉRIES RECORRENTES (isSerie = true) ====================
+
+    /**
+     * Busca séries recorrentes aprovadas de um espaço cujo período se sobrepõe ao intervalo dado.
+     * Usado para detecção de conflito ao criar nova reserva.
+     *
+     * @param espacoId  ID do espaço
+     * @param dataInicio início do intervalo a verificar
+     * @param dataFim    fim do intervalo a verificar
+     * @return séries aprovadas do espaço com sobreposição de período
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        JOIN FETCH sr.usuarioSolicitante
+        WHERE sr.espaco.id = :espacoId
+          AND sr.isSerie = true
+          AND sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND sr.dataInicio <= :dataFim
+          AND sr.dataFimRecorrencia >= :dataInicio
+    """)
+    List<SolicitacaoReserva> findSeriesAprovadosDoEspacoComPeriodoRelevante(
+        @Param("espacoId") String espacoId,
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim
+    );
+
+    /**
+     * Busca séries recorrentes aprovadas de um equipamento cujo período se sobrepõe ao intervalo dado.
+     * Usado para detecção de conflito ao criar nova reserva.
+     *
+     * @param equipamentoId ID do equipamento
+     * @param dataInicio    início do intervalo a verificar
+     * @param dataFim       fim do intervalo a verificar
+     * @return séries aprovadas do equipamento com sobreposição de período
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        JOIN FETCH sr.usuarioSolicitante
+        WHERE sr.equipamento.id = :equipamentoId
+          AND sr.isSerie = true
+          AND sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND sr.dataInicio <= :dataFim
+          AND sr.dataFimRecorrencia >= :dataInicio
+    """)
+    List<SolicitacaoReserva> findSeriesAprovadosDoEquipamentoComPeriodoRelevante(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim
+    );
+
+    /**
+     * Busca séries recorrentes (qualquer status) de um espaço cujo período se sobrepõe ao intervalo dado.
+     * Usado para calcular estatísticas do espaço.
+     *
+     * @param espacoId     ID do espaço
+     * @param periodoInicio início do período de estatística
+     * @param periodoFim    fim do período de estatística
+     * @return séries do espaço com sobreposição de período
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        JOIN FETCH sr.usuarioSolicitante
+        WHERE sr.espaco.id = :espacoId
+          AND sr.isSerie = true
+          AND sr.dataInicio <= :periodoFim
+          AND sr.dataFimRecorrencia >= :periodoInicio
+    """)
+    List<SolicitacaoReserva> findSeriesDoEspacoNoPeriodo(
+        @Param("espacoId") String espacoId,
+        @Param("periodoInicio") LocalDateTime periodoInicio,
+        @Param("periodoFim") LocalDateTime periodoFim
+    );
+
+    /**
+     * Busca séries recorrentes (qualquer status) de um equipamento cujo período se sobrepõe ao intervalo dado.
+     * Usado para calcular estatísticas do equipamento.
+     *
+     * @param equipamentoId ID do equipamento
+     * @param periodoInicio início do período de estatística
+     * @param periodoFim    fim do período de estatística
+     * @return séries do equipamento com sobreposição de período
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        JOIN FETCH sr.usuarioSolicitante
+        WHERE sr.equipamento.id = :equipamentoId
+          AND sr.isSerie = true
+          AND sr.dataInicio <= :periodoFim
+          AND sr.dataFimRecorrencia >= :periodoInicio
+    """)
+    List<SolicitacaoReserva> findSeriesDoEquipamentoNoPeriodo(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("periodoInicio") LocalDateTime periodoInicio,
+        @Param("periodoFim") LocalDateTime periodoFim
+    );
+
+    /**
+     * Busca séries recorrentes aprovadas de um espaço com ocorrências no intervalo dado.
+     * Usado para obter horários ocupados.
+     *
+     * @param espacoId     ID do espaço
+     * @param periodoInicio início do período
+     * @param periodoFim    fim do período
+     * @return séries aprovadas do espaço com sobreposição de período
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        JOIN FETCH sr.usuarioSolicitante
+        JOIN FETCH sr.espaco
+        LEFT JOIN FETCH sr.projeto
+        WHERE sr.espaco.id = :espacoId
+          AND sr.isSerie = true
+          AND sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND sr.dataInicio <= :periodoFim
+          AND sr.dataFimRecorrencia >= :periodoInicio
+    """)
+    List<SolicitacaoReserva> findSeriesAprovadasDoEspacoNoPeriodo(
+        @Param("espacoId") String espacoId,
+        @Param("periodoInicio") LocalDateTime periodoInicio,
+        @Param("periodoFim") LocalDateTime periodoFim
+    );
+
+    /**
+     * Busca todas as séries recorrentes aprovadas (todos os espaços) com ocorrências no intervalo dado.
+     * Usado para obter horários ocupados sem filtro de espaço.
+     *
+     * @param periodoInicio início do período
+     * @param periodoFim    fim do período
+     * @return séries aprovadas com sobreposição de período
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        JOIN FETCH sr.usuarioSolicitante
+        JOIN FETCH sr.espaco
+        LEFT JOIN FETCH sr.projeto
+        WHERE sr.isSerie = true
+          AND sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND sr.dataInicio <= :periodoFim
+          AND sr.dataFimRecorrencia >= :periodoInicio
+    """)
+    List<SolicitacaoReserva> findSeriesAprovadasNoPeriodo(
+        @Param("periodoInicio") LocalDateTime periodoInicio,
+        @Param("periodoFim") LocalDateTime periodoFim
+    );
+
+    /**
+     * Verifica conflito de horário para um espaço, excluindo uma reserva específica.
+     * Considera apenas reservas aprovadas. Usado para validar reagendamentos de ocorrências
+     * sem que a própria série seja apontada como conflitante.
+     *
+     * @param espacoId   ID do espaço
+     * @param dataInicio data/hora de início do novo horário
+     * @param dataFim    data/hora de fim do novo horário
+     * @param excludeId  ID da reserva a excluir da busca (a própria série)
+     * @return true se houver conflito com outra reserva aprovada, false caso contrário
+     */
+    @Query("""
+        SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END
+        FROM SolicitacaoReserva s
+        WHERE s.espaco.id = :espacoId
+          AND s.id <> :excludeId
+          AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.dataInicio < :dataFim
+          AND s.dataFim > :dataInicio
+    """)
+    boolean existsConflitoPorEspacoExcluindoId(
+        @Param("espacoId") String espacoId,
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim,
+        @Param("excludeId") String excludeId
     );
 }
 
