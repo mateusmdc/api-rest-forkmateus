@@ -4,6 +4,7 @@ import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EstatisticasGeralEquipamentoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -46,6 +47,21 @@ public interface EquipamentoService {
      */
     byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId) throws java.io.IOException;
     
+    /**
+     * Obtém os horários ocupados de um equipamento em um mês específico.
+     *
+     * Retorna reservas simples aprovadas agrupadas por dia ({@code diasComHorariosOcupados})
+     * e séries recorrentes aprovadas com suas ocorrências efetivas no mês
+     * ({@code seriesRecorrentes}), considerando eventuais exceções de recorrência.
+     *
+     * @param equipamentoId ID do equipamento; deve existir no banco
+     * @param mes           mês (1-12); usa o mês atual quando núlo
+     * @param ano           ano; usa o ano atual quando nulo
+     * @return horários ocupados agrupados por dia e séries recorrentes
+     */
+    HorariosOcupadosPorMesDTO obterHorariosOcupadosPorEquipamento(
+            String equipamentoId, Integer mes, Integer ano);
+
     /**
      * Obtém equipamentos reserváveis com filtros e paginação.
      * Retorna apenas equipamentos com o campo 'reservavel' definido como true.

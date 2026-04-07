@@ -4,9 +4,11 @@ import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EstatisticasGeralEquipamentoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import br.uece.alunos.sisreserva.v1.dto.utils.ApiResponseDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -107,6 +109,33 @@ public class EquipamentoController {
             @RequestBody EquipamentoAtualizarDTO data) {
         var atualizado = service.atualizar(id, data);
         return ResponseEntity.ok(ApiResponseDTO.success(atualizado));
+    }
+
+    /**
+     * Retorna os horários ocupados de um equipamento em um mês específico.
+     *
+     * Inclui tanto reservas simples aprovadas (agrupadas por dia em
+     * {@code diasComHorariosOcupados}) quanto séries recorrentes aprovadas (em
+     * {@code seriesRecorrentes}), com suas ocorrências efetivas no mês após aplicar
+     * eventuais exceções de recorrência.
+     *
+     * @param id  ID do equipamento
+     * @param mes mês (1-12); usa o mês atual quando omitido
+     * @param ano ano; usa o ano atual quando omitido
+     * @return horários ocupados do equipamento no mês
+     */
+    @GetMapping("/{id}/horarios-ocupados")
+    @Operation(summary = "Obter horários ocupados do equipamento",
+               description = "Retorna reservas aprovadas do equipamento no mês, agrupadas por dia " +
+                             "(reservas simples) e como séries recorrentes separadamente.")
+    public ResponseEntity<ApiResponseDTO<HorariosOcupadosPorMesDTO>> obterHorariosOcupados(
+            @PathVariable String id,
+            @Parameter(description = "Mês (1-12); usa o mês atual quando omitido")
+            @RequestParam(required = false) Integer mes,
+            @Parameter(description = "Ano; usa o ano atual quando omitido")
+            @RequestParam(required = false) Integer ano) {
+        var horariosOcupados = service.obterHorariosOcupadosPorEquipamento(id, mes, ano);
+        return ResponseEntity.ok(ApiResponseDTO.success(horariosOcupados));
     }
 
     @DeleteMapping("/{id}")

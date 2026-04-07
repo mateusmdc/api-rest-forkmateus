@@ -769,6 +769,59 @@ public interface SolicitacaoReservaRepository extends JpaRepository<SolicitacaoR
     );
 
     /**
+     * Busca reservas simples (não-série) aprovadas de um equipamento em um período específico,
+     * com eager load dos relacionamentos necessários para montar o DTO de horários ocupados.
+     *
+     * @param dataInicio    início do período (inclusive)
+     * @param dataFim       fim do período (exclusive)
+     * @param equipamentoId ID do equipamento
+     * @return lista de reservas simples aprovadas, ordenadas por data de início
+     */
+    @Query("""
+        SELECT s FROM SolicitacaoReserva s
+        JOIN FETCH s.usuarioSolicitante
+        JOIN FETCH s.equipamento
+        LEFT JOIN FETCH s.projeto
+        WHERE s.equipamento.id = :equipamentoId
+          AND s.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND s.isSerie = false
+          AND s.dataInicio >= :dataInicio
+          AND s.dataInicio < :dataFim
+        ORDER BY s.dataInicio ASC
+    """)
+    List<SolicitacaoReserva> findReservasAprovadasSimplesPorPeriodoEEquipamento(
+        @Param("dataInicio") LocalDateTime dataInicio,
+        @Param("dataFim") LocalDateTime dataFim,
+        @Param("equipamentoId") String equipamentoId
+    );
+
+    /**
+     * Busca séries recorrentes aprovadas de um equipamento com ocorrências no intervalo dado.
+     * Usado para obter horários ocupados do equipamento.
+     *
+     * @param equipamentoId ID do equipamento
+     * @param periodoInicio início do período
+     * @param periodoFim    fim do período
+     * @return séries aprovadas do equipamento com sobreposição de período
+     */
+    @Query("""
+        SELECT sr FROM SolicitacaoReserva sr
+        JOIN FETCH sr.usuarioSolicitante
+        JOIN FETCH sr.equipamento
+        LEFT JOIN FETCH sr.projeto
+        WHERE sr.equipamento.id = :equipamentoId
+          AND sr.isSerie = true
+          AND sr.status = br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao.APROVADO
+          AND sr.dataInicio <= :periodoFim
+          AND sr.dataFimRecorrencia >= :periodoInicio
+    """)
+    List<SolicitacaoReserva> findSeriesAprovadasDoEquipamentoNoPeriodo(
+        @Param("equipamentoId") String equipamentoId,
+        @Param("periodoInicio") LocalDateTime periodoInicio,
+        @Param("periodoFim") LocalDateTime periodoFim
+    );
+
+    /**
      * Busca séries recorrentes aprovadas de um espaço com ocorrências no intervalo dado.
      * Usado para obter horários ocupados.
      *

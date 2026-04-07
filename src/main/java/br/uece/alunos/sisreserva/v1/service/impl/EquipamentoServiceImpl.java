@@ -5,10 +5,12 @@ import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.CriarEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.DeletarEquipamento;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.ObterEquipamentos;
 import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.ObterEstatisticasEquipamentos;
+import br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.ObterHorariosOcupadosEquipamento;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoAtualizarDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EquipamentoRetornoDTO;
 import br.uece.alunos.sisreserva.v1.dto.equipamento.EstatisticasGeralEquipamentoDTO;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.HorariosOcupadosPorMesDTO;
 import br.uece.alunos.sisreserva.v1.service.EquipamentoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     private final DeletarEquipamento deletarEquipamento;
     private final ObterEquipamentos obterEquipamentos;
     private final ObterEstatisticasEquipamentos obterEstatisticasEquipamentos;
+    private final ObterHorariosOcupadosEquipamento obterHorariosOcupadosEquipamento;
     private final br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.GerarPDFEstatisticasEquipamentos gerarPDFEstatisticasEquipamentos;
     private final br.uece.alunos.sisreserva.v1.domain.equipamento.useCase.ObterEquipamentosReservaveis obterEquipamentosReservaveis;
 
@@ -56,6 +59,13 @@ public class EquipamentoServiceImpl implements EquipamentoService {
     @Override
     public byte[] gerarPDFEstatisticas(Integer mesInicial, Integer anoInicial, Integer mesFinal, Integer anoFinal, List<String> equipamentoIds, String tipoEquipamentoId, Boolean multiusuario, String espacoId) throws java.io.IOException {
         return gerarPDFEstatisticasEquipamentos.gerarPDF(mesInicial, anoInicial, mesFinal, anoFinal, equipamentoIds, tipoEquipamentoId, multiusuario, espacoId);
+    }
+
+    @Override
+    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorEquipamento(
+            String equipamentoId, Integer mes, Integer ano) {
+        return obterHorariosOcupadosEquipamento.obterHorariosOcupadosPorEquipamento(
+                equipamentoId, mes, ano);
     }
 
     @Override
