@@ -44,6 +44,9 @@ public interface SolicitacaoReservaService {
      * @param status                 filtro por status
      * @param projetoId              filtro por projeto
      * @param espacoDoEquipamentoId  filtra reservas de equipamentos pertencentes ao espaço informado
+     * @param mes                    mês (1-12) para filtrar por período; séries recorrentes
+     *                               incluirão lista de ocorrências calculadas no mês
+     * @param ano                    ano do filtro de mês; usa o ano atual quando nulo
      * @return página de reservas encontradas
      */
     Page<SolicitacaoReservaRetornoDTO> obterSolicitacaoReserva(
@@ -56,7 +59,9 @@ public interface SolicitacaoReservaService {
             String usuarioSolicitanteId,
             Integer status,
             String projetoId,
-            String espacoDoEquipamentoId
+            String espacoDoEquipamentoId,
+            Integer mes,
+            Integer ano
     );
 
     /**

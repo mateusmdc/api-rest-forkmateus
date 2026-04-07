@@ -2,6 +2,7 @@ package br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva;
 
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO de retorno para solicitação de reserva.
@@ -20,8 +21,10 @@ public record SolicitacaoReservaRetornoDTO(
     Integer tipoRecorrencia,
     LocalDateTime dataFimRecorrencia,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    List<OcorrenciaReservaDTO> ocorrenciasMes
 ) {
+    /** Construtor padrão sem ocorrências do mês (para listagem sem filtro de mês). */
     public SolicitacaoReservaRetornoDTO(SolicitacaoReserva solicitacaoReserva) {
         this(
             solicitacaoReserva.getId(),
@@ -35,7 +38,27 @@ public record SolicitacaoReservaRetornoDTO(
             solicitacaoReserva.getTipoRecorrencia().getCodigo(),
             solicitacaoReserva.getDataFimRecorrencia(),
             solicitacaoReserva.getCreatedAt(),
-            solicitacaoReserva.getUpdatedAt()
+            solicitacaoReserva.getUpdatedAt(),
+            null
+        );
+    }
+
+    /** Construtor com ocorrências do mês calculadas (para listagem com filtro de mês). */
+    public SolicitacaoReservaRetornoDTO(SolicitacaoReserva solicitacaoReserva, List<OcorrenciaReservaDTO> ocorrenciasMes) {
+        this(
+            solicitacaoReserva.getId(),
+            solicitacaoReserva.getDataInicio(),
+            solicitacaoReserva.getDataFim(),
+            solicitacaoReserva.getEspaco() != null ? solicitacaoReserva.getEspaco().getId() : null,
+            solicitacaoReserva.getEquipamento() != null ? solicitacaoReserva.getEquipamento().getId() : null,
+            solicitacaoReserva.getUsuarioSolicitante().getId(),
+            solicitacaoReserva.getStatus().getCodigo(),
+            solicitacaoReserva.getProjeto() != null ? solicitacaoReserva.getProjeto().getId() : null,
+            solicitacaoReserva.getTipoRecorrencia().getCodigo(),
+            solicitacaoReserva.getDataFimRecorrencia(),
+            solicitacaoReserva.getCreatedAt(),
+            solicitacaoReserva.getUpdatedAt(),
+            ocorrenciasMes
         );
     }
 }

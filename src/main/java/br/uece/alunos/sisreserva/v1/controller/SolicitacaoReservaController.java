@@ -55,12 +55,16 @@ public class SolicitacaoReservaController {
             @RequestParam(required = false) Integer statusCodigo,
             @RequestParam(required = false) String projetoId,
             @Parameter(description = "Filtra reservas de equipamentos pertencentes ao espaço informado")
-            @RequestParam(required = false) String espacoDoEquipamentoId
+            @RequestParam(required = false) String espacoDoEquipamentoId,
+            @Parameter(description = "Mês (1-12) para filtrar por período; séries recorrentes retornam ocorrências calculadas do mês")
+            @RequestParam(required = false) Integer mes,
+            @Parameter(description = "Ano para filtro de mês; usa o ano atual quando omitido")
+            @RequestParam(required = false) Integer ano
     ) {
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortOrder), sortField));
         var solicitacoesPaginadas = solicitacaoReservaService.obterSolicitacaoReserva(
                 pageable, id, dataInicio, dataFim, espacoId, equipamentoId,
-                usuarioSolicitanteId, statusCodigo, projetoId, espacoDoEquipamentoId
+                usuarioSolicitanteId, statusCodigo, projetoId, espacoDoEquipamentoId, mes, ano
         );
         return ResponseEntity.ok(ApiResponseDTO.success(solicitacoesPaginadas));
     }
