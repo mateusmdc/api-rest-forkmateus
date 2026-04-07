@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
+import br.uece.alunos.sisreserva.v1.domain.credencialLocal.CredencialLocalRepository;
 import br.uece.alunos.sisreserva.v1.domain.usuario.Usuario;
 import br.uece.alunos.sisreserva.v1.domain.usuario.UsuarioRepository;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
@@ -20,6 +21,7 @@ public class AtualizarUsuarioLoginErrado {
     private static final int MAX_ATTEMPTS = 5;
 
     private final UsuarioRepository usuarioRepository;
+    private final CredencialLocalRepository credencialLocalRepository;
     private final TaskScheduler taskScheduler;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -30,25 +32,36 @@ public class AtualizarUsuarioLoginErrado {
             throw new ValidationException("Não foi encontrado usuário com o email informado: " + email);
         }
 
-        int failedAttempts = usuario.getAccessFailedCount() + 1;
+        var credencialOptional = credencialLocalRepository.findByUsuarioId(usuario.getId());
+
+        if (credencialOptional.isEmpty()) {
+            return;
+        }
+
+        var credencial = credencialOptional.get();
+        int failedAttempts = credencial.getAccessFailedCount() + 1;
 
         if (failedAttempts >= MAX_ATTEMPTS) {
             var lockoutEndTime = LocalDateTime.now().plusMinutes(15);
-            usuario.setLockoutEnabled(true);
-            usuario.setLockoutEnd(lockoutEndTime);
-            taskScheduler.schedule(() -> unlockUserAccount(usuario),
+            credencial.setLockoutEnabled(true);
+            credencial.setLockoutEnd(lockoutEndTime);
+            String credencialId = credencial.getId();
+            taskScheduler.schedule(() -> unlockUserAccount(credencialId),
                     lockoutEndTime.atZone(ZoneId.systemDefault()).toInstant());
         } else {
-            usuario.setAccessFailedCount(failedAttempts);
+            credencial.setAccessFailedCount(failedAttempts);
         }
 
-        usuarioRepository.save(usuario);
+        credencialLocalRepository.save(credencial);
     }
 
-    private void unlockUserAccount(Usuario usuario) {
-        usuario.setLockoutEnabled(false);
-        usuario.setAccessFailedCount(0);
-        usuario.setLockoutEnd(null);
-        usuarioRepository.save(usuario);
+    @Transactional
+    public void unlockUserAccount(String credencialId) {
+        credencialLocalRepository.findById(credencialId).ifPresent(credencial -> {
+            credencial.setLockoutEnabled(false);
+            credencial.setAccessFailedCount(0);
+            credencial.setLockoutEnd(null);
+            credencialLocalRepository.save(credencial);
+        });
     }
 }

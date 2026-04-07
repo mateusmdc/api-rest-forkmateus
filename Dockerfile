@@ -14,8 +14,8 @@ FROM eclipse-temurin:21-jre AS runner
 
 WORKDIR /app
 
-RUN addgroup --system --gid 1001 javauser
-RUN adduser --system --uid 1001 javauser
+RUN addgroup --system --gid 69 javauser
+RUN adduser --system --uid 69 javauser
 
 COPY --from=builder /app/target/sisreserva-0.0.1-SNAPSHOT.jar app.jar
 

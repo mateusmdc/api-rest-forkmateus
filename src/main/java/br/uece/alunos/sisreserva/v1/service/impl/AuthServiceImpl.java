@@ -30,6 +30,18 @@ public class AuthServiceImpl implements AuthService {
     private final RealizarLogin realizarLogin;
     private final RealizarLogout realizarLogout;
     private final TrocarSenha trocarSenha;
+    private final RealizarLoginLdap realizarLoginLdap;
+    private final OnboardingUsuarioInterno onboardingUsuarioInterno;
+
+    @Override
+    public LoginInternoResultDTO loginInterno(UsuarioLoginInternoDTO data, HttpServletRequest request) {
+        return realizarLoginLdap.login(data, request);
+    }
+
+    @Override
+    public AuthTokensDTO completarOnboardingInterno(OnboardingUsuarioInternoDTO data, HttpServletRequest request) {
+        return onboardingUsuarioInterno.completarOnboarding(data, request);
+    }
 
     @Override
     public TokenDTO atualizarToken(String refreshToken) {

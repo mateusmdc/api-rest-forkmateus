@@ -1,5 +1,6 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario.useCase;
 
+import br.uece.alunos.sisreserva.v1.domain.credencialLocal.CredencialLocalRepository;
 import br.uece.alunos.sisreserva.v1.domain.usuario.validation.UsuarioValidator;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEmailDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioEsqueciSenhaDTO;
@@ -11,8 +12,8 @@ import br.uece.alunos.sisreserva.v1.infra.utils.mail.*;
 import br.uece.alunos.sisreserva.v1.infra.exceptions.ValidationException;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,21 +21,28 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class EsqueciSenha {
     private final UsuarioRepository repository;
+    private final CredencialLocalRepository credencialLocalRepository;
     private final GerarTokenEsqueciMinhaSenha mailToken;
     private final MailSenderMime mailSender;
     private final UsuarioValidator validator;
 
+    @Transactional
     public MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data) {
         var email = data.email();
 
         validator.validarEmailExistenteParaRecuperacao(email);
+        var usuario = repository.findByEmailToHandle(email);
+        var credencialOptional = credencialLocalRepository.findByUsuarioId(usuario.getId());
+        if (credencialOptional.isEmpty()) {
+            throw new ValidationException("Usuários institucionais não podem redefinir a senha por aqui. A senha é gerenciada pelo diretório institucional da UECE.");
+        }
+        var credencial = credencialOptional.get();
 
         var token = mailToken.gerarTokenEmail();
         var emUmaHora = LocalDateTime.now().plusHours(1);
         var esqueciSenhaDTO = new UsuarioEsqueciSenhaDTO(token, emUmaHora);
 
-        var usuario = repository.findByEmailToHandle(email);
-        usuario.esqueciSenha(esqueciSenhaDTO);
+        credencial.esqueciSenha(esqueciSenhaDTO);
 
         var subject = "Esqueci Minha Senha - Sis Reserva";
 

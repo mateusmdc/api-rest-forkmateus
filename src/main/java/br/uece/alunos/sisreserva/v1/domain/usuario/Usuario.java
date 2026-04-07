@@ -1,6 +1,7 @@
 package br.uece.alunos.sisreserva.v1.domain.usuario;
 
 import br.uece.alunos.sisreserva.v1.domain.cargo.Cargo;
+import br.uece.alunos.sisreserva.v1.domain.credencialLocal.CredencialLocal;
 import br.uece.alunos.sisreserva.v1.domain.instituicao.Instituicao;
 import br.uece.alunos.sisreserva.v1.dto.usuario.AtualizarUsuarioDTO;
 import br.uece.alunos.sisreserva.v1.dto.usuario.UsuarioDTO;
@@ -35,9 +36,6 @@ public class Usuario implements UserDetails {
     @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "senha", nullable = false, length = 100)
-    private String senha;
-
     @Column(name = "matricula", length = 20)
     private String matricula;
 
@@ -59,21 +57,6 @@ public class Usuario implements UserDetails {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Instituicao instituicao;
 
-    @Column(name = "access_failed_count")
-    private int accessFailedCount = 0;
-
-    @Column(name = "lockout_enabled")
-    private boolean lockoutEnabled = false;
-
-    @Column(name = "lockout_end")
-    private LocalDateTime lockoutEnd;
-
-    @Column(name = "token_expiration")
-    private LocalDateTime tokenExpiration;
-
-    @Column(name = "token_mail")
-    private String tokenMail;
-
     @Column(name = "refresh_token_enabled")
     private boolean refreshTokenEnabled = false;
 
@@ -86,9 +69,11 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<UsuarioCargo> usuarioCargos = new ArrayList<>();
 
+    @OneToOne(mappedBy = "usuario", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private CredencialLocal credencialLocal;
+
     public Usuario(UsuarioDTO data, Instituicao instituicao) {
         this.nome = data.nome();
-        this.senha = data.senha();
         this.email = data.email();
         this.documentoFiscal = data.documentoFiscal();
         this.fotoPerfil = data.fotoPerfil();
@@ -120,21 +105,9 @@ public class Usuario implements UserDetails {
         return authorities;
     }
 
-    /**
-     * Atualiza os dados do usuário com base no DTO fornecido.
-     * Todos os campos são opcionais - apenas campos não nulos e não vazios serão atualizados.
-     *
-     * @param data DTO contendo os dados a serem atualizados
-     * @param instituicao Nova instituição do usuário (se fornecida)
-     * @param senhaEncriptada Senha já criptografada (se fornecida)
-     */
-    public void atualizarUsuario(AtualizarUsuarioDTO data, Instituicao instituicao, String senhaEncriptada) {
+    public void atualizarUsuario(AtualizarUsuarioDTO data, Instituicao instituicao) {
         if (data.nome() != null && !data.nome().isBlank()) {
             this.nome = data.nome();
-        }
-
-        if (senhaEncriptada != null && !senhaEncriptada.isBlank()) {
-            this.senha = senhaEncriptada;
         }
 
         if (data.fotoPerfil() != null && !data.fotoPerfil().isBlank()) {
@@ -158,45 +131,14 @@ public class Usuario implements UserDetails {
         }
     }
 
-    public void resetAccessCount() {
-        this.accessFailedCount = 0;
-        this.setLockoutEnabled(false);
-        this.setLockoutEnd(null);
-    }
-
-    public void esqueciSenha(UsuarioEsqueciSenhaDTO data) {
-        this.tokenMail = data.tokenMail();
-        this.tokenExpiration = data.tokenExpiration();
-    }
-
     @Override
     public String getPassword() {
-        return senha;
+        return credencialLocal != null ? credencialLocal.getSenha() : null;
     }
 
     @Override
     public String getUsername() {
         return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !lockoutEnabled;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return !lockoutEnabled;
     }
 
     @PrePersist
