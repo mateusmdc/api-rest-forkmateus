@@ -5,6 +5,8 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +43,11 @@ public class SolicitacaoReservaSpecification {
      * @param equipamentosDoespacoIds    IDs dos equipamentos ativos do espaço informado em
      *                                   {@code espacoDoEquipamentoId} (filtro de dados); lista
      *                                   vazia significa que o filtro não deve ser aplicado
+     * @param mes                        mês para filtro de período (1-12); quando informado, inclui
+     *                                   registros simples com dataInicio no mês e séries que se
+     *                                   sobrepõem ao mês
+     * @param ano                        ano para filtro de período; usa o ano atual quando nulo e
+     *                                   {@code mes} está presente
      * @return Specification com os filtros aplicados
      */
     public static Specification<SolicitacaoReserva> byFilter(
@@ -56,7 +63,9 @@ public class SolicitacaoReservaSpecification {
             String usuarioAutenticadoId,
             List<String> espacosGerenciadosIds,
             List<String> equipamentosPermitidosIds,
-            List<String> equipamentosDoespacoIds
+            List<String> equipamentosDoespacoIds,
+            Integer mes,
+            Integer ano
     ) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -79,8 +88,39 @@ public class SolicitacaoReservaSpecification {
             if (usuarioSolicitanteId != null && !usuarioSolicitanteId.isBlank()) {
                 predicates.add(cb.equal(root.get("usuarioSolicitante").get("id"), usuarioSolicitanteId));
             }
+            if (mes != null) {
+                YearMonth yearMonth = (ano != null)
+                        ? YearMonth.of(ano, mes)
+                        : YearMonth.of(java.time.LocalDate.now().getYear(), mes);
+                LocalDateTime inicioMes = yearMonth.atDay(1).atStartOfDay();
+                LocalDateTime fimMes = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+
+                // Registros simples: dataInicio cai dentro do mês
+                Predicate simplePredicate = cb.and(
+                        cb.equal(root.get("isSerie"), false),
+                        cb.greaterThanOrEqualTo(root.get("dataInicio"), inicioMes),
+                        cb.lessThanOrEqualTo(root.get("dataInicio"), fimMes)
+                );
+                // Séries: a série se sobrepõe ao mês (pode ter ocorrências nele)
+                Predicate seriePredicate = cb.and(
+                        cb.equal(root.get("isSerie"), true),
+                        cb.lessThanOrEqualTo(root.get("dataInicio"), fimMes),
+                        cb.greaterThanOrEqualTo(root.get("dataFimRecorrencia"), inicioMes)
+                );
+                predicates.add(cb.or(simplePredicate, seriePredicate));
+            }
+
             if (statusCodigo != null) {
-                predicates.add(cb.equal(root.get("status"), statusCodigo));
+                if (mes != null) {
+                    // Para séries com filtro de mês ativo, o filtro de status é aplicado
+                    // em memória sobre as ocorrências; incluir todas as séries na query.
+                    predicates.add(cb.or(
+                            cb.equal(root.get("isSerie"), true),
+                            cb.equal(root.get("status"), statusCodigo)
+                    ));
+                } else {
+                    predicates.add(cb.equal(root.get("status"), statusCodigo));
+                }
             }
             if (projetoId != null && !projetoId.isBlank()) {
                 predicates.add(cb.equal(root.get("projeto").get("id"), projetoId));

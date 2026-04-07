@@ -142,7 +142,8 @@ public class ObterHorariosOcupados {
         return new HorariosOcupadosPorMesDTO(
                 yearMonth.getMonthValue(),
                 yearMonth.getYear(),
-                diasComHorarios
+                diasComHorarios,
+                List.of()
         );
     }
 

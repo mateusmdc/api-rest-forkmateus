@@ -5,5 +5,6 @@ import java.util.List;
 public record HorariosOcupadosPorMesDTO(
     int mes,
     int ano,
-    List<HorariosOcupadosPorDiaDTO> diasComHorariosOcupados
+    List<HorariosOcupadosPorDiaDTO> diasComHorariosOcupados,
+    List<SerieHorariosOcupadosDTO> seriesRecorrentes
 ) {}
