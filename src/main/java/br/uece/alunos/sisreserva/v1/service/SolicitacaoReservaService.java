@@ -74,14 +74,20 @@ public interface SolicitacaoReservaService {
     SolicitacaoReservaRetornoDTO atualizarStatus(String id, AtualizarStatusSolicitacaoDTO data);
 
     /**
-     * Obtém os horários ocupados em um mês específico para um espaço.
+     * Obtém os horários ocupados em um mês específico, com filtro opcional por espaço
+     * ou equipamento.
      *
-     * @param mes      mês (1-12)
-     * @param ano      ano
-     * @param espacoId identificador do espaço
-     * @return horários ocupados agrupados por dia
+     * Apenas um filtro deve ser informado por chamada. Se ambos forem nulos, todas as
+     * reservas aprovadas do mês são retornadas.
+     *
+     * @param mes           mês (1-12)
+     * @param ano           ano
+     * @param espacoId      identificador do espaço (opcional)
+     * @param equipamentoId identificador do equipamento (opcional); tem precedência sobre {@code espacoId}
+     * @return horários ocupados agrupados por dia e séries recorrentes
      */
-    HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano, String espacoId);
+    HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(
+            Integer mes, Integer ano, String espacoId, String equipamentoId);
 
     /**
      * Obtém informações completas sobre uma reserva recorrente.
