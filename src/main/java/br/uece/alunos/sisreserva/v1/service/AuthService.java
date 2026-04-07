@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface AuthService {
     TokenDTO atualizarToken(String refreshToken);
+    LoginInternoResultDTO loginInterno(UsuarioLoginInternoDTO data, HttpServletRequest request);
+    AuthTokensDTO completarOnboardingInterno(OnboardingUsuarioInternoDTO data, HttpServletRequest request);
     UsuarioRetornoDTO atualizarUsuario(AtualizarUsuarioDTO data, String idUsuario);
     UsuarioRetornoDTO criarUsuario(UsuarioDTO data);
     MessageResponseDTO esqueciMinhaSenha(UsuarioEmailDTO data);

@@ -1,0 +1,3 @@
+ALTER TABLE usuario
+    ALTER COLUMN senha DROP NOT NULL,
+ALTER COLUMN documento_fiscal DROP NOT NULL;

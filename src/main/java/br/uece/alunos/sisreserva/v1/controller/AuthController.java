@@ -140,4 +140,43 @@ public class AuthController {
         authService.logout(request, response);
         return ResponseEntity.ok(ApiResponseDTO.success("Logout realizado com sucesso."));
     }
+
+    @PostMapping("/login/interno")
+    public ResponseEntity<?> realizarLoginInterno(
+            @RequestBody @Valid UsuarioLoginInternoDTO data,
+            HttpServletResponse response,
+            HttpServletRequest request) {
+
+        LoginInternoResultDTO result = authService.loginInterno(data, request);
+
+        if (result instanceof LoginInternoResultDTO.Autenticado(
+                br.uece.alunos.sisreserva.v1.dto.utils.AuthTokensDTO tokens
+        )) {
+            cookieManager.addAccessTokenCookie(response, tokens.accessToken());
+            cookieManager.addRefreshTokenCookie(response, tokens.refreshToken());
+            return ResponseEntity.ok(
+                    ApiResponseDTO.success(new TokenDTO(tokens.accessToken()))
+            );
+        }
+
+        var onboarding = (LoginInternoResultDTO.OnboardingRequerido) result;
+        return ResponseEntity.accepted()
+                .body(ApiResponseDTO.success(new OnboardingRequeridoResponseDTO(onboarding.onboardingToken())));
+    }
+
+    @PostMapping("/onboarding/interno")
+    @Transactional
+    public ResponseEntity<ApiResponseDTO<TokenDTO>> completarOnboardingInterno(
+            @RequestBody @Valid OnboardingUsuarioInternoDTO data,
+            HttpServletResponse response,
+            HttpServletRequest request) {
+
+        var tokens = authService.completarOnboardingInterno(data, request);
+
+        cookieManager.addAccessTokenCookie(response, tokens.accessToken());
+        cookieManager.addRefreshTokenCookie(response, tokens.refreshToken());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.success(new TokenDTO(tokens.accessToken())));
+    }
 }
