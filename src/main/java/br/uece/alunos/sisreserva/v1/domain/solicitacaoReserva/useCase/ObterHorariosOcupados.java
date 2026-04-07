@@ -20,16 +20,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Caso de uso para obter horários ocupados em um mês para um espaço.
+ * Caso de uso para obter horários ocupados em um mês, com suporte a filtro por espaço
+ * ou equipamento.
  *
  * Combina dois tipos de fontes:
  * 
- *   - Reservas simples e legadas (registros com {@code isSerie = false}) aprovadas no mês.
+ *   - Reservas simples (registros com {@code isSerie = false}) aprovadas no mês.
  *   - Séries recorrentes aprovadas (registros com {@code isSerie = true}) cujas ocorrências
  *       calculadas caem no mês – aplicando exceções quando existirem.
+ * 
+ *
+ * Apenas um dos filtros {@code espacoId} ou {@code equipamentoId} deve ser informado
+ * por chamada. Se ambos forem nulos, o resultado abrange todos os recursos.
  *
  * @author Sistema de Reservas UECE
- * @version 2.0
+ * @version 3.0
  */
 @Component
 public class ObterHorariosOcupados {
@@ -41,14 +46,22 @@ public class ObterHorariosOcupados {
     private ExcecaoRecorrenciaRepository excecaoRepository;
 
     /**
-     * Obtém os horários ocupados de um mês específico, opcionalmente filtrados por espaço.
+     * Obtém os horários ocupados de um mês específico, com filtro opcional por espaço
+     * ou equipamento.
      *
-     * @param mes      mês (1-12); se {@code null}, usa o mês atual
-     * @param ano      ano; se {@code null}, usa o ano atual
-     * @param espacoId ID do espaço para filtrar; se {@code null}, retorna todos os espaços
-     * @return horários ocupados agrupados por dia
+     * Ao informar {@code equipamentoId}, apenas reservas desse equipamento são retornadas.
+     * Ao informar {@code espacoId}, apenas reservas desse espaço são retornadas.
+     * Se nenhum filtro for informado, todas as reservas aprovadas do mês são retornadas.
+     *
+     * @param mes           mês (1-12); se {@code null}, usa o mês atual
+     * @param ano           ano; se {@code null}, usa o ano atual
+     * @param espacoId      ID do espaço para filtrar; ignorado quando {@code equipamentoId} é informado
+     * @param equipamentoId ID do equipamento para filtrar; tem precedência sobre {@code espacoId}
+     * @return horários ocupados agrupados por dia e séries recorrentes
      */
-    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(Integer mes, Integer ano, String espacoId) {
+    public HorariosOcupadosPorMesDTO obterHorariosOcupadosPorMes(
+            Integer mes, Integer ano, String espacoId, String equipamentoId) {
+
         YearMonth yearMonth = (mes != null && ano != null)
                 ? YearMonth.of(ano, mes)
                 : YearMonth.now();
@@ -56,12 +69,19 @@ public class ObterHorariosOcupados {
         LocalDateTime inicioMes = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime fimMes    = yearMonth.atEndOfMonth().atTime(23, 59, 59);
 
+        boolean filtrarEquipamento = equipamentoId != null && !equipamentoId.isBlank();
+        boolean filtrarEspaco      = !filtrarEquipamento && espacoId != null && !espacoId.isBlank();
+
         List<HorarioOcupadoDTO> horariosOcupados = new ArrayList<>();
 
-        // 1) Reservas simples/legadas aprovadas no período (isSerie = false)
+        // ─── 1) Reservas simples aprovadas no período (isSerie = false) ───────────────
         List<SolicitacaoReserva> simples;
-        if (espacoId != null && !espacoId.isBlank()) {
-            simples = repository.findReservasAprovadasPorPeriodoEEspaco(inicioMes, fimMes, espacoId.trim());
+        if (filtrarEquipamento) {
+            simples = repository.findReservasAprovadasSimplesPorPeriodoEEquipamento(
+                    inicioMes, fimMes, equipamentoId.trim());
+        } else if (filtrarEspaco) {
+            simples = repository.findReservasAprovadasPorPeriodoEEspaco(
+                    inicioMes, fimMes, espacoId.trim());
         } else {
             simples = repository.findReservasAprovadasPorPeriodo(inicioMes, fimMes);
         }
@@ -69,17 +89,22 @@ public class ObterHorariosOcupados {
                 .map(this::converterParaHorarioOcupadoDTO)
                 .forEach(horariosOcupados::add);
 
-        // 2) Séries recorrentes aprovadas com ocorrências no mês (isSerie = true)
+        // ─── 2) Séries recorrentes aprovadas com ocorrências no mês (isSerie = true) ──
         List<SolicitacaoReserva> series;
-        if (espacoId != null && !espacoId.isBlank()) {
-            series = repository.findSeriesAprovadasDoEspacoNoPeriodo(espacoId.trim(), inicioMes, fimMes);
+        if (filtrarEquipamento) {
+            series = repository.findSeriesAprovadasDoEquipamentoNoPeriodo(
+                    equipamentoId.trim(), inicioMes, fimMes);
+        } else if (filtrarEspaco) {
+            series = repository.findSeriesAprovadasDoEspacoNoPeriodo(
+                    espacoId.trim(), inicioMes, fimMes);
         } else {
             series = repository.findSeriesAprovadasNoPeriodo(inicioMes, fimMes);
         }
 
         if (!series.isEmpty()) {
             // Carregar exceções de todas as séries em lote (evitar N+1)
-            List<String> serieIds = series.stream().map(SolicitacaoReserva::getId).collect(Collectors.toList());
+            List<String> serieIds = series.stream()
+                    .map(SolicitacaoReserva::getId).collect(Collectors.toList());
             List<ExcecaoRecorrencia> todasExcecoes = excecaoRepository.findBySerieIds(serieIds);
             Map<String, Map<LocalDate, ExcecaoRecorrencia>> excecoesPorSerie = todasExcecoes.stream()
                     .collect(Collectors.groupingBy(
@@ -93,7 +118,6 @@ public class ObterHorariosOcupados {
                 Map<LocalDate, ExcecaoRecorrencia> excecoesDaSerie =
                         excecoesPorSerie.getOrDefault(serie.getId(), Map.of());
 
-                // Calcular todas as ocorrências e filtrar as que caem no mês
                 List<LocalDateTime> ocorrencias = RecorrenciaProcessor.gerarDatasDasOcorrencias(
                         serie.getDataInicio(),
                         serie.getDataFimRecorrencia(),
@@ -101,7 +125,6 @@ public class ObterHorariosOcupados {
                 );
 
                 for (LocalDateTime dataOcorrencia : ocorrencias) {
-                    // Aplicar exceção (se existir) para obter status e horários efetivos
                     ExcecaoRecorrencia excecao = excecoesDaSerie.get(dataOcorrencia.toLocalDate());
 
                     // Ocorrências canceladas ou recusadas não ocupam horário
@@ -121,6 +144,8 @@ public class ObterHorariosOcupados {
                     horariosOcupados.add(new HorarioOcupadoDTO(
                             serie.getEspaco() != null ? serie.getEspaco().getId() : null,
                             serie.getEspaco() != null ? serie.getEspaco().getNome() : null,
+                            serie.getEquipamento() != null ? serie.getEquipamento().getId() : null,
+                            serie.getEquipamento() != null ? serie.getEquipamento().getTombamento() : null,
                             inicioEfetivo,
                             fimEfetivo,
                             serie.getUsuarioSolicitante().getNome(),
@@ -149,11 +174,14 @@ public class ObterHorariosOcupados {
 
     /**
      * Converte uma reserva simples/legada em DTO de horário ocupado.
+     * Popula os campos de espaço ou equipamento conforme o tipo da reserva.
      */
     private HorarioOcupadoDTO converterParaHorarioOcupadoDTO(SolicitacaoReserva reserva) {
         return new HorarioOcupadoDTO(
-                reserva.getEspaco().getId(),
-                reserva.getEspaco().getNome(),
+                reserva.getEspaco() != null ? reserva.getEspaco().getId() : null,
+                reserva.getEspaco() != null ? reserva.getEspaco().getNome() : null,
+                reserva.getEquipamento() != null ? reserva.getEquipamento().getId() : null,
+                reserva.getEquipamento() != null ? reserva.getEquipamento().getTombamento() : null,
                 reserva.getDataInicio(),
                 reserva.getDataFim(),
                 reserva.getUsuarioSolicitante().getNome(),

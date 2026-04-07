@@ -79,11 +79,18 @@ public class SolicitacaoReservaController {
     }
 
     @GetMapping("/horarios-ocupados")
+    @Operation(summary = "Obter horários ocupados por mês",
+               description = "Retorna reservas aprovadas do mês agrupadas por dia e séries recorrentes. " +
+                             "Filtrar por espaço via 'espacoId' ou por equipamento via 'equipamentoId'. " +
+                             "Apenas um filtro é considerado por chamada; 'equipamentoId' tem precedência.")
     public ResponseEntity<ApiResponseDTO<HorariosOcupadosPorMesDTO>> obterHorariosOcupados(
             @RequestParam(required = false) Integer mes,
             @RequestParam(required = false) Integer ano,
-            @RequestParam(required = false) String espacoId) {
-        var horariosOcupados = solicitacaoReservaService.obterHorariosOcupadosPorMes(mes, ano, espacoId);
+            @RequestParam(required = false) String espacoId,
+            @Parameter(description = "Filtra horários ocupados de um equipamento específico; tem precedência sobre espacoId")
+            @RequestParam(required = false) String equipamentoId) {
+        var horariosOcupados = solicitacaoReservaService.obterHorariosOcupadosPorMes(
+                mes, ano, espacoId, equipamentoId);
         return ResponseEntity.ok(ApiResponseDTO.success(horariosOcupados));
     }
 
