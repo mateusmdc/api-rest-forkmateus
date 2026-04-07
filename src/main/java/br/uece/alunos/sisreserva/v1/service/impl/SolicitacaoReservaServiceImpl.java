@@ -50,11 +50,13 @@ public class SolicitacaoReservaServiceImpl implements SolicitacaoReservaService 
             String usuarioSolicitanteId,
             Integer status,
             String projetoId,
-            String espacoDoEquipamentoId
+            String espacoDoEquipamentoId,
+            Integer mes,
+            Integer ano
     ) {
         return obterSolicitacaoReserva.obterSolicitacaoReserva(
                 pageable, id, dataInicio, dataFim, espacoId, equipamentoId,
-                usuarioSolicitanteId, status, projetoId, espacoDoEquipamentoId
+                usuarioSolicitanteId, status, projetoId, espacoDoEquipamentoId, mes, ano
         );
     }
 

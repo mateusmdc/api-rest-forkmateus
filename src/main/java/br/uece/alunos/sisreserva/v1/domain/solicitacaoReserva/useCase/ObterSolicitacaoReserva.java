@@ -3,9 +3,13 @@ package br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.useCase;
 import br.uece.alunos.sisreserva.v1.domain.equipamentoEspaco.EquipamentoEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.gestorEspaco.GestorEspacoRepository;
 import br.uece.alunos.sisreserva.v1.domain.secretariaEspaco.SecretariaEspacoRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrencia;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.ExcecaoRecorrenciaRepository;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReserva;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.SolicitacaoReservaRepository;
+import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.StatusSolicitacao;
 import br.uece.alunos.sisreserva.v1.domain.solicitacaoReserva.specification.SolicitacaoReservaSpecification;
+import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.OcorrenciaReservaDTO;
 import br.uece.alunos.sisreserva.v1.dto.solicitacaoReserva.SolicitacaoReservaRetornoDTO;
 import br.uece.alunos.sisreserva.v1.infra.security.UsuarioAutenticadoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -36,6 +43,9 @@ public class ObterSolicitacaoReserva {
 
     @Autowired
     private SolicitacaoReservaRepository solicitacaoReservaRepository;
+
+    @Autowired
+    private ExcecaoRecorrenciaRepository excecaoRepository;
 
     @Autowired
     private UsuarioAutenticadoService usuarioAutenticadoService;
@@ -63,6 +73,9 @@ public class ObterSolicitacaoReserva {
      * @param statusCodigo          filtro por status
      * @param projetoId             filtro por projeto
      * @param espacoDoEquipamentoId filtra reservas de equipamentos pertencentes ao espaço informado
+     * @param mes                   mês (1-12) para filtrar ocorrências; quando informado, séries
+     *                              recorrentes incluírem a lista de ocorrências calculadas no mês
+     * @param ano                   ano do filtro de mês; usa o ano atual quando nulo
      * @return página de solicitações de reserva
      */
     public Page<SolicitacaoReservaRetornoDTO> obterSolicitacaoReserva(
@@ -75,7 +88,9 @@ public class ObterSolicitacaoReserva {
             String usuarioSolicitanteId,
             Integer statusCodigo,
             String projetoId,
-            String espacoDoEquipamentoId
+            String espacoDoEquipamentoId,
+            Integer mes,
+            Integer ano
     ) {
         Map<String, Object> filtros = new HashMap<>();
         if (id != null)                     filtros.put("id", id);
@@ -87,8 +102,87 @@ public class ObterSolicitacaoReserva {
         if (statusCodigo != null)           filtros.put("statusCodigo", statusCodigo);
         if (projetoId != null)              filtros.put("projetoId", projetoId);
         if (espacoDoEquipamentoId != null)  filtros.put("espacoDoEquipamentoId", espacoDoEquipamentoId);
+        if (mes != null)                    filtros.put("mes", mes);
+        if (ano != null)                    filtros.put("ano", ano);
 
-        return execute(filtros, pageable).map(SolicitacaoReservaRetornoDTO::new);
+        Page<SolicitacaoReserva> page = execute(filtros, pageable);
+
+        if (mes == null) {
+            return page.map(SolicitacaoReservaRetornoDTO::new);
+        }
+
+        // Com filtro de mês ativo: enriquecer séries recorrentes com ocorrências do mês
+        YearMonth yearMonth = (ano != null)
+                ? YearMonth.of(ano, mes)
+                : YearMonth.of(LocalDate.now().getYear(), mes);
+        LocalDateTime inicioMes = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime fimMes = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        List<String> serieIds = page.getContent().stream()
+                .filter(r -> Boolean.TRUE.equals(r.getIsSerie()))
+                .map(SolicitacaoReserva::getId)
+                .collect(Collectors.toList());
+
+        final Map<String, Map<LocalDate, ExcecaoRecorrencia>> excecoesPorSerie;
+        if (!serieIds.isEmpty()) {
+            List<ExcecaoRecorrencia> todasExcecoes = excecaoRepository.findBySerieIds(serieIds);
+            excecoesPorSerie = todasExcecoes.stream()
+                    .collect(Collectors.groupingBy(
+                            ExcecaoRecorrencia::getSolicitacaoReservaId,
+                            Collectors.toMap(ExcecaoRecorrencia::getDataOcorrencia, e -> e)
+                    ));
+        } else {
+            excecoesPorSerie = Map.of();
+        }
+
+        return page.map(reserva -> {
+            if (!Boolean.TRUE.equals(reserva.getIsSerie())) {
+                return new SolicitacaoReservaRetornoDTO(reserva);
+            }
+
+            Map<LocalDate, ExcecaoRecorrencia> excecoesDaSerie =
+                    excecoesPorSerie.getOrDefault(reserva.getId(), Map.of());
+            long duracaoMinutos = RecorrenciaProcessor.calcularDuracaoEmMinutos(
+                    reserva.getDataInicio(), reserva.getDataFim());
+
+            List<OcorrenciaReservaDTO> ocorrenciasMes = RecorrenciaProcessor
+                    .gerarDatasDasOcorrencias(
+                            reserva.getDataInicio(),
+                            reserva.getDataFimRecorrencia(),
+                            reserva.getTipoRecorrencia())
+                    .stream()
+                    .map(dt -> {
+                        LocalDate dataOcc = dt.toLocalDate();
+                        ExcecaoRecorrencia excecao = excecoesDaSerie.get(dataOcc);
+                        StatusSolicitacao statusEfetivo = excecao != null
+                                ? excecao.getStatus() : reserva.getStatus();
+                        LocalDateTime inicioEfetivo = excecao != null && excecao.getDataInicioNova() != null
+                                ? excecao.getDataInicioNova() : dt;
+                        LocalDateTime fimEfetivo = excecao != null && excecao.getDataFimNova() != null
+                                ? excecao.getDataFimNova() : inicioEfetivo.plusMinutes(duracaoMinutos);
+
+                        // Verificar se a ocorrência cai dentro do mês
+                        boolean dentroDoMes = !inicioEfetivo.isAfter(fimMes)
+                                && !fimEfetivo.isBefore(inicioMes);
+                        if (!dentroDoMes) return null;
+
+                        return new OcorrenciaReservaDTO(
+                                reserva.getId(),
+                                dataOcc,
+                                inicioEfetivo,
+                                fimEfetivo,
+                                statusEfetivo.getCodigo(),
+                                excecao != null,
+                                excecao != null ? excecao.getId() : null,
+                                excecao != null ? excecao.getMotivo() : null
+                        );
+                    })
+                    .filter(oc -> oc != null
+                            && (statusCodigo == null || oc.status().equals(statusCodigo)))
+                    .collect(Collectors.toList());
+
+            return new SolicitacaoReservaRetornoDTO(reserva, ocorrenciasMes);
+        });
     }
 
     /**
@@ -118,7 +212,9 @@ public class ObterSolicitacaoReserva {
                         usuarioId,
                         espacosPermitidos,
                         equipamentosPermitidos,
-                        equipamentosDoespacoFiltro
+                        equipamentosDoespacoFiltro,
+                        (Integer) filtros.get("mes"),
+                        (Integer) filtros.get("ano")
                 ),
                 pageable
         );
